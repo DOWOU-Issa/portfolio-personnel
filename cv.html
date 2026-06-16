@@ -20,7 +20,6 @@
         <li><a href="github.html">GitHub</a></li>
         <li><a href="video.html">Vidéos</a></li>
         <li><a href="contact.html">Contact</a></li>
-
       </ul>
     </nav>
   </header>
@@ -28,7 +27,7 @@
   <!-- Section Profil -->
   <section class="cv-section">
     <h1>Profil</h1>
-    <p>Étudiant en informatique passionné par les systèmes intelligents, la cybersécurité et l’automatisation. Je conçois des solutions robustes et reproductibles adaptées à des environnements contraints.</p>
+    <p>Étudiant en IA & Big Data passionné par le Machine Learning, le NLP et la cybersécurité. Expérience pratique en classification de texte, prédiction du churn et analyse de sentiments. Capable de concevoir des solutions robustes et documentées, du prototype au déploiement.</p>
     <a href="assets/pdf/CV_DOWOU-Issa.pdf" class="btn" download>Télécharger mon CV en PDF</a>
   </section>
 
@@ -36,64 +35,91 @@
   <section class="cv-section">
     <h2>Expériences</h2>
     <ul>
-      <li><strong>CDP – BUREAU DES ÉTUDIANTS | RESPONSABLE D ’ INTEGRATION & LOGISTIQUE</strong><br>
-      </li>
-      <li>+ Organisation d’événements associatifs : planification, coordination logistique, gestion des
-        ressources</li>
+      <li><strong>CDP – Bureau des Étudiants | Responsable Intégration & Logistique</strong><br></li>
+      <li>+ Organisation d’événements associatifs : planification, coordination logistique, gestion des ressources</li>
       <li>+ Accueil et intégration des nouveaux arrivants</li>
-      <li>+ Communication interculturelle et gestion d’équipe au sein du BD</li>
+      <li>+ Communication interculturelle et gestion d’équipe</li>
     </ul>
   </section>
 
   <!-- Section Projets -->
-<section class="cv-section">
-  <h2>Projets</h2>
-  <ul>
-    <li>
-      <strong>Virtualisation de stockage avec Nextcloud & NFS</strong><br>
-      <ul>
-        <li>+ Déploiement d’un environnement virtualisé (Ubuntu Server + VirtualBox) avec Nextcloud et stockage partagé via NFS</li>
-        <li>+ Accès en ligne depuis n’importe quel poste via l’adresse IP correcte, garantissant disponibilité et mobilité</li>
-        <li>+ Documentation technique avec schémas d’architecture et mise en évidence que NFS ne se limite pas au format ext4</li>
-      </ul>
-    </li>
+  <section class="cv-section">
+    <h2>Projets</h2>
+    <ul>
+      <li>
+        <strong>Classification de texte NLP (AG News)</strong><br>
+        <ul>
+          <li>+ Prétraitement, vectorisation TF-IDF et fine-tuning de DistilBERT</li>
+          <li>+ Comparaison des approches sur accuracy et F1-score</li>
+          <li>+ Analyse des apports du Transformer</li>
+        </ul>
+      </li>
 
-    <li>
-      <strong>Bot social avec intégration Ollama (LLM local)</strong><br>
-      <ul>
-        <li>+ Développement d’un chatbot interactif avec gestion des sessions et personnalisation des réponses</li>
-        <li>+ Intégration locale de modèles Ollama pour garantir la confidentialité et la rapidité des échanges</li>
-        <li>+ Structuration du code pour une réutilisation modulaire, avec journalisation des interactions et adaptation aux besoins sociaux (accueil, orientation, FAQ)</li>
-      </ul>
-    </li>
+      <li>
+        <strong>Analyse de sentiments</strong><br>
+        <ul>
+          <li>+ Classification positive / négative / neutre sur corpus de commentaires</li>
+          <li>+ Feature engineering textuel et cross-validation</li>
+          <li>+ Visualisation des erreurs pour interprétabilité</li>
+        </ul>
+      </li>
 
-    <li>
-      <strong>Plateforme de chat et API REST</strong><br>
-      <ul>
-        <li>+ Développement d’un système de messagerie en temps réel avec WebSocket et gestion des sessions</li>
-        <li>+ Sécurisation des échanges via authentification JWT et chiffrement des données sensibles</li>
-        <li>+ Documentation complète de l’API avec Swagger pour faciliter l’intégration externe</li>
-      </ul>
-    </li>
+      <li>
+        <strong>Prédiction du churn client</strong><br>
+        <ul>
+          <li>+ Feature engineering sur données clients</li>
+          <li>+ Comparaison Random Forest / Gradient Boosting / Régression Logistique</li>
+          <li>+ Évaluation AUC-ROC et interprétabilité avec SHAP</li>
+        </ul>
+      </li>
 
-    <li>
-      <strong>Plateforme de paiement sécurisée (Node.js + Stripe)</strong><br>
-      <ul>
-        <li>+ Développement d’un backend en Node.js avec intégration complète de l’API Stripe</li>
-        <li>+ Mise en place de webhooks pour le suivi des paiements en temps réel (succès, échecs, remboursements)</li>
-        <li>+ Gestion des erreurs avec journalisation structurée et relance automatique</li>
-        <li>+ Anonymisation des logs pour garantir la confidentialité des données sensibles</li>
-      </ul>
-    </li>
+      <li>
+        <strong>Segmentation clients & Dashboard Power BI</strong><br>
+        <ul>
+          <li>+ ACP pour réduction de dimensionnalité</li>
+          <li>+ Clustering K-Means pour profils clients</li>
+          <li>+ Tableau de bord interactif Power BI pour suivi du churn</li>
+        </ul>
+      </li>
 
-  </ul>
-</section>
+      <li>
+        <strong>Bot social avec LLM local (Ollama)</strong><br>
+        <ul>
+          <li>+ Chatbot interactif avec gestion des sessions</li>
+          <li>+ Intégration locale de modèles LLM pour confidentialité</li>
+        </ul>
+      </li>
 
+      <li>
+        <strong>Plateforme de chat & API REST</strong><br>
+        <ul>
+          <li>+ Messagerie temps réel avec WebSocket</li>
+          <li>+ Authentification JWT et documentation Swagger</li>
+        </ul>
+      </li>
+
+      <li>
+        <strong>Plateforme de paiement sécurisée (Node.js + Stripe)</strong><br>
+        <ul>
+          <li>+ Intégration API Stripe et webhooks temps réel</li>
+          <li>+ Journalisation structurée et anonymisation des logs</li>
+        </ul>
+      </li>
+
+      <li>
+        <strong>Virtualisation de stockage (Nextcloud & NFS)</strong><br>
+        <ul>
+          <li>+ Déploiement d’un cloud privé avec Ubuntu Server</li>
+          <li>+ Stockage partagé NFS et accès distant via IP</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
 
   <!-- Section Formation -->
   <section class="cv-section">
     <h2>Formation</h2>
-    <p>Licence IT (2023-2026) – Collège de Paris Supérieur (CDP) </p>
+    <p>Licence IT – IA & Big Data (2023-2026) – Collège de Paris Supérieur (CDP)</p>
     <p>BAC Série C (Maths & Physique) – Collège Protestant Lomé, 2023</p>
   </section>
 
@@ -101,12 +127,9 @@
   <section class="cv-section">
     <h2>Compétences</h2>
     <div class="skills">
-      <span>💻 Développement : PHP, API REST, HTML/CSS/JS, Java, React</span>
-      <span>☁️ Virtualisation & Cloud : VirtualBox, Nextcloud, NFS</span>
-      <span>🔒 Cybersécurité & OSINT : audit Wi-Fi, anonymisation</span>
-      <span>⚙️ DevOps & Scripting : Bash, PowerShell, Python</span>
-      <span>🗄️ Bases de données : SQL, NoSQL</span>
-      <span>🤝 Communication : gestion de projet agile, documentation technique</span>
+      <span>💻 Langages : Python, React, Java</span>
+      <span>🗄️ Bases de données : MySQL, MongoDB</span>
+      <span>🔒 Cybersécurité & OSINT : audit réseau, anonymisation, monitoring et bonnes pratiques</span
     </div>
   </section>
 
@@ -114,7 +137,7 @@
   <section class="cv-section">
     <h2>Certificats</h2>
     <ul>
- 
+      <li>Certification interne – Projet Power BI (Segmentation & Churn)</li>
     </ul>
   </section>
 
