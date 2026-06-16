@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DNS/DHCP & NFS — Documentation Technique</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #d2a679;
+    --warn: #e3b341;
+    --danger: #f85149;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --text-dim: #484f58;
+    --code-bg: #161b22;
+    --radius: 8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%; z-index: 1000;
+    transition: width 0.1s linear;
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed; top: 20px; left: 20px; z-index: 999;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    padding: 8px 16px; border-radius: 40px;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
+  }
+  .back-btn:hover {
+    background: var(--surface2); border-color: var(--accent);
+    color: var(--accent); transform: translateX(-3px);
+  }
+  .back-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 100px 24px 60px;
+    max-width: 900px; margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent2); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-tag::before {
+    content: ''; display: block; width: 24px; height: 1px;
+    background: var(--accent2);
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700; line-height: 1.15;
+    color: var(--text); margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-items: center; margin-top: 24px;
+  }
+  .hero-author {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 40px; padding: 6px 14px 6px 6px;
+  }
+  .hero-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    font-weight: 600; color: var(--bg);
+  }
+  .hero-name { font-size: 13px; font-weight: 500; }
+  .hero-role { font-size: 11px; color: var(--text-muted); }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.3);
+    color: var(--accent); font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; padding: 4px 10px; border-radius: 4px;
+  }
+  .badge.green {
+    background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.3);
+    color: var(--accent2);
+  }
+
+  /* ── TOC ── */
+  .toc-container {
+    max-width: 900px; margin: 0 auto;
+    padding: 40px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .toc-title {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 16px;
+  }
+  .toc-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .toc-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 16px;
+    text-decoration: none; color: var(--text-muted);
+    transition: all 0.2s ease;
+  }
+  .toc-item:hover {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(88,166,255,0.05); transform: translateY(-2px);
+  }
+  .toc-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--text-dim); min-width: 20px;
+  }
+  .toc-label { font-size: 13px; font-weight: 500; }
+
+  /* ── MAIN CONTENT ── */
+  .content {
+    max-width: 900px; margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 60px 0 0;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .section.visible { opacity: 1; transform: translateY(0); }
+
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--accent); background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25); border-radius: 4px;
+    padding: 2px 8px; flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif; font-size: 22px;
+    font-weight: 700; color: var(--text);
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection { margin-top: 36px; }
+  .subsection-title {
+    font-family: 'Fraunces', serif; font-size: 17px;
+    font-weight: 700; color: var(--text);
+    margin-bottom: 14px; padding-left: 14px;
+    border-left: 3px solid var(--accent);
+  }
+  .subsection-title.green { border-left-color: var(--accent2); }
+  .subsection-title.amber { border-left-color: var(--warn); }
+
+  /* ── PARAGRAPHS ── */
+  p { color: var(--text-muted); margin-bottom: 14px; line-height: 1.8; }
+  p:last-child { margin-bottom: 0; }
+  strong, b { color: var(--text); font-weight: 600; }
+  em { color: var(--accent3); font-style: italic; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin: 20px 0; overflow: hidden;
+    position: relative;
+  }
+  .code-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px; background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--text-muted); display: flex; align-items: center; gap: 8px;
+  }
+  .code-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-red { background: #f85149; }
+  .dot-yellow { background: #e3b341; }
+  .dot-green { background: #3fb950; }
+  .copy-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--text-muted); font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; padding: 4px 10px; border-radius: 4px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  pre {
+    padding: 20px; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    line-height: 1.6; color: #e6edf3;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .kw { color: #ff7b72; }
+  .cm { color: #8b949e; font-style: italic; }
+  .val { color: #79c0ff; }
+  .path { color: #d2a679; }
+  .flag { color: #3fb950; }
+
+  /* ── INLINE CODE ── */
+  code {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;
+    background: rgba(88,166,255,0.1); color: var(--accent);
+    padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(88,166,255,0.2);
+  }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: var(--radius); padding: 16px 20px;
+    margin: 20px 0; border-left: 3px solid;
+    display: flex; gap: 12px;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; line-height: 1.5; }
+  .callout-body { flex: 1; }
+  .callout-title {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .callout-body p { margin: 0; font-size: 14px; }
+  .callout.info {
+    background: rgba(88,166,255,0.07); border-color: var(--accent);
+  }
+  .callout.info .callout-title { color: var(--accent); }
+  .callout.success {
+    background: rgba(63,185,80,0.07); border-color: var(--accent2);
+  }
+  .callout.success .callout-title { color: var(--accent2); }
+  .callout.warn {
+    background: rgba(227,179,65,0.07); border-color: var(--warn);
+  }
+  .callout.warn .callout-title { color: var(--warn); }
+  .callout.danger {
+    background: rgba(248,81,73,0.07); border-color: var(--danger);
+  }
+  .callout.danger .callout-title { color: var(--danger); }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex; gap: 20px; margin-bottom: 32px;
+    counter-increment: step;
+  }
+  .step-num {
+    flex-shrink: 0; width: 36px; height: 36px;
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    color: var(--accent); font-weight: 600;
+    position: relative; top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-title {
+    font-family: 'Fraunces', serif; font-size: 16px;
+    font-weight: 700; color: var(--text); margin-bottom: 10px;
+  }
+
+  /* ── IMAGES ── */
+  .img-frame {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin: 16px 0;
+  }
+  .img-frame img {
+    display: block; width: 100%; height: auto;
+    opacity: 0.95;
+  }
+
+  /* ── OPTION TABLE ── */
+  .opt-table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13.5px;
+  }
+  .opt-table th {
+    text-align: left; padding: 10px 16px;
+    background: var(--surface2); color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    border-bottom: 2px solid var(--border);
+  }
+  .opt-table td {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .opt-table td:first-child {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--accent2);
+  }
+  .opt-table tr:last-child td { border-bottom: none; }
+  .opt-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px; background: var(--border);
+    margin: 50px 0; position: relative;
+  }
+  .divider::after {
+    content: '◆'; position: absolute; top: -9px;
+    left: 50%; transform: translateX(-50%);
+    background: var(--bg); padding: 0 12px;
+    color: var(--text-dim); font-size: 10px;
+  }
+
+  /* ── LINKS SECTION ── */
+  .links-grid {
+    display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    margin-top: 16px;
+  }
+  .link-card {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    text-decoration: none; color: var(--text-muted);
+    transition: all 0.2s ease;
+  }
+  .link-card:hover {
+    border-color: var(--accent); color: var(--text);
+    transform: translateX(4px);
+  }
+  .link-icon {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .link-text { font-size: 13px; }
+  .link-text span { display: block; font-size: 11px; color: var(--text-dim); margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    max-width: 900px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer-brand {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--text-dim);
+  }
+  .footer-brand strong { color: var(--accent); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 80px 16px 40px; }
+    .content { padding: 0 16px 60px; }
+    .toc-container { padding: 30px 16px; }
+    .section-title { font-size: 18px; }
+    .back-btn span { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="hero-tag">Documentation Technique — Réseaux Linux</div>
+  <h1>Configuration <span>DNS/DHCP</span> &amp; Partage<br/>de fichiers NFS</h1>
+  <div class="hero-meta">
+    <div class="hero-author">
+      <div class="hero-avatar">DI</div>
+      <div>
+        <div class="hero-name">DOWOU Issa</div>
+        <div class="hero-role">Auteur</div>
+      </div>
+    </div>
+    <span class="badge">🌐 Dnsmasq</span>
+    <span class="badge green">📂 NFS</span>
+    <span class="badge">🐧 Ubuntu</span>
+  </div>
+</header>
+
+<!-- ══════════ TOC ══════════ -->
+<nav class="toc-container">
+  <div class="toc-title">// Table des matières</div>
+  <div class="toc-grid">
+    <a href="#dnsmasq-intro" class="toc-item">
+      <span class="toc-num">01</span>
+      <span class="toc-label">Introduction à Dnsmasq</span>
+    </a>
+    <a href="#dnsmasq-install" class="toc-item">
+      <span class="toc-num">02</span>
+      <span class="toc-label">Installation</span>
+    </a>
+    <a href="#dnsmasq-config" class="toc-item">
+      <span class="toc-num">03</span>
+      <span class="toc-label">Configuration Dnsmasq</span>
+    </a>
+    <a href="#dnsmasq-conflict" class="toc-item">
+      <span class="toc-num">04</span>
+      <span class="toc-label">Résolution de conflits</span>
+    </a>
+    <a href="#static-ip" class="toc-item">
+      <span class="toc-num">05</span>
+      <span class="toc-label">IP statique & Cache DNS</span>
+    </a>
+    <a href="#block-domain" class="toc-item">
+      <span class="toc-num">06</span>
+      <span class="toc-label">Bloquer un domaine</span>
+    </a>
+    <a href="#client-tests" class="toc-item">
+      <span class="toc-num">07</span>
+      <span class="toc-label">Tests côté client</span>
+    </a>
+    <a href="#nfs-server" class="toc-item">
+      <span class="toc-num">08</span>
+      <span class="toc-label">Serveur NFS</span>
+    </a>
+    <a href="#nfs-client" class="toc-item">
+      <span class="toc-num">09</span>
+      <span class="toc-label">Client NFS</span>
+    </a>
+    <a href="#ressources" class="toc-item">
+      <span class="toc-num">10</span>
+      <span class="toc-label">Liens & ressources</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ══════════ CONTENT ══════════ -->
+<main class="content">
+
+  <!-- Section 1 — Intro Dnsmasq -->
+  <section class="section" id="dnsmasq-intro">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Introduction à Dnsmasq</h2>
+    </div>
+
+    <p>Comment configurer un serveur léger DNS et DHCP alias <strong>Dnsmasq</strong> ?</p>
+
+    <div class="callout info">
+      <span class="callout-icon">🔵</span>
+      <div class="callout-body">
+        <div class="callout-title">Qu'est-ce que Dnsmasq ?</div>
+        <p>DnsMasq est un petit serveur DNS (cache DNS) qui intègre un serveur DHCP. Peu gourmand en ressources et très simple à configurer, il est bien adapté à une installation sur une solution embarquée telle qu'un routeur ou point d'accès wifi (sous OpenWRT par exemple).</p>
+      </div>
+    </div>
+
+    <p>Pour la résolution des noms, il se base sur les DNS déclarés dans la configuration réseau (<code>/etc/resolv.conf</code>) ou sur le fichier <code>/etc/hosts</code>. Ce qui est bien pratique pour configurer une petite zone LAN : il suffit d'éditer le fichier <code>/etc/hosts</code> comme nous le ferions pour une seule machine.</p>
+
+    <p>Côté serveur DHCP, la configuration minimale se passe dans le fichier <code>/etc/dnsmasq.conf</code> où l'on devra configurer la plage DHCP, l'adresse d'un serveur DNS et une route par défaut (gateway).</p>
+  </section>
+
+  <!-- Section 2 — Installation -->
+  <section class="section" id="dnsmasq-install">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Installation</h2>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Désactiver systemd-resolved</h3>
+      <p>On désactive la résolution DNS de <em>systemd-resolved</em>. Pour cela on édite avec les droits d'administrateur le fichier <code>/etc/systemd/resolved.conf</code> :</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label">
+            <div class="code-dot dot-red"></div>
+            <div class="code-dot dot-yellow"></div>
+            <div class="code-dot dot-green"></div>
+            /etc/systemd/resolved.conf
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="cm">[Resolve]</span>
+<span class="kw">DNSStubListener</span>=<span class="val">no</span></pre>
+      </div>
+
+      <div class="img-frame">
+        <img src="../assets/images/media/image1.jpg" alt="Configuration resolved.conf" onerror="this.parentElement.style.display='none'"/>
+      </div>
+
+      <p>Puis on relance le service :</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> Terminal</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="kw">sudo</span> systemctl restart systemd-resolved</pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Installer Dnsmasq</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> Terminal</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="kw">sudo</span> apt-get install dnsmasq</pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image2.jpg" alt="Installation dnsmasq" onerror="this.parentElement.style.display='none'"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3 — Configuration -->
+  <section class="section" id="dnsmasq-config">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Configuration</h2>
+    </div>
+
+    <p>Pour configurer Dnsmasq, on édite le fichier <code>/etc/dnsmasq.conf</code>. Voici un exemple complet pour un réseau simple :</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/dnsmasq.conf</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+      </div>
+      <pre><span class="kw">domain-needed</span>
+<span class="kw">bogus-priv</span>
+<span class="kw">filterwin2k</span>
+<span class="kw">localise-queries</span>
+<span class="kw">local</span>=<span class="val">/lan/</span>
+<span class="kw">domain</span>=<span class="val">local.lan</span>
+<span class="kw">expand-hosts</span>
+<span class="kw">no-negcache</span>
+<span class="kw">resolv-file</span>=<span class="path">/tmp/resolv.conf.auto</span>
+<span class="kw">dhcp-authoritative</span>
+<span class="kw">dhcp-leasefile</span>=<span class="path">/tmp/dhcp.leases</span>
+<span class="cm"># use /etc/ethers for static hosts; same format as --dhcp-host</span>
+<span class="kw">read-ethers</span>
+
+<span class="cm"># Plage DHCP</span>
+<span class="kw">dhcp-range</span>=<span class="val">192.168.1.100,192.168.1.150,12h</span>
+<span class="cm"># Netmask</span>
+<span class="kw">dhcp-option</span>=<span class="val">1,255.255.255.0</span>
+<span class="cm"># Route par défaut (gateway)</span>
+<span class="kw">dhcp-option</span>=<span class="val">3,192.168.1.1</span></pre>
+    </div>
+
+    <div class="img-frame">
+      <img src="../assets/images/media/image3.jpg" alt="Config dnsmasq.conf" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Fichier /etc/resolv.conf</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/resolv.conf</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="cm"># Le nom de domaine local (n'existe pas sur internet)</span>
+<span class="kw">domain</span> <span class="val">local.lan</span>
+<span class="cm"># Où les clients doivent chercher les pc sur le réseau local</span>
+<span class="kw">search</span> <span class="val">local.lan</span>
+<span class="cm"># Serveur dns primaire</span>
+<span class="kw">nameserver</span> <span class="val">10.0.2.3</span></pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image4.jpg" alt="resolv.conf" onerror="this.parentElement.style.display='none'"/>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Fichier /etc/hosts</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/hosts</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="val">127.0.0.1</span>    localhost
+<span class="val">127.0.1.1</span>    client-desktop
+<span class="val">192.168.1.1</span>  mail
+<span class="val">192.168.1.1</span>  mail.local.lan</pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image5.jpg" alt="hosts" onerror="this.parentElement.style.display='none'"/>
+      </div>
+      <div class="callout success">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <div class="callout-title">Astuce</div>
+          <p>Dans l'exemple ci-dessus, l'ordinateur <strong>192.168.1.1</strong> aura comme nom DNS <code>mail</code> et <code>mail.local.lan</code>. Pas besoin d'ajouter tous les ordinateurs — ceux ayant fait une demande DHCP auront leur nom DNS directement configuré.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title amber">Appliquer la nouvelle configuration</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> Terminal</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="kw">sudo</span> /etc/init.d/dnsmasq restart</pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image6.jpg" alt="restart dnsmasq" onerror="this.parentElement.style.display='none'"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4 — Conflits -->
+  <section class="section" id="dnsmasq-conflict">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Résolution de conflits (Port 53)</h2>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">En cas de conflit</div>
+        <p>Si dnsmasq ne démarre pas, un autre service occupe peut-être le port 53. Suivez les étapes ci-dessous pour le résoudre.</p>
+      </div>
+    </div>
+
+    <div class="img-frame">
+      <img src="../assets/images/media/image7.jpg" alt="conflit port 53" onerror="this.parentElement.style.display='none'"/>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Identifier quel service utilise le port 53</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> lsof -i :53</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Arrêter le service en conflit</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> systemctl stop systemd-resolved</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Désactiver systemd-resolved si inutile</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> systemctl disable systemd-resolved</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Redémarrer dnsmasq</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> systemctl restart dnsmasq</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5 — IP statique & cache DNS -->
+  <section class="section" id="static-ip">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">IP statique & Cache DNS</h2>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Fixer une adresse IP à un client</h3>
+      <p>On ajoute dans <code>/etc/dnsmasq.conf</code> la ligne suivante (MAC adresse → IP fixe) :</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/dnsmasq.conf</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="kw">dhcp-host</span>=<span class="val">00:08:27:15:e4:fe,192.168.1.2</span></pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image8.jpg" alt="dhcp-host static IP" onerror="this.parentElement.style.display='none'"/>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title green">Configurer le cache DNS</h3>
+      <p>Éditer <code>/etc/dnsmasq.conf</code> et décommenter la directive <code>listen-address</code> :</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/dnsmasq.conf</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="cm"># Cache DNS pour localhost uniquement :</span>
+<span class="kw">listen-address</span>=<span class="val">127.0.0.1</span>
+
+<span class="cm"># Pour écouter aussi sur l'IP LAN :</span>
+<span class="kw">listen-address</span>=<span class="val">192.168.1.1</span>
+
+<span class="cm"># Plusieurs adresses (séparées par virgule) :</span>
+<span class="kw">listen-address</span>=<span class="val">127.0.0.1,192.168.1.1</span></pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image9.jpg" alt="listen-address" onerror="this.parentElement.style.display='none'"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 6 — Bloquer domaine -->
+  <section class="section" id="block-domain">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Bloquer un domaine avec Dnsmasq</h2>
+    </div>
+
+    <p>Éditer <code>/etc/NetworkManager/dnsmasq.d/local</code> et ajouter les règles de blocage :</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/NetworkManager/dnsmasq.d/local</div>
+        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+      </div>
+      <pre><span class="cm"># Modèle :</span>
+<span class="kw">address</span>=/<span class="val">sousdomaine.domaine</span>/<span class="flag">127.0.0.1</span>
+
+<span class="cm"># Bloquer tous les domaines .io :</span>
+<span class="kw">address</span>=/<span class="val">.io</span>/<span class="flag">127.0.0.1</span>
+
+<span class="cm"># Bloquer facebook.com :</span>
+<span class="kw">address</span>=/<span class="val">facebook.com</span>/<span class="flag">127.0.0.1</span></pre>
+    </div>
+  </section>
+
+  <!-- Section 7 — Tests client -->
+  <section class="section" id="client-tests">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Tests côté machine cliente</h2>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Test de connectivité réseau</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Client</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="cm"># Pinger le routeur :</span>
+<span class="kw">ping</span> 192.168.43.1
+
+<span class="cm"># Pinger le nameserver :</span>
+<span class="kw">ping</span> 10.0.2.3</pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image10.jpg" alt="ping gateway" onerror="this.parentElement.style.display='none'"/>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image11.jpg" alt="ping nameserver" onerror="this.parentElement.style.display='none'"/>
+      </div>
+      <p>Nous avons au préalable changé le nameserver du client par le nôtre :</p>
+      <div class="img-frame">
+        <img src="../assets/images/media/image12.jpg" alt="nameserver client" onerror="this.parentElement.style.display='none'"/>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title green">Test de résolution DNS</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Client</div>
+          <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+        </div>
+        <pre><span class="kw">nslookup</span> google.com</pre>
+      </div>
+      <div class="img-frame">
+        <img src="../assets/images/media/image13.jpg" alt="nslookup" onerror="this.parentElement.style.display='none'"/>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Section 8 — NFS Serveur -->
+  <section class="section" id="nfs-server">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Serveur NFS — Installation & Configuration</h2>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">📂</span>
+      <div class="callout-body">
+        <div class="callout-title">Qu'est-ce que NFS ?</div>
+        <p><strong>NFS</strong> (Network File Share) est un protocole qui vous permet de partager des répertoires et des fichiers avec d'autres clients Linux dans un réseau. Il s'avère pratique lorsque vous devez partager des données communes entre les systèmes clients, en particulier lorsqu'ils manquent d'espace.</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Installer nfs-kernel-server</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Serveur</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> apt update
+<span class="kw">sudo</span> apt install nfs-kernel-server</pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image14.jpg" alt="install nfs-kernel-server" onerror="this.parentElement.style.display='none'"/>
+          </div>
+
+          <div class="callout warn">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-body">
+              <div class="callout-title">Problème de DNS lors de l'installation ?</div>
+              <p>Si l'installation échoue, vérifiez d'abord vos interfaces réseau avec <code>ip a</code>, puis modifiez <code>/etc/resolv.conf</code> en utilisant les DNS publics de Google :</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/resolv.conf — fallback DNS</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">nameserver</span> <span class="val">8.8.8.8</span>
+<span class="kw">nameserver</span> <span class="val">8.8.4.4</span></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Réinitialiser les services</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> systemctl restart NetworkManager
+<span class="kw">sudo</span> systemctl restart dnsmasq</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Créer le répertoire d'exportation NFS</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Serveur</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> mkdir -p <span class="path">/mnt/nfs_share</span>
+<span class="kw">sudo</span> chown -R nobody:nogroup <span class="path">/mnt/nfs_share/</span>
+<span class="kw">sudo</span> chmod <span class="val">777</span> <span class="path">/mnt/nfs_share/</span></pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image15.jpg" alt="mkdir nfs_share" onerror="this.parentElement.style.display='none'"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Accorder l'accès aux systèmes clients</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> vim <span class="path">/etc/exports</span></pre>
+          </div>
+          <p>Ajouter dans le fichier <code>/etc/exports</code> :</p>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> /etc/exports</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="cm"># Accès pour tout un sous-réseau :</span>
+<span class="path">/mnt/nfs_share</span> <span class="val">192.168.43.0/24</span>(rw,sync,no_subtree_check)
+
+<span class="cm"># Accès pour un seul client :</span>
+<span class="path">/mnt/nfs_share</span> <span class="val">client_IP_1</span>(rw,sync,no_subtree_check)
+
+<span class="cm"># Accès pour plusieurs clients :</span>
+<span class="path">/mnt/nfs_share</span> <span class="val">client_IP_1</span>(rw,sync,no_subtree_check)
+<span class="path">/mnt/nfs_share</span> <span class="val">client_IP_2</span>(rw,sync,no_subtree_check)</pre>
+          </div>
+          <table class="opt-table">
+            <thead>
+              <tr><th>Option</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>rw</td><td>Lecture <strong>et</strong> écriture autorisées</td></tr>
+              <tr><td>sync</td><td>Les modifications sont écrites sur disque avant d'être appliquées</td></tr>
+              <tr><td>no_subtree_check</td><td>Élimine la vérification des sous-arbres (améliore la fiabilité)</td></tr>
+            </tbody>
+          </table>
+          <div class="img-frame">
+            <img src="../assets/images/media/image16.jpg" alt="exports config" onerror="this.parentElement.style.display='none'"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Exporter le répertoire & redémarrer NFS</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Serveur</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> exportfs -a
+<span class="kw">sudo</span> systemctl restart nfs-kernel-server</pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image17.jpg" alt="exportfs" onerror="this.parentElement.style.display='none'"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Autoriser l'accès NFS via le pare-feu</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Serveur</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> ufw allow from 192.168.43.0/24 to any port nfs
+<span class="kw">sudo</span> ufw enable
+<span class="kw">sudo</span> ufw status</pre>
+          </div>
+          <div class="callout info">
+            <span class="callout-icon">🔒</span>
+            <div class="callout-body">
+              <div class="callout-title">Port par défaut NFS</div>
+              <p>Le port <strong>2049</strong> est le port de partage de fichiers NFS par défaut. Vérifiez qu'il est bien ouvert dans le statut du pare-feu.</p>
+            </div>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image18.jpg" alt="ufw status" onerror="this.parentElement.style.display='none'"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 9 — Client NFS -->
+  <section class="section" id="nfs-client">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2 class="section-title">Client NFS — Montage & Tests</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Installer nfs-common sur le client</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Client</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> apt update
+<span class="kw">sudo</span> apt install nfs-common</pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image19.jpg" alt="install nfs-common" onerror="this.parentElement.style.display='none'"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Créer le point de montage NFS</div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Client</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> mkdir -p <span class="path">/mnt/nfs_clientshare</span></pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image20.jpg" alt="mkdir clientshare" onerror="this.parentElement.style.display='none'"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Monter le partage NFS</div>
+          <p>Vérifier l'IP du serveur NFS avec <code>ifconfig</code> :</p>
+          <div class="img-frame">
+            <img src="../assets/images/media/image21.jpg" alt="ifconfig" onerror="this.parentElement.style.display='none'"/>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Client</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">sudo</span> mount <span class="val">192.168.43.12</span>:<span class="path">/mnt/nfs_share</span> <span class="path">/mnt/nfs_clientshare</span></pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image22.jpg" alt="mount nfs" onerror="this.parentElement.style.display='none'"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Tester le partage NFS</div>
+          <p>Sur le <strong>serveur</strong>, créer des fichiers de test :</p>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Serveur</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">cd</span> <span class="path">/mnt/nfs_share/</span>
+<span class="kw">touch</span> test.txt test2.txt test3.txt</pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image23.jpg" alt="touch files" onerror="this.parentElement.style.display='none'"/>
+          </div>
+          <p>Puis sur le <strong>client</strong>, vérifier que les fichiers sont accessibles :</p>
+          <div class="code-block">
+            <div class="code-header">
+              <div class="code-label"><div class="code-dot dot-red"></div><div class="code-dot dot-yellow"></div><div class="code-dot dot-green"></div> bash — Client</div>
+              <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+            </div>
+            <pre><span class="kw">ls</span> -l <span class="path">/mnt/nfs_clientshare/</span></pre>
+          </div>
+          <div class="img-frame">
+            <img src="../assets/images/media/image24.jpg" alt="ls nfs_clientshare" onerror="this.parentElement.style.display='none'"/>
+          </div>
+          <div class="callout success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-body">
+              <div class="callout-title">Partage NFS opérationnel</div>
+              <p>Si les fichiers créés sur le serveur apparaissent dans le répertoire client, la configuration NFS est fonctionnelle !</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 10 — Ressources -->
+  <section class="section" id="ressources">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <h2 class="section-title">Liens & Ressources complémentaires</h2>
+    </div>
+    <div class="links-grid">
+      <a href="https://doc.ubuntu-fr.org/configuration_serveur_dns_pour_son_poste_de_travail" class="link-card" target="_blank" rel="noopener">
+        <div class="link-icon">🐧</div>
+        <div class="link-text">
+          Serveur DNS avec Dnsmasq
+          <span>doc.ubuntu-fr.org</span>
+        </div>
+      </a>
+      <a href="http://www.thekelleys.org.uk/dnsmasq/doc.html" class="link-card" target="_blank" rel="noopener">
+        <div class="link-icon">🌐</div>
+        <div class="link-text">
+          Site officiel Dnsmasq
+          <span>thekelleys.org.uk</span>
+        </div>
+      </a>
+      <a href="https://askubuntu.com/questions/150135/how-to-block-specific-domains-in-hosts-file" class="link-card" target="_blank" rel="noopener">
+        <div class="link-icon">🔗</div>
+        <div class="link-text">
+          Bloquer des domaines
+          <span>askubuntu.com</span>
+        </div>
+      </a>
+      <a href="https://doc.ubuntu-fr.org/tutoriel/comment_editer_un_fichier" class="link-card" target="_blank" rel="noopener">
+        <div class="link-icon">📝</div>
+        <div class="link-text">
+          Éditer un fichier sous Ubuntu
+          <span>doc.ubuntu-fr.org</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="footer">
+  <div class="footer-brand">
+    <strong>DOWOU Issa</strong> — Documentation Technique<br/>
+    <span style="font-size:11px;color:var(--text-dim)">DNS/DHCP & NFS sur Ubuntu Linux</span>
+  </div>
+  <a href="projets.html" class="back-btn" style="position:static;transform:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 5l-7 7 7 7"/>
+    </svg>
+    <span>Retour aux projets</span>
+  </a>
+</footer>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+  // Copy button
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copié';
+      btn.style.borderColor = 'var(--accent2)';
+      btn.style.color = 'var(--accent2)';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 1800);
+    });
+  }
+</script>
+</body>
+</html>

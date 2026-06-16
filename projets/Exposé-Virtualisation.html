@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clonage de machines virtuelles · Virtualisation</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    filter: brightness(0.9) contrast(1.05);
+    background: linear-gradient(145deg, #0a1a2f, #0f2a44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS (un seul) ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── TABLE COMPARATIVE ── */
+  .ns-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  .ns-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: rgba(0,212,255,0.06);
+    color: var(--accent);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--border);
+  }
+  .ns-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .ns-table tr:last-child td { border-bottom: none; }
+  .ns-table tr:hover td { background: rgba(0,212,255,0.03); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+  }
+  .code-body .cmd { color: #38bdf8; }
+  .code-body .flag { color: #a78bfa; }
+  .code-body .val { color: #4ade80; }
+  .code-body .comment { color: #475569; font-style: italic; }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── PRACTICE CARDS (bonnes pratiques) ── */
+  .practice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .practice-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .practice-item:hover { border-color: rgba(0,255,157,0.2); }
+  .practice-item .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .practice-item .check svg { width: 11px; height: 11px; color: var(--accent3); }
+
+  /* ── SECTION LETTER BADGE ── */
+  .letter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0a2545, #0d3566);
+    border: 1px solid rgba(0,212,255,0.3);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── CONCLUSION BOX ── */
+  .conclusion-box {
+    background: linear-gradient(135deg, rgba(0,129,255,0.06), rgba(0,212,255,0.04));
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .conclusion-box::before {
+    content: '📦';
+    position: absolute;
+    right: 30px; top: 30px;
+    font-size: 80px;
+    opacity: 0.06;
+  }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .img-placeholder img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  /* ── REFERENCE LINKS ── */
+  .ref-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .ref-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .ref-link:hover {
+    border-color: var(--accent);
+  }
+  .ref-link svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .ref-link-content {
+    flex: 1;
+  }
+  .ref-link-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+  .ref-link-url {
+    font-size: 12px;
+    color: var(--text-dim);
+    word-break: break-all;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.2s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc, .conclusion-box { padding: 20px; }
+    .subsection { padding: 18px 18px; }
+    .back-btn span { display: none; }
+    .ns-table { font-size: 12px; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Exposé Technique · Virtualisation</div>
+    <div class="hero-img">
+      <span>📦 VM Cloning · Hyperviseurs</span>
+    </div>
+    <h1>Clonage de Machines<br/><span>Virtuelles</span></h1>
+    <p class="hero-sub">Full Clone · Linked Clone · Sysprep · Bonnes Pratiques</p>
+  </div>
+
+  <!-- ── MEMBRES (un seul : DOWOU Issa) ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membre du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#intro">Introduction au clonage de machines virtuelles</a></li>
+      <li>
+        <a href="#methodes">Les différentes méthodes de clonage</a>
+        <ul>
+          <li>Clonage complet (Full Clone)</li>
+          <li>Clonage lié (Linked Clone)</li>
+        </ul>
+      </li>
+      <li>
+        <a href="#cas-usages">Cas d'utilisation et limites</a>
+        <ul>
+          <li>Cas d'utilisation du clonage complet</li>
+          <li>Cas d'utilisation du clonage lié</li>
+          <li>Limites du clonage complet</li>
+          <li>Limites du clonage lié</li>
+        </ul>
+      </li>
+      <li>
+        <a href="#pratique">Clonage avec hyperviseur de type 2</a>
+        <ul>
+          <li>Clonage avec Oracle VirtualBox</li>
+          <li>Pratique clonage intégral</li>
+          <li>Pratique clonage lié</li>
+          <li>Clonage avec VMware Workstation</li>
+        </ul>
+      </li>
+      <li>
+        <a href="#hyperv">Préparer et cloner pour Hyper-V avec Sysprep</a>
+        <ul>
+          <li>Qu'est-ce que Sysprep ?</li>
+          <li>Désactiver BitLocker</li>
+          <li>Lancer Sysprep</li>
+          <li>Clonage à partir d'un modèle VHDX</li>
+        </ul>
+      </li>
+      <li><a href="#conclusion">Conclusion</a></li>
+      <li><a href="#references">Références</a></li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION I — INTRODUCTION
+  ══════════════════════════════ -->
+  <div class="section" id="intro">
+    <div class="section-header">
+      <span class="section-num">SECTION I</span>
+      <h2>Introduction au clonage de machines virtuelles</h2>
+    </div>
+
+    <p style="margin-bottom:16px;">
+      Le clonage de machines virtuelles est une technique essentielle dans les environnements informatiques modernes. Il consiste à créer une copie exacte d'une machine virtuelle existante, incluant son système d'exploitation, ses configurations, ses logiciels et ses données. Ce processus permet de gagner du temps et d'assurer la cohérence dans le déploiement de plusieurs environnements identiques.
+    </p>
+
+    <p style="margin-bottom:16px;">
+      L'historique du clonage virtuel remonte aux années 2000, avec l'essor de la virtualisation introduite par des entreprises comme VMware. À cette époque, l'optimisation des ressources matérielles était une priorité. Le clonage est ainsi devenu une réponse efficace aux besoins croissants de flexibilité, de rapidité de déploiement et de standardisation dans les infrastructures informatiques.
+    </p>
+
+    <div class="info-box orange">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:#ffa502;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+      <p>Aujourd'hui, il est couramment utilisé pour les tests, les environnements de développement, la formation et le déploiement en masse de systèmes homogènes.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION II — MÉTHODES DE CLONAGE
+  ══════════════════════════════ -->
+  <div class="section" id="methodes">
+    <div class="section-header">
+      <span class="section-num">SECTION II</span>
+      <h2>Les différentes méthodes de clonage</h2>
+    </div>
+
+    <p>Nous avons deux principales méthodes de clonage :</p>
+
+    <!-- Full Clone -->
+    <div class="subsection">
+      <h3><span class="num">1</span> Clonage complet (Full Clone)</h3>
+      <p style="font-size:14px;">Le clonage complet consiste à créer une copie totalement indépendante d'une machine virtuelle (VM) existante. Toutes les données de la machine virtuelle d'origine sont entièrement dupliquées, y compris les fichiers du disque dur virtuel, les paramètres et les instantanés. Chaque fichier est copié séparément, ce qui fait que le clone ne dépend en rien de la machine source. Il s'agit donc d'une nouvelle machine autonome, capable de fonctionner même si la VM d'origine est supprimée ou modifiée.</p>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;">✅ Avantages</p>
+          <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
+            <li><strong>Autonomie totale</strong> : La machine clonée reste pleinement fonctionnelle même si la VM source est supprimée ou modifiée.</li>
+            <li><strong>Meilleure stabilité à long terme</strong> : L'absence de dépendances garantit que le clone évoluera sans problème avec le temps.</li>
+          </ul>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--danger);margin-bottom:6px;">⚠️ Inconvénients</p>
+          <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
+            <li><strong>Temps de création plus long</strong> : Le processus peut être lent, surtout si la VM source est volumineuse.</li>
+            <li><strong>Occupation importante d'espace de stockage</strong> : Chaque clonage complet double les besoins en espace disque.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Linked Clone -->
+    <div class="subsection">
+      <h3><span class="num">2</span> Clonage lié (Linked Clone)</h3>
+      <p style="font-size:14px;">Le clonage lié permet de créer une machine virtuelle dérivée d'une autre, tout en partageant le disque dur virtuel de la machine source. Contrairement au clonage complet, seules les différences entre la machine d'origine et le clone sont enregistrées. Cela signifie que le clone dépend de la machine virtuelle source pour fonctionner, car il n'en contient pas une copie complète. Il fonctionne comme une extension, stockant uniquement ses propres changements dans un fichier différentiel tout en lisant le reste des données depuis le disque de la source.</p>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;">✅ Avantages</p>
+          <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
+            <li><strong>Création très rapide</strong> : Le processus est presque instantané.</li>
+            <li><strong>Économie d'espace disque</strong> : Seule une fraction des données est dupliquée.</li>
+          </ul>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--danger);margin-bottom:6px;">⚠️ Inconvénients</p>
+          <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
+            <li><strong>Dépendance à la machine source</strong> : Si la VM originale est supprimée, toutes les VM liées deviennent inutilisables.</li>
+            <li><strong>Performances parfois réduites</strong> : Surcharge possible du disque partagé avec de nombreux clones.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION III — CAS D'USAGE ET LIMITES
+  ══════════════════════════════ -->
+  <div class="section" id="cas-usages">
+    <div class="section-header">
+      <span class="section-num">SECTION III</span>
+      <h2>Cas d'utilisation et limites du clonage</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Cas d'utilisation du clonage complet</h3>
+      
+      <p style="font-weight:600;margin-top:12px;"><u>Cas 1 : Déploiement de serveurs web pour répartition de charge</u></p>
+      <p><strong>Synopsis :</strong> Le Super Marché CHAMPION a besoin de deux serveurs web identiques pour gérer les pics de trafic. Les serveurs doivent être identiques pour assurer une répartition de charge.</p>
+      <p><strong>Mise en œuvre :</strong> L'équipe IT configure une VM avec Ubuntu Server, Nginx, et une application web, puis utilise VMware Workstation pour créer un clone complet. Les deux VM sont déployées sur des hôtes différents, chacune avec sa propre IP (ex. : 192.168.1.10 et 192.168.1.11).</p>
+      <p><strong>Avantages :</strong> Les deux serveurs fonctionnent en toute autonomie. Une panne d'un hôte n'impacte pas l'autre. Possibilité de réplication rapide pour ajouter un 3e serveur en cas de besoin.</p>
+      
+      <p style="font-weight:600;margin-top:12px;"><u>Cas 2 : Hébergement client sur VM dédiée</u></p>
+      <p><strong>Synopsis :</strong> Une société d'hébergement fournit à ses clients des serveurs personnalisés avec CMS, bases de données et accès FTP.</p>
+      <p><strong>Mise en œuvre :</strong> Une VM de base est clonée en mode complet pour chaque nouveau client, puis personnalisée (nom d'hôte, configurations spécifiques, sécurité).</p>
+      <p><strong>Avantages :</strong> Chaque client dispose d'un environnement isolé. Les modifications sur une VM n'affectent pas les autres. Les clients peuvent être autonomes dans la gestion de leurs machines.</p>
+      
+      <p style="font-weight:600;margin-top:12px;"><u>Cas 3 : Sauvegarde de sécurité avant mise à jour critique</u></p>
+      <p><strong>Synopsis :</strong> Un administrateur doit mettre à jour le noyau Linux sur une machine critique.</p>
+      <p><strong>Mise en œuvre :</strong> Avant l'opération, il crée un clone complet de la VM. En cas d'échec de la mise à jour, il peut revenir facilement à l'état initial.</p>
+      <p><strong>Avantages :</strong> Le clone est une sauvegarde autonome prête à l'emploi. Aucune dépendance à la VM d'origine. Possibilité de redéploiement immédiat.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Cas d'utilisation du clonage lié</h3>
+      
+      <p style="font-weight:600;margin-top:12px;"><u>Cas 1 : Formation technique à grande échelle</u></p>
+      <p><strong>Synopsis :</strong> Lotié Telecom organise une formation Linux à la demande d'une entreprise cliente pour ses 10 employés. Chaque participant doit avoir un environnement identique pour pratiquer.</p>
+      <p><strong>Mise en œuvre :</strong> Le formateur configure une VM avec Ubuntu, des fichiers d'exemple, et un terminal, puis utilise VMware Workstation pour créer 10 clones liés. Chaque employé accède à son clone via un client léger. À la fin de la formation, les clones sont supprimés sans encombrer le stockage.</p>
+      <p><strong>Avantages :</strong> Déploiement des clones en moins de 5 minutes (contre 30 pour un clonage complet). Parfait pour des environnements éphémères.</p>
+      
+      <p style="font-weight:600;margin-top:12px;"><u>Cas 2 : Tests de logiciels dans un environnement isolé</u></p>
+      <p><strong>Synopsis :</strong> Un développeur doit tester une nouvelle version d'un programme sans affecter son environnement principal.</p>
+      <p><strong>Mise en œuvre :</strong> Il crée un clone lié de sa VM de travail, installe le logiciel, fait ses tests, puis supprime la VM.</p>
+      <p><strong>Avantages :</strong> Création rapide d'un environnement de test. Aucun risque de polluer la machine de base. Peu de ressources consommées.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Limites du clonage complet</h3>
+      <ul style="margin-left:20px;font-size:14px;">
+        <li><strong>Consommation importante d'espace de stockage :</strong> Chaque clone duplique entièrement les fichiers de la VM, ce qui peut rapidement épuiser les ressources.</li>
+        <li><strong>Temps de création prolongé :</strong> La copie intégrale peut prendre de plusieurs minutes à des heures selon la taille.</li>
+        <li><strong>Risque de conflits d'identité :</strong> Sans reconfiguration, les clones peuvent partager les mêmes adresses IP, MAC ou noms d'hôte.</li>
+        <li><strong>Coût de maintenance élevé :</strong> Gérer plusieurs clones indépendants augmente la charge administrative.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">4</span> Limites du clonage lié</h3>
+      <ul style="margin-left:20px;font-size:14px;">
+        <li><strong>Dépendance à la VM source :</strong> Toute modification ou suppression de la source rend les clones inopérants.</li>
+        <li><strong>Dégradation des performances :</strong> L'accès partagé peut provoquer des goulets d'étranglement.</li>
+        <li><strong>Limitation de la durée d'utilisation :</strong> Conçu pour des usages temporaires.</li>
+        <li><strong>Complexité en cas de mise à jour de la source :</strong> Les clones ne reflètent pas automatiquement les changements.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION IV — CLONAGE AVEC HYPERVISEUR TYPE 2
+  ══════════════════════════════ -->
+  <div class="section" id="pratique">
+    <div class="section-header">
+      <span class="section-num">SECTION IV</span>
+      <h2>Clonage avec hyperviseur de type 2</h2>
+    </div>
+
+    <!-- VirtualBox -->
+    <div class="subsection">
+      <h3><span class="letter-badge">A</span> Clonage avec Oracle VirtualBox</h3>
+      
+      <p><u>Interface de VirtualBox :</u></p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image1.jpeg" alt="Interface VirtualBox" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible : interface VirtualBox</span>'">
+        <span style="display:none;">Image : interface VirtualBox</span>
+      </div>
+      
+      <p><u>Pour procéder au clonage, trois possibilités :</u></p>
+      <ul style="margin-left:20px;">
+        <li>Raccourci clavier <strong>CTRL + O</strong></li>
+        <li>Menu <strong>Machine</strong> > clic droit</li>
+        <li>Clic droit sur la machine à cloner</li>
+      </ul>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image2.png" alt="Assistant clonage VirtualBox" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible : assistant clonage</span>'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image3.png" alt="Options clonage" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image4.png" alt="Clic droit sur VM" onerror="this.style.display='none'">
+      </div>
+      
+      <p><strong>Explications des options :</strong></p>
+      <ol style="margin-left:20px;">
+        <li><strong>Nom et emplacement du clone :</strong> Nom unique et dossier de stockage.</li>
+        <li><strong>Type de clonage :</strong> 
+          <ul>
+            <li><strong>Clone intégral :</strong> Copie indépendante</li>
+            <li><strong>Clone lié :</strong> Dépend de la source</li>
+          </ul>
+        </li>
+        <li><strong>Options supplémentaires :</strong>
+          <ul>
+            <li>Adresses MAC : inclure ou générer de nouvelles adresses</li>
+            <li>Préserver les noms de disque</li>
+            <li>Garder les UUID matériels</li>
+          </ul>
+        </li>
+      </ol>
+      
+      <h4 id="pratique-clonage-intégral">Pratique clonage intégral</h4>
+      <p>Configuration : nom "clone ubuntu", dossier par défaut, clone intégral.</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image5.png" alt="Configuration clone intégral" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image6.png" alt="Résultat clone intégral" onerror="this.style.display='none'">
+      </div>
+      
+      <h4 id="pratique-clonage-lié">Pratique clonage lié</h4>
+      <p>Configuration identique mais avec clone lié.</p>
+    </div>
+
+    <!-- VMware -->
+    <div class="subsection">
+      <h3><span class="letter-badge">B</span> Clonage avec VMware Workstation</h3>
+      
+      <p><u>Clonage lié :</u></p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image7.jpg" alt="Interface VMware" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Menu "Manage" → "Clone"</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image8.jpg" alt="Menu Clone VMware" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image9.jpg" alt="Assistant clonage VMware" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Choix du type de clone :</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image10.jpg" alt="Type de clone VMware" onerror="this.style.display='none'">
+      </div>
+      
+      <ol style="margin-left:20px;">
+        <li><strong>Créer un clone lié :</strong> référence la source, moins d'espace</li>
+        <li><strong>Créer un clone complet :</strong> copie indépendante</li>
+      </ol>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image11.jpg" alt="Nom du clone" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image12.jpg" alt="Résultat clone VMware" onerror="this.style.display='none'">
+      </div>
+      
+      <p><strong>Résultat :</strong> VM Windows Server 2016 clonée avec ses paramètres :</p>
+      <ul style="margin-left:20px;">
+        <li>Nom : Clone of Windows Server 2016</li>
+        <li>Mémoire : 2 GB</li>
+        <li>Processeur : 2</li>
+        <li>Disque dur (SCSI) : 40 GB</li>
+        <li>Disque dur (NVMe) : 60 GB</li>
+        <li>CD/DVD (SATA) : Windows Server 2016.iso</li>
+        <li>Carte réseau : Mode Host-Only</li>
+      </ul>
+      
+      <p><u>Clonage intégral :</u> mêmes étapes mais choisir "clone complet"</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION V — HYPER-V ET SYSPREP
+  ══════════════════════════════ -->
+  <div class="section" id="hyperv">
+    <div class="section-header">
+      <span class="section-num">SECTION V</span>
+      <h2>Préparer et cloner une machine pour Hyper-V avec Sysprep</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Présentation</h3>
+      <p>Dans cet exemple, une machine virtuelle sous Hyper-V est utilisée pour préparer un modèle de machine virtuelle. Le disque dur virtuel pourra être dupliqué à souhait après cette opération.</p>
+    </div>
+
+    <div class="subsection" id="cest-quoi-un-sysprep">
+      <h3><span class="num">2</span> C'est quoi un SYSPREP ?</h3>
+      <p><strong>SYSPREP</strong> (System Preparation Tool) est un outil fourni par Microsoft sur les systèmes d'exploitation Windows. Il est principalement utilisé pour préparer une machine Windows avant de la dupliquer ou de la déployer sur d'autres ordinateurs.</p>
+      
+      <p><strong>Problèmes sans Sysprep :</strong> Le clonage sans Sysprep pose des problèmes car certains éléments doivent être uniques, comme le nom de l'ordinateur et le SID (identifiant de sécurité), notamment en environnement Active Directory.</p>
+      
+      <p><strong>Sysprep résout ces problèmes en :</strong></p>
+      <ul style="margin-left:20px;">
+        <li>Réinitialisant le SID pour éviter les conflits</li>
+        <li>Activant le mode OOBE (première expérience de démarrage)</li>
+        <li>Généralisant l'image pour différents matériels</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Effectuer le SYSPREP sur Windows</h3>
+      
+      <p><u>a. Désactiver BitLocker</u></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Disable-BitLocker</span> -MountPoint "C:"</div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image13.png" alt="Commande Disable-BitLocker" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Vérification :</p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Get-BitLockerVolume</span> | Select MountPoint, VolumeStatus</div>
+      </div>
+      
+      <p><u>b. Lancer l'opération de SYSPREP</u></p>
+      <p>Accédez à : <strong>C:\Windows\System32\Sysprep</strong></p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image14.png" alt="Dossier Sysprep" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image15.png" alt="Application sysprep" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Configuration :</p>
+      <ul style="margin-left:20px;">
+        <li>Mode OOBE (Out-of-Box Experience)</li>
+        <li>Cocher "Généraliser"</li>
+        <li>Option d'extinction : "Arrêter le système"</li>
+      </ul>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image16.png" alt="Fenêtre Sysprep" onerror="this.style.display='none'">
+      </div>
+      
+      <p>En ligne de commande :</p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">cd C:\Windows\System32\Sysprep</span>
+<span class="cmd">sysprep.exe /generalize /oobe /shutdown /mode:vm</span></div>
+      </div>
+      <p><em>Remarque : pour une machine physique, retirer l'option /mode:vm</em></p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">4</span> Clonage d'une machine virtuelle Hyper-V à partir d'un modèle VHDX</h3>
+      
+      <p>Étapes à suivre :</p>
+      <ol style="margin-left:20px;">
+        <li>Créer une nouvelle machine virtuelle sans disque dur</li>
+        <li>Copier le disque VHDX modèle dans le répertoire de la nouvelle VM</li>
+        <li>Renommer le fichier VHDX</li>
+        <li>Ajouter le disque dur dans les paramètres de la VM</li>
+      </ol>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image17.png" alt="Copie fichier VHDX" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image18.png" alt="Ajout disque dur Hyper-V" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image19.png" alt="Démarrage VM clonée" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Au démarrage, la VM finalisera l'installation comme une nouvelle machine (OOBE).</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION VI — CONCLUSION
+  ══════════════════════════════ -->
+  <div class="section" id="conclusion">
+    <div class="section-header">
+      <span class="section-num">SECTION VI</span>
+      <h2>Conclusion</h2>
+    </div>
+
+    <div class="conclusion-box">
+      <p>En somme, le clonage de machines virtuelles est une pratique incontournable dans la gestion des infrastructures informatiques modernes, offrant flexibilité, rapidité et standardisation dans le déploiement d'environnements numériques. Les deux principales méthodes, le clonage complet et le clonage lié, répondent à des besoins distincts : le premier garantit une autonomie totale, idéale pour des environnements critiques ou permanents, tandis que le second optimise les ressources pour des usages temporaires ou à grande échelle.</p>
+      
+      <p style="margin-top:16px;">Cependant, chaque approche présente des limites, telles que la consommation d'espace pour le clonage complet ou la dépendance à la machine source pour le clonage lié, nécessitant une planification rigoureuse.</p>
+      
+      <p style="margin-top:16px;">L'utilisation d'hyperviseurs comme VirtualBox, VMware Workstation ou Hyper-V facilite grandement le processus de clonage tout en assurant la compatibilité et l'unicité des machines déployées. En somme, le clonage de machines virtuelles est un levier puissant pour les administrateurs et les développeurs, permettant d'optimiser les ressources, de réduire les coûts et d'accélérer la mise en œuvre de solutions informatiques, à condition de bien maîtriser ses techniques et ses contraintes.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION VII — RÉFÉRENCES
+  ══════════════════════════════ -->
+  <div class="section" id="references">
+    <div class="section-header">
+      <span class="section-num">SECTION VII</span>
+      <h2>Références</h2>
+    </div>
+
+    <div class="ref-links">
+      <!-- Vidéos YouTube -->
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M10 9l5 3-5 3V9z"/>
+        </svg>
+        <span style="font-weight:600; color:var(--accent);">Vidéos YouTube</span>
+      </div>
+      
+      <a href="https://youtu.be/hwCoMdaWodI?si=FXzC02vxqr39fIHJ" class="ref-link" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M10 9l5 3-5 3V9z"/>
+        </svg>
+        <div class="ref-link-content">
+          <div class="ref-link-title">Clonage de machines virtuelles - Tutoriel 1</div>
+          <div class="ref-link-url">https://youtu.be/hwCoMdaWodI</div>
+        </div>
+      </a>
+      
+      <a href="https://youtu.be/xOCJh2N9w4A?si=cm7680X_BSjRMoXE" class="ref-link" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M10 9l5 3-5 3V9z"/>
+        </svg>
+        <div class="ref-link-content">
+          <div class="ref-link-title">Clonage de machines virtuelles - Tutoriel 2</div>
+          <div class="ref-link-url">https://youtu.be/xOCJh2N9w4A</div>
+        </div>
+      </a>
+      
+      <a href="https://youtu.be/eU6FPIM8WzI?si=N1mKLnNikrhRkgPE" class="ref-link" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M10 9l5 3-5 3V9z"/>
+        </svg>
+        <div class="ref-link-content">
+          <div class="ref-link-title">Clonage de machines virtuelles - Tutoriel 3</div>
+          <div class="ref-link-url">https://youtu.be/eU6FPIM8WzI</div>
+        </div>
+      </a>
+      
+      <!-- Documentation VMware -->
+      <div style="display:flex; align-items:center; gap:8px; margin:16px 0 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <span style="font-weight:600; color:var(--accent);">Virtualisation VMware</span>
+      </div>
+      
+      <a href="https://www.informatiweb-pro.net/virtualisation/vmware/vmware-workstation-15-cloner-des-machines-virtuelles.html" class="ref-link" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <div class="ref-link-content">
+          <div class="ref-link-title">VMware Workstation - Cloner des machines virtuelles</div>
+          <div class="ref-link-url">informatiweb-pro.net</div>
+        </div>
+      </a>
+      
+      <!-- Documentation Red Hat -->
+      <div style="display:flex; align-items:center; gap:8px; margin:16px 0 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        <span style="font-weight:600; color:var(--accent);">Documentation Red Hat</span>
+      </div>
+      
+      <a href="https://docs.redhat.com/fr/documentation/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/cloning-virtual-machines_configuring-and-managing-virtualization" class="ref-link" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        <div class="ref-link-content">
+          <div class="ref-link-title">Red Hat - Clonage de machines virtuelles</div>
+          <div class="ref-link-url">docs.redhat.com</div>
+        </div>
+      </a>
+      
+      <!-- Clonage Hyper-V -->
+      <div style="display:flex; align-items:center; gap:8px; margin:16px 0 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M8 10h8M8 14h4"/>
+        </svg>
+        <span style="font-weight:600; color:var(--accent);">Clonage de VM Hyper-V</span>
+      </div>
+      
+      <a href="https://www.vinchin.com/fr/vm-backup/clone-vm-hyper-v.html" class="ref-link" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M8 10h8M8 14h4"/>
+        </svg>
+        <div class="ref-link-content">
+          <div class="ref-link-title">Vinchin - Cloner une VM Hyper-V</div>
+          <div class="ref-link-url">vinchin.com</div>
+        </div>
+      </a>
+      
+      <a href="https://www.it-connect.fr/hyper-v-comment-cloner-une-vm/" class="ref-link" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M8 10h8M8 14h4"/>
+        </svg>
+        <div class="ref-link-content">
+          <div class="ref-link-title">IT-Connect - Hyper-V : comment cloner une VM</div>
+          <div class="ref-link-url">it-connect.fr</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <p>📦 Clonage de machines virtuelles · Groupe 2025</p>
+    <p style="margin-top:6px;font-size:11px;">· DOWOU Issa ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box, .practice-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

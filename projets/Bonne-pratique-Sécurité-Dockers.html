@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sécurité & Isolation Docker</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    filter: brightness(0.9) contrast(1.05);
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── TABLE ── */
+  .ns-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  .ns-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: rgba(0,212,255,0.06);
+    color: var(--accent);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--border);
+  }
+  .ns-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .ns-table tr:last-child td { border-bottom: none; }
+  .ns-table tr:hover td { background: rgba(0,212,255,0.03); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+  }
+  .code-body .cmd { color: #38bdf8; }
+  .code-body .flag { color: #a78bfa; }
+  .code-body .val { color: #4ade80; }
+  .code-body .comment { color: #475569; font-style: italic; }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── PRACTICE CARDS ── */
+  .practice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .practice-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .practice-item:hover { border-color: rgba(0,255,157,0.2); }
+  .practice-item .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .practice-item .check svg { width: 11px; height: 11px; color: var(--accent3); }
+
+  /* ── SECTION LETTER BADGE ── */
+  .letter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0a2545, #0d3566);
+    border: 1px solid rgba(0,212,255,0.3);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── CONCLUSION ── */
+  .conclusion-box {
+    background: linear-gradient(135deg, rgba(0,129,255,0.06), rgba(0,212,255,0.04));
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .conclusion-box::before {
+    content: '🐳';
+    position: absolute;
+    right: 30px; top: 30px;
+    font-size: 80px;
+    opacity: 0.06;
+  }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ── REAL IMAGES ── */
+  .doc-img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin: 12px 0;
+    display: block;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.2s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc, .conclusion-box { padding: 20px; }
+    .subsection { padding: 18px 18px; }
+    .back-btn span { display: none; }
+    .ns-table { font-size: 12px; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Exposé Technique · Sécurité Système</div>
+    <img
+      src="../assets/images/433713efa5ebe28c08e21a86b0b92e2a482c810d.jpg"
+      alt="Docker Security Banner"
+      class="hero-img"
+      onerror="this.style.display='none'"
+    />
+    <h1>Sécurité &amp; Isolation des<br/><span>Conteneurs Docker</span></h1>
+    <p class="hero-sub">Namespaces · Cgroups · UFS · AppArmor · SELinux</p>
+  </div>
+
+  <!-- ── MEMBRES ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membres du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#intro">Introduction à la sécurité Docker</a></li>
+      <li>
+        <a href="#isolation">Isolation des conteneurs Docker</a>
+        <ul>
+          <li>Namespaces : Isolement logique</li>
+          <li>Cgroups : Gestion des ressources</li>
+          <li>Union File System (UFS)</li>
+          <li>Réseaux Docker isolés</li>
+          <li>AppArmor / SELinux</li>
+        </ul>
+      </li>
+      <li>
+        <a href="#pratique">Démonstrations pratiques &amp; bonnes pratiques</a>
+        <ul>
+          <li>A. Sécuriser un conteneur Alpine</li>
+          <li>B. Isolation réseau</li>
+          <li>C. Accès en lecture seule</li>
+          <li>D. Limitation CPU &amp; mémoire</li>
+        </ul>
+      </li>
+      <li><a href="#conclusion">Conclusion et recommandations</a></li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION I — INTRODUCTION
+  ══════════════════════════════ -->
+  <div class="section" id="intro">
+    <div class="section-header">
+      <span class="section-num">SECTION I</span>
+      <h2>Introduction à la sécurité Docker</h2>
+    </div>
+
+    <p style="margin-bottom:16px;">
+      Docker est aujourd'hui l'un des outils les plus utilisés dans le monde du développement et de l'administration système. Grâce à ses conteneurs, il permet de <strong style="color:var(--text-bright)">créer, déployer et exécuter des applications</strong> de façon rapide, légère et isolée.
+    </p>
+
+    <div class="info-box orange">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:#ffa502;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+      <p>Un conteneur <strong>mal configuré</strong> peut devenir une porte d'entrée pour des attaques, ou compromettre les données de tout un système. C'est pourquoi la sécurité dans Docker est devenue une <strong>préoccupation majeure</strong> pour les entreprises comme pour les développeurs.</p>
+    </div>
+
+    <p style="margin-top:16px;">Dans cet exposé, nous allons d'abord expliquer comment Docker isole ses conteneurs, puis nous passerons à une démonstration pratique qui servira à illustrer les bonnes pratiques de sécurité.</p>
+
+    <div class="info-box green" style="margin-top:20px;">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:#00ff9d;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      <p><strong>Notre objectif :</strong> montrer que la sécurité n'est pas un obstacle dans Docker, mais une <em>condition indispensable</em> pour l'utiliser de manière professionnelle et fiable.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION II — ISOLATION
+  ══════════════════════════════ -->
+  <div class="section" id="isolation">
+    <div class="section-header">
+      <span class="section-num">SECTION II</span>
+      <h2>Isolation des conteneurs</h2>
+    </div>
+
+    <p style="margin-bottom:24px;">Docker isole chaque conteneur du système hôte et des autres conteneurs grâce à plusieurs technologies intégrées dans le noyau Linux. Si un conteneur est compromis, il ne peut pas facilement affecter les autres ou l'hôte.</p>
+
+    <!-- Namespaces -->
+    <div class="subsection">
+      <h3><span class="num">1</span> Namespaces — Isolement logique</h3>
+      <p style="margin-bottom:16px;font-size:14px;">Les namespaces permettent de créer des environnements isolés pour chaque conteneur. Chaque conteneur <em>pense qu'il est seul sur le système</em>.</p>
+      <table class="ns-table">
+        <thead>
+          <tr><th>Namespace</th><th>Rôle</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="tag">pid</span></td><td>Isole les processus — chaque conteneur a ses propres PIDs</td></tr>
+          <tr><td><span class="tag">mnt</span></td><td>Isole le système de fichiers</td></tr>
+          <tr><td><span class="tag">net</span></td><td>Isole les interfaces réseau et adresses IP</td></tr>
+          <tr><td><span class="tag">ipc</span></td><td>Isole les communications inter-processus</td></tr>
+          <tr><td><span class="tag">uts</span></td><td>Isole le nom de l'hôte et du domaine</td></tr>
+          <tr><td><span class="tag">user</span></td><td>Permet d'avoir des UID différents dans l'hôte et le conteneur</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box blue" style="margin-top:14px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--accent2);"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        <p style="font-size:13px;"><strong>Exemple :</strong> si vous lancez <code style="font-family:var(--mono);color:var(--accent);">ps aux</code> dans un conteneur, vous ne verrez que les processus de ce conteneur.</p>
+      </div>
+    </div>
+
+    <!-- Cgroups -->
+    <div class="subsection">
+      <h3><span class="num">2</span> Cgroups — Contrôle des ressources</h3>
+      <p style="font-size:14px;margin-bottom:14px;">Les cgroups limitent l'utilisation des ressources système par un conteneur, évitant qu'un conteneur consomme toute la mémoire ou le CPU de l'hôte.</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--accent);">CPU</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--accent);">RAM</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--accent);">E/S Disque</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--accent);">Réseau</div>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">docker run</span> <span class="flag">-d --memory=</span><span class="val">"256m"</span> <span class="flag">--cpus=</span><span class="val">"1.0"</span> nginx</div>
+      </div>
+    </div>
+
+    <!-- UFS -->
+    <div class="subsection">
+      <h3><span class="num">3</span> Union File System (UFS)</h3>
+      <p style="font-size:14px;margin-bottom:14px;">Chaque conteneur utilise une copie en lecture/écriture de son système de fichiers, basé sur l'image Docker. Cela empêche les conteneurs de modifier directement les fichiers du système hôte ou d'un autre conteneur.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">docker run</span> <span class="flag">--read-only</span> nginx</div>
+      </div>
+    </div>
+
+    <!-- Réseaux -->
+    <div class="subsection">
+      <h3><span class="num">4</span> Réseaux Docker isolés</h3>
+      <p style="font-size:14px;margin-bottom:14px;">Docker permet de créer des réseaux virtuels isolés. Par défaut, les conteneurs ne peuvent pas communiquer entre eux sans être dans le même réseau.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">docker network create</span> my-net
+<span class="cmd">docker run</span> <span class="flag">-d --network</span> my-net <span class="flag">--name</span> web nginx
+<span class="cmd">docker run</span> <span class="flag">-d --network</span> my-net <span class="flag">--name</span> db mongo</div>
+      </div>
+    </div>
+
+    <!-- AppArmor -->
+    <div class="subsection">
+      <h3><span class="num">5</span> AppArmor / SELinux</h3>
+      <p style="font-size:14px;margin-bottom:14px;">Sur certains systèmes, Docker utilise des profils de sécurité qui empêchent un conteneur d'accéder à des fichiers sensibles sur l'hôte.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:6px;">AppArmor</p>
+          <p style="font-size:13px;color:var(--text-dim);">Ubuntu / Debian</p>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:6px;">SELinux</p>
+          <p style="font-size:13px;color:var(--text-dim);">Red Hat / CentOS</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exemple concret -->
+    <div class="subsection" style="border-color:rgba(0,212,255,0.15);">
+      <h3 style="font-size:15px;color:var(--accent);margin-bottom:14px;">🔬 Exemple concret — Démontrer l'isolation</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="comment"># Lancer un conteneur en mode détaché</span>
+<span class="cmd">docker run</span> <span class="flag">-dit --name</span> test-isolation ubuntu bash
+
+<span class="comment"># Entrer dans le conteneur</span>
+<span class="cmd">docker exec</span> <span class="flag">-it</span> test-isolation bash
+
+<span class="comment"># Vous ne verrez que les processus de ce conteneur</span>
+ps aux
+
+<span class="comment"># Depuis l'hôte, vérifier l'isolation</span>
+<span class="cmd">docker inspect</span> test-isolation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION III — PRATIQUE
+  ══════════════════════════════ -->
+  <div class="section" id="pratique">
+    <div class="section-header">
+      <span class="section-num">SECTION III</span>
+      <h2>Commandes pratiques &amp; Bonnes pratiques</h2>
+    </div>
+
+    <!-- A. Alpine -->
+    <div class="subsection">
+      <h3><span class="letter-badge">A</span>&nbsp; Sécuriser un conteneur Docker Alpine</h3>
+      <div class="info-box blue" style="margin-bottom:20px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--accent2);"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p style="font-size:13px;"><strong>Objectif :</strong> Exécuter un conteneur avec <code style="font-family:var(--mono);color:var(--accent);">secureuser</code> pour limiter les privilèges et réduire les risques d'exploitation en cas de compromission.</p>
+      </div>
+
+      <p style="font-weight:600;color:var(--text-bright);margin-bottom:8px;font-size:14px;">1. Créer un conteneur Alpine</p>
+      <p style="font-size:14px;margin-bottom:10px;">Ouvre un terminal et démarre un conteneur Alpine :</p>
+      <div class="img-placeholder">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color:var(--text-dim);"><rect x="3" y="3" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M3 9h18M9 21V9"/></svg>
+        <span>Image : docker run -it alpine sh</span>
+        <img src="../assets/images/media/image1.png" alt="docker run alpine" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+
+      <p style="font-size:14px;margin-top:16px;margin-bottom:8px;">Cela te permet d'interagir directement avec le système dans un conteneur.</p>
+
+      <p style="font-weight:600;color:var(--text-bright);margin-bottom:8px;font-size:14px;">2. Créer un utilisateur dédié</p>
+      <p style="font-size:14px;margin-bottom:10px;">À l'intérieur du conteneur, crée un utilisateur <code style="font-family:var(--mono);color:var(--accent);">secureuser</code> et définis son mot de passe :</p>
+      <div class="img-placeholder">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color:var(--text-dim);"><rect x="3" y="3" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M3 9h18M9 21V9"/></svg>
+        <img src="../assets/images/media/image2.png" alt="adduser secureuser" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <p style="font-size:14px;margin-top:10px;">Test :</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image3.png" alt="whoami" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:8px;">Si <code style="font-family:var(--mono);">whoami</code> affiche <code style="font-family:var(--mono);color:var(--accent3);">secureuser</code>, alors l'utilisateur est bien actif.</p>
+      <div class="img-placeholder" style="margin-top:10px;">
+        <img src="../assets/images/media/image4.png" alt="user created" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+
+      <p style="font-weight:600;color:var(--text-bright);margin:18px 0 8px;font-size:14px;">3. Créer une nouvelle image avec cet utilisateur</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="comment"># Lister les conteneurs actifs</span>
+<span class="cmd">docker ps</span>
+<span class="comment"># → e649b49758dd alpine "sh" Up About a minute vigorous_shirley</span>
+
+<span class="comment"># Commit l'ID du conteneur</span>
+<span class="cmd">docker commit</span> &lt;CONTAINER_ID&gt; alpine_secureuser</div>
+      </div>
+      <div class="img-placeholder" style="margin-top:10px;">
+        <img src="../assets/images/media/image5.png" alt="docker commit" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="img-placeholder" style="margin-top:10px;">
+        <img src="../assets/images/media/image6.png" alt="docker images" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+
+      <p style="font-weight:600;color:var(--text-bright);margin:18px 0 8px;font-size:14px;">4. Commande finale avec bonnes pratiques intégrées</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image7.png" alt="final command" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="code-block" style="margin-top:12px;">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">docker run</span> <span class="flag">-it \
+  --user</span> secureuser <span class="flag">\
+  --security-opt</span> no-new-privileges <span class="flag">\
+  --cap-drop</span> ALL <span class="flag">\
+  --cap-add</span> NET_BIND_SERVICE <span class="flag">\
+  </span>alpine_secureuser sh</div>
+      </div>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:8px;">La commande <code style="font-family:var(--mono);">id</code> confirme que l'utilisateur n'est pas root (UID/GID non nuls).</p>
+
+      <div style="margin-top:20px;">
+        <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px;">Explication des options</p>
+        <div class="practice-list">
+          <div class="practice-item" style="flex-direction:column;gap:4px;">
+            <code style="font-family:var(--mono);font-size:13px;color:var(--accent);">--security-opt no-new-privileges</code>
+            <p style="font-size:13px;">Empêche les processus d'acquérir de nouveaux privilèges via <code style="font-family:var(--mono);">setuid</code> ou <code style="font-family:var(--mono);">setgid</code>. Limite les risques d'escalade de privilèges.</p>
+          </div>
+          <div class="practice-item" style="flex-direction:column;gap:4px;">
+            <code style="font-family:var(--mono);font-size:13px;color:var(--accent);">--cap-drop ALL</code>
+            <p style="font-size:13px;">Supprime toutes les capacités Linux par défaut du conteneur, réduisant les possibilités d'actions potentiellement dangereuses.</p>
+          </div>
+          <div class="practice-item" style="flex-direction:column;gap:4px;">
+            <code style="font-family:var(--mono);font-size:13px;color:var(--accent);">--cap-add NET_BIND_SERVICE</code>
+            <p style="font-size:13px;">Permet de lier des sockets à des ports privilégiés (&lt;1024) sans donner des privilèges root complets.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent3);margin-bottom:12px;">✅ Bonnes pratiques</p>
+        <div class="practice-list">
+          <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Utiliser un utilisateur dédié plutôt que <code style="font-family:var(--mono);">nobody</code> — créer un utilisateur spécifique avec permissions minimales.</p></div>
+          <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Éviter l'exécution en root — utiliser <code style="font-family:var(--mono);">USER</code> dans le Dockerfile pour définir un utilisateur non privilégié.</p></div>
+          <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Restreindre les capacités du conteneur avec <code style="font-family:var(--mono);">--security-opt no-new-privileges</code> et <code style="font-family:var(--mono);">--cap-drop ALL</code>.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B. Isolation réseau -->
+    <div class="subsection" style="margin-top:24px;">
+      <h3><span class="letter-badge">B</span>&nbsp; Isolation réseau dans Docker</h3>
+      <div class="info-box blue" style="margin-bottom:18px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--accent2);"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p style="font-size:13px;"><strong>Objectif :</strong> Désactiver complètement l'accès réseau d'un conteneur, empêchant toute communication avec l'hôte ou d'autres conteneurs.</p>
+      </div>
+
+      <p style="font-size:14px;font-weight:600;color:var(--text-bright);margin-bottom:8px;">Commande</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image8.png" alt="network none command" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="code-block" style="margin-top:10px;">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">docker run</span> <span class="flag">-it \
+  --user</span> secureuser <span class="flag">\
+  --network</span> none <span class="flag">\
+  </span>alpine_secureuser sh</div>
+      </div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
+        <p style="font-size:13px;"><code style="font-family:var(--mono);color:var(--accent);">--user secureuser</code> → Exécute le conteneur sans root.</p>
+        <p style="font-size:13px;"><code style="font-family:var(--mono);color:var(--accent);">--network none</code> → Supprime toute connectivité réseau.</p>
+      </div>
+
+      <p style="font-size:14px;font-weight:600;color:var(--text-bright);margin:18px 0 8px;">Vérification</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="comment"># Doit échouer</span>
+ping google.com
+
+<span class="comment"># Ne doit afficher aucune interface externe</span>
+ip a</div>
+      </div>
+      <div class="img-placeholder" style="margin-top:10px;">
+        <img src="../assets/images/media/image9.png" alt="ping fail" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="img-placeholder" style="margin-top:10px;">
+        <img src="../assets/images/media/image10.png" alt="ip a output" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="practice-list" style="margin-top:14px;">
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p><strong>Interface lo (loopback)</strong> : Seule cette interface est active — communication interne uniquement.</p></div>
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p><strong>Adresse 127.0.0.1</strong> : Le conteneur peut communiquer avec lui-même mais pas avec d'autres réseaux.</p></div>
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p><strong>Absence d'autres interfaces</strong> : Aucune carte réseau ou adresse IP externe n'est attribuée.</p></div>
+      </div>
+    </div>
+
+    <!-- C. Lecture seule -->
+    <div class="subsection" style="margin-top:24px;">
+      <h3><span class="letter-badge">C</span>&nbsp; Test de l'accès en lecture seule</h3>
+      <div class="info-box blue" style="margin-bottom:18px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--accent2);"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p style="font-size:13px;"><strong>Objectif :</strong> L'option <code style="font-family:var(--mono);">--read-only</code> empêche toute modification du système de fichiers, renforçant l'intégrité des données.</p>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image11.png" alt="read-only command" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="code-block" style="margin-top:10px;">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">docker run</span> <span class="flag">-it \
+  --user</span> secureuser <span class="flag">\
+  --read-only \
+  </span>alpine_secureuser sh</div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:6px;font-size:13px;">
+        <p><code style="font-family:var(--mono);color:var(--accent);">--user secureuser</code> → Évite l'exécution en root.</p>
+        <p><code style="font-family:var(--mono);color:var(--accent);">--read-only</code> → Active le mode lecture seule.</p>
+        <p><code style="font-family:var(--mono);color:var(--accent);">alpine_secureuser</code> → Image contenant déjà secureuser.</p>
+        <p><code style="font-family:var(--mono);color:var(--accent);">sh</code> → Lance un shell interactif.</p>
+      </div>
+
+      <p style="font-size:14px;font-weight:600;color:var(--text-bright);margin:18px 0 8px;">Test d'écriture</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image12.png" alt="write test" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="info-box red" style="margin-top:12px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <p style="font-size:13px;"><strong>Résultat attendu :</strong> La commande d'écriture doit échouer car le système de fichiers est en lecture seule.</p>
+      </div>
+
+      <div class="practice-list" style="margin-top:16px;">
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Utiliser <code style="font-family:var(--mono);">--read-only</code> pour les conteneurs servant des fichiers statiques ou des applications web.</p></div>
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Associer un volume <code style="font-family:var(--mono);">-v /data:/data</code> pour les écritures nécessaires — <em>seul /data sera accessible en écriture !</em></p></div>
+      </div>
+    </div>
+
+    <!-- D. Ressources -->
+    <div class="subsection" style="margin-top:24px;">
+      <h3><span class="letter-badge">D</span>&nbsp; Gestion des ressources : CPU &amp; Mémoire</h3>
+      <div class="info-box blue" style="margin-bottom:18px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--accent2);"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p style="font-size:13px;"><strong>Objectif :</strong> Éviter les surcharges et prévenir les abus (attaques DoS) en limitant l'utilisation des ressources d'un conteneur.</p>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image13.png" alt="resource limit command" class="doc-img" style="margin:0;" onerror="this.style.display='none'"/>
+      </div>
+      <div class="code-block" style="margin-top:10px;">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">docker run</span> <span class="flag">-it \
+  --memory=</span><span class="val">"100m"</span> <span class="flag">\
+  --cpus=</span><span class="val">"0.5"</span> <span class="flag">\
+  </span>alpine_secureuser sh</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:6px;">--memory="100m"</p>
+          <p style="font-size:13px;color:var(--text-dim);">Limite à <strong style="color:var(--text);">100 Mo</strong> de RAM</p>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:6px;">--cpus="0.5"</p>
+          <p style="font-size:13px;color:var(--text-dim);">Limite à <strong style="color:var(--text);">50%</strong> d'un cœur CPU</p>
+        </div>
+      </div>
+
+      <div class="info-box orange" style="margin-top:16px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:#ffa502;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+        <p style="font-size:13px;">Cela empêche un conteneur malveillant d'utiliser toutes les ressources — <strong>attaque par déni de service (DoS)</strong>.</p>
+      </div>
+
+      <div class="practice-list" style="margin-top:16px;">
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Toujours limiter les ressources en production pour éviter les conflits entre applications.</p></div>
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Adapter les valeurs de <code style="font-family:var(--mono);">--memory</code> et <code style="font-family:var(--mono);">--cpus</code> selon les besoins réels de l'application.</p></div>
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Utiliser des <strong>cgroups</strong> pour un contrôle avancé des ressources.</p></div>
+        <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Surveiller la consommation avec <code style="font-family:var(--mono);">docker stats</code>.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION IV — CONCLUSION
+  ══════════════════════════════ -->
+  <div class="section" id="conclusion">
+    <div class="section-header">
+      <span class="section-num">SECTION IV</span>
+      <h2>Conclusion et recommandations</h2>
+    </div>
+
+    <div class="conclusion-box">
+      <p style="margin-bottom:18px;">Docker offre une isolation efficace des conteneurs grâce à des mécanismes puissants comme les <strong style="color:var(--accent);">namespaces</strong>, les <strong style="color:var(--accent);">cgroups</strong>, le <strong style="color:var(--accent);">Union File System</strong> et les <strong style="color:var(--accent);">réseaux Docker</strong>. Ces technologies permettent de compartimenter les ressources et de limiter les interactions, réduisant ainsi les risques d'attaques.</p>
+      <p>Cependant, <strong style="color:var(--text-bright);">l'isolation seule ne suffit pas</strong>. Il est essentiel d'adopter des bonnes pratiques :</p>
+    </div>
+
+    <div class="practice-list">
+      <div class="practice-item">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+        <p>Exécuter des conteneurs avec des privilèges restreints (<code style="font-family:var(--mono);color:var(--accent);">--security-opt no-new-privileges</code>).</p>
+      </div>
+      <div class="practice-item">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+        <p>Supprimer les capacités inutiles (<code style="font-family:var(--mono);color:var(--accent);">--cap-drop ALL</code>).</p>
+      </div>
+      <div class="practice-item">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+        <p>Utiliser des profils de sécurité comme <strong>AppArmor</strong> et <strong>SELinux</strong>.</p>
+      </div>
+      <div class="practice-item">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+        <p>Restreindre l'accès réseau et éviter d'exposer directement des services sensibles.</p>
+      </div>
+    </div>
+
+    <div class="info-box green" style="margin-top:28px;">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--accent3);"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      <p>Une approche <strong>proactive</strong> de la sécurité dans Docker permet de profiter de ses avantages sans compromettre la fiabilité du système. En combinant isolation et bonnes pratiques, on peut utiliser Docker en toute confiance, que ce soit pour un développement personnel ou en entreprise.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>🐳 Sécurité &amp; Isolation Docker · Groupe 2025</p>
+    <p style="margin-top:6px;font-size:11px;">· DOWOU ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box, .practice-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

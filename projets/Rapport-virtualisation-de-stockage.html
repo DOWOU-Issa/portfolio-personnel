@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rapport Virtualisation Stockage · Ubuntu Server</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    background: linear-gradient(145deg, #0a1a2f, #0f2a44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS (un seul : DOWOU Issa) ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .subsection h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 16px 0 8px;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+    white-space: pre-wrap;
+  }
+  .code-body .cmd { color: #38bdf8; }
+  .code-body .comment { color: #475569; font-style: italic; }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .img-placeholder img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── STEP BADGE ── */
+  .step-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+    background: rgba(0,212,255,0.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc { padding: 20px; }
+    .subsection { padding: 18px; }
+    .back-btn span { display: none; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Rapport Technique · Virtualisation Stockage</div>
+    <div class="hero-img">
+      <span>💾 Ubuntu Server · LVM · Cockpit · NFS · Nextcloud</span>
+    </div>
+    <h1>Virtualisation de Stockage<br/><span>sur Ubuntu Server avec Cockpit</span></h1>
+    <p class="hero-sub">LVM · NFS · Nextcloud · Démonstration complète</p>
+  </div>
+
+  <!-- ── MEMBRES (un seul : DOWOU Issa) ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membre du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#prerequis">Prérequis et préparation</a>
+        <ul>
+          <li>1. Ajout de disque dans VirtualBox</li>
+          <li>2. Vérification des disques (Cockpit + commande)</li>
+        </ul>
+      </li>
+      <li><a href="#initialisation-lvm">Initialisation LVM</a></li>
+      <li><a href="#formatage-montage">Formatage et montage du LV</a></li>
+      <li><a href="#montage-persistant">Montage persistant</a></li>
+      <li><a href="#extension-lv">Extension du LV</a></li>
+      <li><a href="#partage-nfs">Partage via NFS</a></li>
+      <li><a href="#acces-windows">Démonstration accès NFS depuis Windows</a></li>
+      <li><a href="#nextcloud">Accès Cloud avec Nextcloud</a></li>
+      <li><a href="#demo-nextcloud">Démonstration Nextcloud</a></li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       INTRODUCTION
+  ══════════════════════════════ -->
+  <div class="section" id="introduction">
+    <div class="section-header">
+      <span class="section-num">INTRODUCTION</span>
+      <h2>Introduction</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Ce rapport présente étape par étape la mise en place d'une virtualisation de stockage sur Ubuntu Server en utilisant LVM (Logical Volume Manager) et l'interface web Cockpit. Chaque étape est accompagnée des commandes utilisées, des objectifs pédagogiques et des captures d'écran.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 1 — PRÉREQUIS
+  ══════════════════════════════ -->
+  <div class="section" id="prerequis">
+    <div class="section-header">
+      <span class="section-num">SECTION 1</span>
+      <h2>Prérequis et préparation</h2>
+    </div>
+
+    <div class="subsection">
+      <ul style="margin-left:20px;">
+        <li><strong>Réseau :</strong> La machine virtuelle est configurée en mode accès par pont et Cockpit est accessible via <code>http://IP:9090</code>.</li>
+        <li><strong>Connexion Cockpit :</strong> Connexion avec l'utilisateur (exemple : lord).</li>
+        <li><strong>Disque supplémentaire :</strong> Ajout d'un second disque virtuel (20–50 Go) dans VirtualBox avant le démarrage de la VM.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Ajout de disque dans VirtualBox</h3>
+      <p>VM éteinte : Paramètres → Stockage → Contrôleur SATA → Ajouter un disque dur → Créer → VDI → Dynamique → Taille (ex. 20 Go).</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image1.png" alt="Ajout disque VirtualBox" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible : ajout disque VirtualBox</span>'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Vérification des disques dans Ubuntu</h3>
+      <p><strong>Objectif :</strong> Identifier le nouveau disque (souvent /dev/sdb).</p>
+      
+      <h4>2.1 Interface web Cockpit</h4>
+      <p>On observe les disques ajoutés sdb et sdc :</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image2.png" alt="Cockpit disques" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>2.2 Commande</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">lsblk</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image3.png" alt="lsblk" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 2 — INITIALISATION LVM
+  ══════════════════════════════ -->
+  <div class="section" id="initialisation-lvm">
+    <div class="section-header">
+      <span class="section-num">SECTION 2</span>
+      <h2>Initialisation LVM</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Transformer le disque en PV, l'ajouter au VG et créer un LV.</p>
+      
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="comment"># Initialiser le disque comme PV</span>
+<span class="cmd">sudo pvcreate /dev/sdb</span>
+
+<span class="comment"># Vérifier le nom du VG existant</span>
+<span class="cmd">sudo vgdisplay</span>
+
+<span class="comment"># Créer un nouveau VG ou ajouter au VG existant</span>
+<span class="cmd">sudo vgcreate ubuntu-vg /dev/sdb</span>
+<span class="cmd">sudo vgextend ubuntu-vg /dev/sdb</span>
+
+<span class="comment"># Créer un volume logique de 10 Go</span>
+<span class="cmd">sudo lvcreate -L 10G -n data_lv ubuntu-vg</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image4.png" alt="pvcreate" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image5.png" alt="lvcreate" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 3 — FORMATAGE ET MONTAGE
+  ══════════════════════════════ -->
+  <div class="section" id="formatage-montage">
+    <div class="section-header">
+      <span class="section-num">SECTION 3</span>
+      <h2>Formatage et montage du LV</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Préparer le LV pour l'utilisation et le monter.</p>
+      
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="comment"># Formater en ext4</span>
+<span class="cmd">sudo mkfs.ext4 /dev/ubuntu-vg/data_lv</span>
+
+<span class="comment"># Créer le point de montage</span>
+<span class="cmd">sudo mkdir -p /mnt/data</span>
+
+<span class="comment"># Monter le volume</span>
+<span class="cmd">sudo mount /dev/ubuntu-vg/data_lv /mnt/data</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image6.png" alt="Formatage et montage" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="info-box orange">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 0a.75.75 0 0 0 .75.75H15"/></svg>
+        <p><strong>Note :</strong> Cette erreur n'empêche pas le montage. Elle indique simplement que le point de montage n'est pas défini dans /etc/fstab, donc non persistant après redémarrage.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 4 — MONTAGE PERSISTANT
+  ══════════════════════════════ -->
+  <div class="section" id="montage-persistant">
+    <div class="section-header">
+      <span class="section-num">SECTION 4</span>
+      <h2>Montage persistant</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Assurer que le montage persiste après redémarrage.</p>
+      
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="cmd">echo '/dev/ubuntu-vg/data_lv /mnt/data ext4 defaults 0 2' | sudo tee -a /etc/fstab</span>
+<span class="cmd">sudo systemctl daemon-reload</span>
+
+<span class="comment"># Vérifier</span>
+<span class="cmd">df -h | grep /mnt/data</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image7.png" alt="fstab" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image8.png" alt="df -h" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image9.png" alt="Vérification" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 5 — EXTENSION DU LV
+  ══════════════════════════════ -->
+  <div class="section" id="extension-lv">
+    <div class="section-header">
+      <span class="section-num">SECTION 5</span>
+      <h2>Extension du LV</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Démontrer la flexibilité de LVM en agrandissant un volume logique en ligne.</p>
+      
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="comment"># Étendre le LV de +5 Go</span>
+<span class="cmd">sudo lvextend -L +5G /dev/ubuntu-vg/data_lv</span>
+
+<span class="comment"># Redimensionner le système de fichiers</span>
+<span class="cmd">sudo resize2fs /dev/ubuntu-vg/data_lv</span>
+
+<span class="comment"># Vérifier</span>
+<span class="cmd">df -h | grep /mnt/data</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image10.png" alt="lvextend" onerror="this.style.display='none'">
+        <p>On observe qu'on est passé de 10G à 15G</p>
+        <img src="../assets/images/media/image11.png" alt="df après extension" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 6 — PARTAGE NFS
+  ══════════════════════════════ -->
+  <div class="section" id="partage-nfs">
+    <div class="section-header">
+      <span class="section-num">SECTION 6</span>
+      <h2>Partage via NFS</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Partager le stockage sur le réseau.</p>
+      
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="comment"># Installer NFS</span>
+<span class="cmd">sudo apt update &amp;&amp; sudo apt install nfs-kernel-server -y</span>
+
+<span class="comment"># Exporter le répertoire</span>
+<span class="cmd">echo '/mnt/data *(rw,sync,no_subtree_check)' | sudo tee -a /etc/exports</span>
+<span class="cmd">sudo exportfs -a</span>
+<span class="cmd">sudo systemctl restart nfs-kernel-server</span>
+
+<span class="comment"># Vérifier le service</span>
+<span class="cmd">systemctl status nfs-kernel-server --no-pager</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image12.png" alt="Installation NFS" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>Cockpit - Services NFS actifs</h4>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image13.png" alt="Services NFS Cockpit" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>Journaux de démarrage du service</h4>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image14.png" alt="Journaux NFS" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 7 — ACCÈS WINDOWS
+  ══════════════════════════════ -->
+  <div class="section" id="acces-windows">
+    <div class="section-header">
+      <span class="section-num">SECTION 7</span>
+      <h2>Démonstration de l'accès NFS depuis une machine Windows</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Montrer que le volume logique data_lv (sur /mnt/data) créé avec LVM et partagé via NFS est accessible depuis une machine Windows physique, prouvant la virtualisation et le partage réseau.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Vérifier le partage côté serveur Ubuntu</h3>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">cat /etc/exports</span>
+<span class="cmd">systemctl status nfs-kernel-server --no-pager</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image15.png" alt="Vérification partage" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Activer le client NFS sur Windows</h3>
+      <ol style="margin-left:20px;">
+        <li>Ouvrir Panneau de configuration → Programmes → Activer ou désactiver des fonctionnalités Windows.</li>
+        <li>Cocher "Services pour NFS" (Client NFS).</li>
+        <li>Redémarrer si nécessaire.</li>
+      </ol>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image16.png" alt="Activer client NFS Windows" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Monter le partage NFS sur Windows</h3>
+      <p>Quelques vérifications côté serveur :</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/f266d8be04cdec5fb2f3729961f93b0164e3fd61.png" alt="Vérifications serveur" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Commande (PowerShell ou CMD en admin) :</p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">mount \\192.168.43.149\mnt\data Z:</span></div>
+      </div>
+      <p><em>(Remplacer l'IP par celle de ton serveur Ubuntu)</em></p>
+      <div class="img-placeholder">
+        <img src="../assets/images/97096d950fc583815ae72fddd9c0f3045385cf63.png" alt="Montage NFS Windows" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">4</span> Vérification du partage NFS</h3>
+      
+      <h4>Objectif</h4>
+      <p>Prouver que le partage NFS est fonctionnel en créant un fichier test depuis Windows (lecteur Z:) et en vérifiant sa présence sur le serveur Ubuntu dans /mnt/data.</p>
+      
+      <h4>Explication</h4>
+      <p>Le lecteur Z: ne s'affiche pas dans l'Explorateur Windows car le système de fichiers utilisé côté Ubuntu est ext4, un format que Windows ne sait pas interpréter directement. Cependant, grâce à NFS, Windows peut tout de même écrire et lire dans ce répertoire via le réseau. La preuve se fait par la commande echo sous Windows et la vérification avec ls sous Ubuntu.</p>
+      
+      <h4>1. Côté Windows</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">echo test &gt; Z:\test.txt</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/94f86fd87b6851c3600ef31ada80f3bbf1bcf4cd.png" alt="Création fichier test Windows" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>2. Côté Ubuntu</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">ls /mnt/data</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/2306d150b3ec3c92c8dec500c5513aba84775f75.png" alt="Vérification Ubuntu" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="info-box green">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <p><strong>Conclusion :</strong> Même si le lecteur Z: n'est pas visible dans l'Explorateur Windows, la démonstration est réussie : Windows écrit bien dans le partage NFS, Ubuntu lit le fichier créé. Cela prouve l'interopérabilité entre systèmes différents grâce à NFS et valide la virtualisation du stockage.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 8 — NEXTCLOUD
+  ══════════════════════════════ -->
+  <div class="section" id="nextcloud">
+    <div class="section-header">
+      <span class="section-num">SECTION 8</span>
+      <h2>Accès Cloud avec Nextcloud (Disque sdb)</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Démontrer que le stockage virtualisé sur sdb peut être intégré dans une solution cloud (Nextcloud) et accessible via un navigateur web. Cela prouve que le même espace de stockage est utilisable en local, en réseau (NFS), et en mode cloud.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7.1</span> Installation de Nextcloud</h3>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">sudo snap install nextcloud</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/6c0869b1c4d17ee0a96d2d28f003d57d6100ded8.png" alt="Installation Nextcloud" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7.2</span> Configuration initiale de Nextcloud (Snap)</h3>
+      
+      <h4>1. Vérifier que le service est actif</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">sudo snap services nextcloud</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/f9ef60a83a5367d1ff4773242a28d060f47b2ced.png" alt="Services Nextcloud" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>2. Créer l'utilisateur admin</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">sudo nextcloud.manual-install admin monmotdepasse</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/01405d975d2ca83ca48942dfba08c8caddc8dbc6.png" alt="Install admin Nextcloud" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>3. Autoriser l'accès web</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">sudo nextcloud.enable-https self-signed</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/9dba6b1696683fd4c8ba736b2ec92966afa59b1a.png" alt="Enable HTTPS Nextcloud" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7.3</span> Accéder à l'interface Nextcloud</h3>
+      <p>Depuis ton navigateur Windows :</p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">http://192.168.43.149/</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/7efb04299b6b2ac781c905813b0df510be338b6c.png" alt="Interface Nextcloud" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 9 — DÉMONSTRATION NEXTCLOUD
+  ══════════════════════════════ -->
+  <div class="section" id="demo-nextcloud">
+    <div class="section-header">
+      <span class="section-num">SECTION 9</span>
+      <h2>Démonstration Nextcloud</h2>
+    </div>
+
+    <div class="subsection">
+      <p><strong>Objectif :</strong> Valider l'accès cloud au stockage virtualisé en créant un fichier via l'interface web de Nextcloud et en vérifiant sa présence côté serveur Ubuntu.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Création d'un fichier test dans Nextcloud</h3>
+      <ul style="margin-left:20px;">
+        <li>Ouvrir l'interface Nextcloud dans le navigateur : <code>https://192.168.43.149/</code></li>
+        <li>Cliquer sur le bouton "+" en haut ou dans le dossier "Fichiers"</li>
+      </ul>
+      <div class="img-placeholder">
+        <img src="../assets/images/171b053f34f62ffb417123b64687bc3b8cc06563.png" alt="Création fichier Nextcloud" onerror="this.style.display='none'">
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li>Sélectionner "Nouveau fichier texte"</li>
+        <li>Nommer le fichier : cloud_test.txt</li>
+      </ul>
+      <div class="img-placeholder">
+        <img src="../assets/images/539905762ddf33a436c43a619db342ba3ae0060f.png" alt="Nommer fichier" onerror="this.style.display='none'">
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li>Écrire une ligne de contenu, par exemple : "Test Nextcloud depuis Navigateur"</li>
+      </ul>
+      <div class="img-placeholder">
+        <img src="../assets/images/67687f5f5ee2637855793705a989b4ffc8308da3.png" alt="Contenu fichier" onerror="this.style.display='none'">
+      </div>
+      <ul style="margin-left:20px;"><li>Enregistrer le fichier.</li></ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Vérification côté Ubuntu</h3>
+      <p>Dans le terminal Ubuntu, exécuter la commande suivante :</p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">ls /var/snap/nextcloud/common/nextcloud/data/lord/files</span></div>
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/e564f9baec48807610ed387010baad0662e13fda.png" alt="Vérification fichier Ubuntu" onerror="this.style.display='none'">
+      </div>
+      <p>Le fichier cloud_test.txt doit apparaître dans ce répertoire.</p>
+      <p><em>Remarque :</em> Si l'on souhaite que le fichier apparaisse dans /mnt/data, il faut configurer Nextcloud pour utiliser ce dossier comme répertoire de données. Pour cette démonstration, le dossier par défaut est suffisant.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Conclusion</h3>
+      <div class="info-box green">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <p>Cette étape confirme que le stockage virtualisé est accessible via une interface cloud. L'utilisateur peut créer et consulter des fichiers depuis un navigateur, prouvant l'interopérabilité entre le serveur Ubuntu et l'environnement web. La démonstration est ainsi complète et fonctionnelle.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>💾 Virtualisation Stockage · Ubuntu Server · LVM · NFS · Nextcloud</p>
+    <p style="margin-top:6px;font-size:11px;">· DOWOU Issa ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

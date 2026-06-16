@@ -1,0 +1,58 @@
+[
+  {
+    "titre": "Bonne-pratique-Sécurité-Dockers",
+    "fichier": "Bonne-pratique-Sécurité-Dockers.html",
+    "description": "Sécurité et isolation des conteneurs Docker"
+  },
+  {
+    "titre": "Configuration-DNS-DHCP-NFS",
+    "fichier": "Configuration-DNS-DHCP-NFS.html",
+    "description": "Comment configurer un serveur léger dns et dhcp alias Dnsmasq ?"
+  },
+  {
+    "titre": "Exposé-Virtualisation",
+    "fichier": "Exposé-Virtualisation.html",
+    "description": "SOMMAIRE :"
+  },
+  {
+    "titre": "Pipeline-Ci-GithubActions",
+    "fichier": "Pipeline-Ci-GithubActions.html",
+    "description": "A.Création du dépôt GitHub"
+  },
+  {
+    "titre": "Plan-ERP-ONOMO",
+    "fichier": "Plan-ERP-ONOMO.html",
+    "description": "Mise en place d’un ERP à l’hôtel ONOMO"
+  },
+  {
+    "titre": "Projet-Ingénieurie-du-besoin",
+    "fichier": "Projet-Ingénieurie-du-besoin.html",
+    "description": "Introduction"
+  },
+  {
+    "titre": "Gestion d une bibliotheque",
+    "fichier": "Gestion-Bibliotheque.html",
+    "description": "INTRODUCTION"
+  },
+  {
+    "titre": "Rapport-virtualisation-de-stockage",
+    "fichier": "Rapport-virtualisation-de-stockage.html",
+    "description": "Rapport de Virtualisation de Stockage sur Ubuntu Server avec Cockpit"
+  },
+  {
+    "titre": "SCANNER-UN-RESEAU-AVEC-NMAP",
+    "fichier": "SCANNER-UN-RESEAU-AVEC-NMAP.html",
+    "description": "SCANNER UN RESEAU AVEC NMAP"
+  },
+  {
+    "titre": "Windows-Servers-Adds",
+    "fichier": "Windows-Servers-Adds.html",
+    "description": "Installation d un serveur"
+  },
+  {
+    "titre": "Analyses des precipitations 1982-2024",
+    "fichier": "Analyses-des-precipitations-1982-2024.html",
+    "description": "Installation d un serveur"
+  }
+
+]

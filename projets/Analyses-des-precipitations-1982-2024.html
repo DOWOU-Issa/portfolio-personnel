@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse Pluviométrique · DOWOU Issa · 1982–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --bg-deep: #020c1a;
+    --bg-surface: #0b1424;
+    --bg-elevated: #101a2c;
+    --border-glow: #1f3a5f;
+    --accent-primary: #00e0ff;
+    --accent-secondary: #3b82f6;
+    --accent-tertiary: #00ffb3;
+    --text-main: #eaf4ff;
+    --text-dim: #8aa3c4;
+    --text-muted: #4a617c;
+    --danger: #ff4d6d;
+    --warning: #ffb347;
+    --success: #2ecc71;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    background-color: var(--bg-deep);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle at 15% 30%, rgba(0,224,255,0.02) 1.5px, transparent 1.5px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(0,224,255,0.2);
+    z-index: 1000;
+  }
+  .progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+    box-shadow: 0 0 8px var(--accent-primary);
+    transition: width 0.12s ease;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16, 26, 44, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 0.5rem 1.2rem;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    color: var(--accent-primary);
+    text-decoration: none;
+    border: 1px solid rgba(0,224,255,0.25);
+    transition: all 0.2s;
+    margin-bottom: 2rem;
+  }
+  .back-link:hover {
+    border-color: var(--accent-primary);
+    background: rgba(0,224,255,0.08);
+    transform: translateX(-3px);
+  }
+
+  .hero {
+    text-align: center;
+    margin: 1rem 0 2rem;
+    animation: fadeUp 0.8s ease forwards;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,224,255,0.1);
+    padding: 0.3rem 1rem;
+    border-radius: 60px;
+    border: 1px solid rgba(0,224,255,0.3);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--accent-primary);
+    margin-bottom: 1.8rem;
+  }
+  .badge span {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse { 0% { opacity: 0.4; } 100% { opacity: 1; } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero h1 {
+    font-size: clamp(1.8rem, 6vw, 3.2rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff, var(--accent-primary), var(--accent-secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .hero-sub {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .author-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glow);
+    border-radius: 24px;
+    padding: 0.8rem 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin: 1.2rem 0 2rem;
+    backdrop-filter: blur(4px);
+  }
+  .author-avatar {
+    background: linear-gradient(145deg, var(--accent-secondary), var(--accent-primary));
+    width: 42px;
+    height: 42px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+
+  .toc {
+    background: rgba(11, 20, 36, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-glow);
+    border-radius: 28px;
+    padding: 1.8rem 2rem;
+    margin: 2rem 0 2.5rem;
+  }
+  .toc-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent-primary);
+    margin-bottom: 1.2rem;
+  }
+  .toc-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.4rem;
+  }
+  .toc-item {
+    flex: 1 1 220px;
+    font-size: 0.85rem;
+  }
+  .toc-item a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc-item a:hover { color: var(--accent-primary); }
+
+  .section {
+    margin: 3rem 0;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    border-left: 4px solid var(--accent-primary);
+    padding-left: 1.2rem;
+    margin-bottom: 1.8rem;
+  }
+  .section-num {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--accent-primary);
+    font-size: 0.8rem;
+    background: rgba(0,224,255,0.1);
+    padding: 2px 10px;
+    border-radius: 40px;
+  }
+  .section h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-glow);
+    border-radius: 24px;
+    padding: 1.5rem;
+    margin-bottom: 1.6rem;
+    transition: border 0.2s;
+  }
+  .card:hover { border-color: rgba(0,224,255,0.3); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .stat-badge {
+    background: #0a1022;
+    border-radius: 18px;
+    padding: 0.9rem;
+    text-align: center;
+    border: 1px solid #1f3552;
+  }
+  .stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent-tertiary);
+    font-family: var(--font-mono);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    font-family: var(--font-mono);
+    margin: 1rem 0;
+  }
+  th, td {
+    border-bottom: 1px solid rgba(100, 140, 180, 0.3);
+    padding: 0.7rem 0.5rem;
+    text-align: left;
+  }
+  th {
+    color: var(--accent-primary);
+    font-weight: 600;
+  }
+
+  .info-note {
+    background: rgba(59,130,246,0.08);
+    border-left: 3px solid var(--accent-secondary);
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+  }
+
+  .img-placeholder {
+    background: linear-gradient(120deg, #0e172a, #0a1220);
+    border-radius: 20px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+    border: 1px dashed #2c4568;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .img-placeholder img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-top: 8px;
+  }
+
+  .drive-link {
+    background: rgba(0,255,179,0.08);
+    border-radius: 24px;
+    padding: 1rem 1.6rem;
+    text-align: center;
+    margin: 2rem 0;
+  }
+  .drive-link a {
+    color: var(--accent-tertiary);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid var(--accent-tertiary);
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-glow);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .card, .stat-badge, .toc { animation: fadeUp 0.6s ease backwards; }
+  .section { animation: fadeUp 0.5s ease both; }
+</style>
+</head>
+<body>
+<div class="progress-container"><div class="progress-bar" id="scrollProgress"></div></div>
+<div class="wrapper">
+  <a href="#" class="back-link" onclick="history.back();return false;">← Retour aux projets</a>
+  
+  <div class="hero">
+    <div class="badge"><span></span> ANALYSE PLUVIOMÉTRIQUE · 43 ANS · 1982–2024</div>
+    <h1>Analyse Pluviométrique<br>Exhaustive <span style="background: linear-gradient(135deg,#00e0ff,#3b82f6); background-clip:text; -webkit-background-clip:text; color:transparent;">1982 – 2024</span></h1>
+    <p class="hero-sub">Qualité des données · Statistiques · Corrélation · Mensuel · Tendance · ACP · Prévision · 15 695 observations</p>
+    <div class="author-card">
+      <div class="author-avatar">DI</div>
+      <div><strong>DOWOU Issa</strong> — IABD B3 · Mai 2026</div>
+    </div>
+  </div>
+
+  <!-- TABLE DES MATIÈRES -->
+  <div class="toc">
+    <div class="toc-title">📑 SOMMAIRE ANALYTIQUE</div>
+    <div class="toc-grid">
+      <div class="toc-item">1. <a href="#qualite">Qualité des données</a></div>
+      <div class="toc-item">2. <a href="#stats-annuelles">Statistiques annuelles</a></div>
+      <div class="toc-item">3. <a href="#mensuel">Régime mensuel</a></div>
+      <div class="toc-item">4. <a href="#correlation">Corrélations</a></div>
+      <div class="toc-item">5. <a href="#tendance">Tendance & Mann-Kendall</a></div>
+      <div class="toc-item">6. <a href="#acp">ACP & Biplot</a></div>
+      <div class="toc-item">7. <a href="#prevision">Prévision 2025–2031</a></div>
+      <div class="toc-item">8. <a href="#excel">Fichier Excel associé</a></div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 1 : QUALITE ========= -->
+  <div class="section" id="qualite">
+    <div class="section-header"><span class="section-num">01</span><h2>Qualité des données & valeurs manquantes</h2></div>
+    <div class="card">
+      <p><strong>Audit exhaustif :</strong> 15 695 observations — <strong>1 seule valeur manquante</strong> (0.006%).</p>
+      </table>
+        <thead><tr><th>Année</th><th>Jour</th><th>Valeur imputée</th><th>Méthode</th><th>Justification</th></tr></thead>
+        <tbody><tr><td>2024</td><td>1 (1 Jan)</td><td>0.0 mm</td><td>Médiane historique du jour 1</td><td>100% des années 1982-2023 : 0 mm</td></tr></tbody>
+      </table>
+      <div class="info-note">🔍 <strong>Valeurs extrêmes (IQR)</strong> : 71 valeurs détectées au-delà de Q3+3×IQR, toutes météorologiquement cohérentes (max 149.2 mm/jour). Décision de conservation. Inventaire complet dans Excel.</div>
+
+    </div>
+  </div>
+
+  <!-- ========== SECTION 2 : STATISTIQUES ANNUES ========= -->
+  <div class="section" id="stats-annuelles">
+    <div class="section-header"><span class="section-num">02</span><h2>Statistiques annuelles globales</h2></div>
+    <div class="card">
+      <div class="stat-grid">
+        <div class="stat-badge"><div class="stat-value">3 860 mm</div><div>Moyenne annuelle</div></div>
+        <div class="stat-badge"><div class="stat-value">±533 mm</div><div>Écart-type interannuel</div></div>
+        <div class="stat-badge"><div class="stat-value">4 985 mm</div><div>Année max (2003)</div></div>
+        <div class="stat-badge"><div class="stat-value">2 591 mm</div><div>Année min (1982)</div></div>
+        <div class="stat-badge"><div class="stat-value">149.2 mm</div><div>Max journalier absolu (2008)</div></div>
+        <div class="stat-badge"><div class="stat-value">~180 j/an</div><div>Jours de pluie moyen</div></div>
+      </div>
+      <div class="img-placeholder">
+        📊 Figure 1 — Totaux pluviométriques annuels (1982–2024) avec droite de tendance et moyenne.
+        <img src="..\\assets\\images\\figure1_totaux_annuels.png" alt="Figure 1 : Totaux annuels 1982-2024" onerror="this.style.display='none'">
+      </div>
+      <div class="info-note">Indicateurs calculés par année : =SUM, =COUNTIF, =STDEV, =PERCENTILE. Colonne ⚠ indique le nombre d'extrêmes IQR par année.</div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 3 : MENSUEL ========= -->
+  <div class="section" id="mensuel">
+    <div class="section-header"><span class="section-num">03</span><h2>Analyse mensuelle & régime tropical</h2></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Mois</th><th>Somme moy. (mm)</th><th>Jours pluie moy.</th><th>% annuel</th></tr></thead>
+        <tbody>
+          <tr><td>Jan</td><td>16.2</td><td>1.4</td><td>0.4%</td></tr>
+          <tr><td>Fév</td><td>47.0</td><td>3.7</td><td>1.2%</td></tr>
+          <tr><td>Mar</td><td>162.4</td><td>11.7</td><td>4.2%</td></tr>
+          <tr><td>Avr</td><td>309.2</td><td>18.8</td><td>8.0%</td></tr>
+          <tr><td>Mai</td><td>404.4</td><td>22.8</td><td>10.5%</td></tr>
+          <tr><td>Jun</td><td>515.7</td><td>25.3</td><td>13.4%</td></tr>
+          <tr><td>Jul</td><td>610.9</td><td>27.5</td><td>15.8%</td></tr>
+          <tr><td>Aoû</td><td>752.1</td><td>27.6</td><td>19.5%</td></tr>
+          <tr><td>Sep</td><td>670.6</td><td>26.9</td><td>17.4%</td></tr>
+          <tr><td>Oct</td><td>314.8</td><td>18.0</td><td>8.2%</td></tr>
+          <tr><td>Nov</td><td>39.3</td><td>3.3</td><td>1.0%</td></tr>
+          <tr><td>Déc</td><td>17.2</td><td>1.3</td><td>0.4%</td></tr>
+        </tbody>
+      </table>
+      <div class="img-placeholder">
+        📊 Figure 2 — Régime pluviométrique mensuel moyen (barres = somme, losanges rouges = jours de pluie).
+        <img src="..\\assets\\images\\figure2_mensuel.png" alt="Figure 2 : Régime mensuel" onerror="this.style.display='none'">
+      </div>
+      <div class="info-note">🌧️ <strong>Régime unimodal typique</strong> : saison des pluies Juin–Octobre (76% du total). Pic maximal en Août (752 mm, 27.6 jours). Saison sèche Nov–Fév (3% annuel).</div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 4 : CORRELATIONS ========= -->
+  <div class="section" id="correlation">
+    <div class="section-header"><span class="section-num">04</span><h2>Analyse de corrélation (Pearson)</h2></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Variable 1</th><th>Variable 2</th><th>r</th><th>R²</th><th>Interprétation</th></tr></thead>
+        <tbody>
+          <tr><td>Somme annuelle</td><td>Jours pluie</td><td>0.578</td><td>33%</td><td>Modérée +</td></tr>
+          <tr><td>Somme annuelle</td><td>Écart-type</td><td>0.743</td><td>55%</td><td>Forte +</td></tr>
+          <tr><td>Somme annuelle</td><td>P95</td><td>0.780</td><td>61%</td><td>Forte + (années humides = événements intenses)</td></tr>
+          <tr><td>Somme annuelle</td><td>Max journalier</td><td>0.236</td><td>6%</td><td>Faible</td></tr>
+          <tr><td>Jours pluie</td><td>Max journalier</td><td>-0.005</td><td>0%</td><td>Nulle</td></tr>
+        </tbody>
+      </table>
+      <div class="img-placeholder">
+        📈 Figure 3 — Nuages de points : Somme vs Jours de pluie, Écart-type, Max journalier (droite de régression en rouge).
+        <img src="../assets/images/figure3_nuages_points.png" alt="Figure 3 : Nuages de points" onerror="this.style.display='none'">
+      </div>
+      <div class="info-note">Corrélation maximale Somme vs P95 (r=0.78). Les années humides génèrent davantage d'épisodes intenses.</div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 5 : TENDANCE + MK ========= -->
+  <div class="section" id="tendance">
+    <div class="section-header"><span class="section-num">05</span><h2>Tendance temporelle & test de Mann-Kendall</h2></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Variable</th><th>Pente (mm/an)</th><th>Pente de Sen</th><th>p-value</th><th>MK Z</th><th>Tendance (5%)</th></tr></thead>
+        <tbody>
+          <tr><td>Somme annuelle</td><td>+2.0</td><td>-0.3</td><td>0.747</td><td>0.000</td><td>NON significative</td></tr>
+          <tr><td>Jours de pluie</td><td>-0.28 j/an</td><td>—</td><td>0.194</td><td>-1.298</td><td>Baisse non significative</td></tr>
+          <tr><td>Max journalier</td><td>-0.05</td><td>—</td><td>0.630</td><td>-0.481</td><td>Stable</td></tr>
+        </tbody>
+      </table>
+      <div class="img-placeholder">
+        📉 Figure 4 — Évolution du nombre annuel de jours de pluie (1982–2024) avec tendance.
+        <img src="../assets/images/figure4_jours_pluie.png" alt="Figure 4 : Évolution jours de pluie" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        📊 Figure 5 — Distribution des totaux annuels par décennie (violinplot + observations individuelles).
+        <img src="../assets/images/figure5_distribution_decennie.png" alt="Figure 5 : Distribution par décennie" onerror="this.style.display='none'">
+      </div>
+      <div class="info-note">✅ <strong>Conclusion robuste :</strong> aucune tendance significative détectée sur 43 ans (régression, Mann-Kendall). Régime pluviométrique stationnaire.</div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 6 : ACP ========= -->
+  <div class="section" id="acp">
+    <div class="section-header"><span class="section-num">06</span><h2>Analyse en Composantes Principales (ACP)</h2></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Composante</th><th>Valeur propre</th><th>% variance</th><th>% cumulé</th><th>Interprétation</th></tr></thead>
+        <tbody>
+          <tr><td>PC1</td><td>3.20</td><td>53.4%</td><td>53.4%</td><td>Humidité globale</td></tr>
+          <tr><td>PC2</td><td>1.76</td><td>29.3%</td><td>82.6%</td><td>Intensité vs régularité</td></tr>
+          <tr><td>PC3</td><td>0.84</td><td>14.1%</td><td>96.7%</td><td>Extrêmes ponctuels</td></tr>
+        </tbody>
+      </table>
+      <div class="img-placeholder">
+        📊 Figure 6 — Gauche : scores des années sur PC1×PC2 (couleur = année). Droite : cercle de corrélation des variables.
+        <img src="../assets/images/figure6_acp_biplot.png" alt="Figure 6 : ACP biplot" onerror="this.style.display='none'">
+      </div>
+      <div class="info-note">PC1 (53.4%) : Somme, P95, Écart-type, Jours_Pluie positifs. PC2 (29.3%) : oppose Jours_Pluie (fréquence) à Écart-type et Max (intensité). Années humides et intenses : 2003, 2008.</div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 7 : PREVISION ========= -->
+  <div class="section" id="prevision">
+    <div class="section-header"><span class="section-num">07</span><h2>Prévision 2025–2031 & intervalle bootstrap</h2></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Année</th><th>Prévision centrale (mm)</th><th>IC 90% Bas (mm)</th><th>IC 90% Haut (mm)</th><th>Interprétation</th></tr></thead>
+        <tbody>
+          <tr><td>2025</td><td>~3 860</td><td>~2 800</td><td>~4 900</td><td>Proche de la moyenne historique</td></tr>
+          <tr><td>2027</td><td>~3 870</td><td>~2 750</td><td>~4 990</td><td>Légère hausse polynomiale</td></tr>
+          <tr><td>2030</td><td>~3 885</td><td>~2 700</td><td>~5 070</td><td>Incertitude croissante</td></tr>
+        </tbody>
+      </table>
+      <div class="img-placeholder">
+        📈 Figure 7 — Prévision pluviométrique 2025–2031 avec intervalle de confiance 90% (bootstrap 500 itérations).
+        <img src="../assets/images/figure7_prevision.png" alt="Figure 7 : Prévision 2025-2031" onerror="this.style.display='none'">
+      </div>
+      <div class="info-note">⚠️ Prévision basée sur tendance polynomiale degré 2 + bootstrap. IC90 large (±1100 mm) reflète la forte variabilité naturelle. Ne remplace pas un modèle climatique régional.</div>
+    </div>
+  </div>
+
+  <!-- ========== SECTION 8 : EXCEL DRIVE ========= -->
+  <div class="section" id="excel">
+    <div class="section-header"><span class="section-num">08</span><h2>Données brutes & fichier Excel associé</h2></div>
+    <div class="drive-link">
+      <p>📁 <strong>Fichier Excel complet</strong> — Données originales, statistiques annuelles, corrélations, ACP, détection d'extrêmes, analyse mensuelle et prévision.</p>
+      <p><a href="https://docs.google.com/spreadsheets/d/1_TnTu44O_pT2gx57RPwpeMwmAnSd5yJP/edit?usp=sharing&ouid=108677796220446355884&rtpof=true&sd=true" target="_blank" rel="noopener">🔗 Accéder au classeur Google Sheets (analyse pluviométrique complète)</a></p>
+      <p style="font-size:0.7rem; margin-top:6px;">Feuilles incluses : DONNEES_BRUTES, STATISTIQUES_ANNUELLES, CORRELATION, ANALYSE_MENSUELLE, ACP_RESUME, NUAGE_DE_POINTS, QUALITE_DONNEES, TENDANCE.</p>
+    </div>
+    <div class="card">
+      <p><strong>Résumé méthodologique :</strong> valeurs manquantes imputées par médiane historique ; détection d'extrêmes par IQR (71 valeurs conservées) ; tendances par régression linéaire + Mann-Kendall ; ACP normalisée ; prévisions par bootstrap polynomial (500 itérations).</p>
+      <div class="info-note">💡 L'inventaire complet des 71 valeurs extrêmes avec seuils et Z-scores est disponible dans la feuille QUALITE_DONNEES du classeur Excel.</div>
+    </div>
+  </div>
+
+  <!-- ========== CONCLUSION ========= -->
+  <div class="section">
+    <div class="section-header"><span class="section-num">✔</span><h2>Conclusion générale</h2></div>
+    <div class="card">
+      <p>- <strong>Qualité des données :</strong> excellente (1 NaN / 15 695 obs.). 71 extrêmes documentés et conservés — tous météorologiquement cohérents.</p>
+      <p>- <strong>Régime pluviométrique :</strong> tropical unimodal, pic en Août (752 mm). Saison sèche marquée Nov–Fév (3% du total).</p>
+      <p>- <strong>Variabilité interannuelle forte :</strong> 2 591 mm (1982) à 4 985 mm (2003). Coefficient de variation ~14%.</p>
+      <p>- <strong>Corrélations :</strong> humidité annuelle liée à l'intensité des épisodes (r=0.78 avec P95), pas à leur fréquence seule.</p>
+      <p>- <strong>Tendance :</strong> AUCUNE tendance significative détectée (Mann-Kendall, régression, p>0.05 sur toutes variables). Régime stationnaire.</p>
+      <p>- <strong>ACP :</strong> 2 composantes expliquent 82.6% de la variance. Structure humidité/intensité robuste et interprétable.</p>
+      <p>- <strong>Prévision :</strong> stationnarité attendue à court terme (~3 860 mm/an), incertitude ±1 100 mm (IC 90%).</p>
+      <p style="margin-top:1rem; font-family:var(--font-mono); font-size:0.8rem; border-top: 1px solid #1f3552; padding-top:1rem;">📧 Contact : dowouissa69@gmail.com· IABD B3 · Mai 2026</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Analyse pluviométrique exhaustive · DOWOU Issa · 1982–2024 (43 ans) · Méthodes : IQR, Pearson, Mann-Kendall, ACP, Bootstrap</p>
+    <p style="margin-top:6px;">⚡ Données validées · Stationnarité statistique confirmée · Fichier Excel complet accessible via lien Google Drive</p>
+  </footer>
+</div>
+
+<script>
+  const progressBar = document.getElementById('scrollProgress');
+  window.addEventListener('scroll', () => {
+    const docEl = document.documentElement;
+    const pct = (docEl.scrollTop / (docEl.scrollHeight - docEl.clientHeight)) * 100;
+    progressBar.style.width = pct + '%';
+  });
+
+  const cards = document.querySelectorAll('.card, .stat-badge, .drive-link');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  cards.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(14px)';
+    el.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

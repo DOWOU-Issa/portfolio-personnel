@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cahier des charges · Gestion logement étudiant</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    background: linear-gradient(145deg, #0a1a2f, #0f2a44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS (un seul : DOWOU Issa) ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .subsection h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 16px 0 8px;
+  }
+
+  /* ── TABLE STYLES ── */
+  .ns-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  .ns-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: rgba(0,212,255,0.06);
+    color: var(--accent);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--border);
+  }
+  .ns-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .ns-table tr:last-child td { border-bottom: none; }
+  .ns-table tr:hover td { background: rgba(0,212,255,0.03); }
+
+  /* ── CUSTOM TABLES (acteurs, limites, versions, benchmark) ── */
+  .project-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .project-table th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-weight: 600;
+    padding: 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  .project-table td {
+    padding: 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  /* ── MAQUETTE STYLES ── */
+  .maquette-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .maquette-box table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+  }
+  .maquette-box td, .maquette-box th {
+    border: 1px solid var(--border);
+    padding: 8px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+    white-space: pre-wrap;
+  }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── PRACTICE CARDS ── */
+  .practice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .practice-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .practice-item:hover { border-color: rgba(0,255,157,0.2); }
+  .practice-item .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .practice-item .check svg { width: 11px; height: 11px; color: var(--accent3); }
+
+  /* ── SECTION LETTER BADGE ── */
+  .letter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0a2545, #0d3566);
+    border: 1px solid rgba(0,212,255,0.3);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .img-placeholder img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── VERSION BADGES ── */
+  .version-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+    background: rgba(0,212,255,0.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc { padding: 20px; }
+    .subsection { padding: 18px; }
+    .back-btn span { display: none; }
+    .project-table { font-size: 12px; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Cahier des charges · Projet étudiant</div>
+    <div class="hero-img">
+      <span>🏠 Gestion des demandes de logement</span>
+    </div>
+    <h1>Système de gestion des<br/><span>demandes de logement étudiant</span></h1>
+    <p class="hero-sub">CDPS-Togo · Centralisation · Automatisation</p>
+  </div>
+
+  <!-- ── MEMBRES (un seul : DOWOU Issa) ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membre du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#introduction">Introduction</a>
+        <ul>
+          <li>1.1. Contexte de la mission</li>
+          <li>1.2. Objectifs du projet</li>
+          <li>1.3. Démarche de recueil des besoins</li>
+        </ul>
+      </li>
+      <li><a href="#glossaire">Glossaire du projet</a>
+        <ul>
+          <li>2.1. Termes et définitions</li>
+        </ul>
+      </li>
+      <li><a href="#contexte">Contexte du système</a>
+        <ul>
+          <li>3.1. Parties prenantes (Acteurs)</li>
+          <li>3.2. Flux d'informations</li>
+          <li>3.3. Outils existants et limites</li>
+          <li>3.4. Contraintes du projet</li>
+          <li>3.5. Opportunités liées au contexte</li>
+        </ul>
+      </li>
+      <li><a href="#specs-fonctionnelles">Spécifications fonctionnelles</a></li>
+      <li><a href="#specs-non-fonctionnelles">Spécifications non fonctionnelles</a></li>
+      <li><a href="#priorites">Priorités et versions</a>
+        <ul>
+          <li>Version 1 – Essentiel</li>
+          <li>Version 2 – Intelligent</li>
+          <li>Version 3 – Connecté</li>
+        </ul>
+      </li>
+      <li><a href="#annexes">Annexes</a>
+        <ul>
+          <li>7.1. Maquette interface étudiante</li>
+          <li>7.2. Schéma des flux d'information</li>
+          <li>7.3. Tableaux comparatifs (benchmark)</li>
+          <li>7.4. Questionnaires</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 1 — INTRODUCTION
+  ══════════════════════════════ -->
+  <div class="section" id="introduction">
+    <div class="section-header">
+      <span class="section-num">SECTION 1</span>
+      <h2>Introduction</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1.1</span> Contexte de la mission</h3>
+      <p>Chaque année, le Collège de Paris Supérieur Togo (CDPS-Togo) accueille de nombreux nouveaux étudiants sur plusieurs de ses campus. C'est un véritable défi de gestion pour l'établissement, puisqu'il est fortement sollicité par ses étudiants pour leur logement entre différents campus de la ville.</p>
+      <p>A l'heure actuelle, ces demandes de logement sont traitées de manière très disparate par chaque campus, à travers des processus peu automatisés reposant sur du papier et du fichier Excel. Cela engendre de nombreux problèmes tels qu'un manque de lisibilité sur les processus entre les différents campus, des délais importants dans le traitement des demandes, un manque de suivi sur les dossiers de logement et bien souvent un manque d'équité dans la distribution des logements.</p>
+      <p>Pour répondre à cette problématique, la direction du CDPS-Togo souhaite mettre en place un outil informatique de gestion des demandes de logement afin d'automatiser et d'équilibrer le traitement de ces demandes.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1.2</span> Objectifs du projet</h3>
+      <p>Ce projet a pour ambition de développer une plateforme unique et automatisée pour les raisons suivantes :</p>
+      <ul style="margin-left:20px;">
+        <li>Saisir et suivre les demandes des étudiants en temps réel</li>
+        <li>Vérifier s'il existe des offres de logement adaptées aux demandes des étudiants</li>
+        <li>Gérer les propositions de logement des établissements et les attributions en conservant un historique</li>
+        <li>Produire des tableaux de bord sur les volumes de demande et les taux d'occupation</li>
+        <li>Assurer que la gestion des demandes et des attributions est diligentée au regard des critères spécifiques suivants : handicapées, précaires, éloignés, etc.</li>
+      </ul>
+      <p>Cette plateforme permettra également aux CROUS de disposer d'une gestion plus transparente et efficiente de leurs attributions de logements, tout en simplifiant les démarches des étudiants.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1.3</span> Démarche de recueil des besoins</h3>
+      <p>Pour créer un service qui réponde aux attentes des étudiants et des responsables, nous avons mené une réflexion commune tout au long de ce projet.</p>
+      
+      <h4>Découvrir les besoins et problématiques</h4>
+      <p>Nous avons rencontré des responsables afin de mieux comprendre les problématiques en matière d'attribution de logement. Ces discussions nous ont permis de cibler des points sensibles : des délais parfois excessifs, un manque de suivi sur les dossiers des étudiants et des règles d'attribution souvent floues.</p>
+      
+      <h4>Comprendre les failles du système actuel</h4>
+      <p>En étudiant les pratiques actuelles, nous avons constaté que chaque campus agit de façon isolée, ce qui crée des incohérences et des inégalités. Certains dossiers sont traités à la vitesse de l'éclair pendant que d'autres prennent des semaines.</p>
+      
+      <h4>Établir les grands axes du projet</h4>
+      <p>Avec les retours des étudiants et des responsables, nous sommes arrivés à un consensus sur les besoins majeurs : faciliter la constitution des dossiers, fournir aux étudiants une visibilité sur l'état de leur dossier, garantir une attribution des logements plus équitable et donner aux responsables les outils de gestion dont ils ont besoin.</p>
+      
+      <h4>Poser les bases du projet</h4>
+      <p>Toutes ces analyses ont été synthétisées dans un cahier des charges précis et détaillé qui servira de guide pour la conception de la solution.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 2 — GLOSSAIRE
+  ══════════════════════════════ -->
+  <div class="section" id="glossaire">
+    <div class="section-header">
+      <span class="section-num">SECTION 2</span>
+      <h2>Glossaire du projet</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Ce glossaire a pour but d'éclaircir certains termes techniques ou spécifiques utilisés tout au long du projet, afin de garantir une compréhension commune entre toutes les parties impliquées.</p>
+      
+      <h4>Termes et définitions</h4>
+      <ul style="margin-left:20px;">
+        <li><strong><u>Demande de logement</u></strong> : Formulaire ou requête faite par un étudiant pour solliciter une place dans un logement universitaire géré par l'un des campus du CDP Togo.</li>
+        <li><strong><u>Affectation</u></strong> : Décision officielle attribuant un logement disponible à un étudiant. L'affectation prend en compte plusieurs critères comme l'urgence ou la situation personnelle.</li>
+        <li><strong><u>Critères de priorité</u></strong> : Règles ou facteurs qui permettent de trier les demandes, notamment en cas de forte affluence. Il peut s'agir d'un handicap, de difficultés financières ou d'un éloignement géographique important.</li>
+        <li><strong><u>Système centralisé</u></strong> : Outil informatique unique, partagé entre tous les campus, qui permet de gérer les demandes de manière coordonnée et cohérente.</li>
+        <li><strong><u>Traçabilité</u></strong> : Possibilité de suivre chaque étape du traitement d'une demande : depuis son dépôt jusqu'à la réponse finale ou l'attribution du logement.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 3 — CONTEXTE DU SYSTÈME
+  ══════════════════════════════ -->
+  <div class="section" id="contexte">
+    <div class="section-header">
+      <span class="section-num">SECTION 3</span>
+      <h2>Contexte du système</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3.1</span> Parties prenantes (Acteurs)</h3>
+      
+      <table class="project-table">
+        <tr>
+          <th>Acteurs</th>
+          <th>Rôles</th>
+          <th>Besoins</th>
+        </tr>
+        <tr>
+          <td><strong>Étudiants</strong></td>
+          <td>Utilisateurs finaux du système</td>
+          <td>
+            - Soumettre une demande facilement<br/>
+            - Consulter les disponibilités<br/>
+            - Suivre l'état de leur dossier
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Gestionnaires de résidence</strong></td>
+          <td>Agents responsables du traitement des demandes</td>
+          <td>
+            - Accéder rapidement aux demandes reçues<br/>
+            - Appliquer des critères de priorité<br/>
+            - Affecter des logements et consulter les historiques
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Direction / Administration</strong></td>
+          <td>Prise de décision stratégique</td>
+          <td>
+            - Accéder aux indicateurs globaux (taux d'occupation, demandes non satisfaites)<br/>
+            - Assurer une politique équitable de logement inter-campus
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Administrateurs du système</strong></td>
+          <td>Techniciens en charge de la gestion technique</td>
+          <td>
+            - Assurer la maintenance<br/>
+            - Garantir la sécurité et la conformité technique
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3.2</span> Flux d'informations</h3>
+      
+      <h4>A. Entre étudiants et le système</h4>
+      <ul style="margin-left:20px;">
+        <li>Saisie et envoi de la demande de logement</li>
+        <li>Réception de notifications (confirmation, affectation, rejet)</li>
+        <li>Consultation de l'état d'avancement</li>
+      </ul>
+      
+      <h4>B. Entre gestionnaires et le système</h4>
+      <ul style="margin-left:20px;">
+        <li>Consultation des demandes en attente</li>
+        <li>Application des critères de priorité</li>
+        <li>Affectation manuelle ou semi-automatique des logements</li>
+        <li>Mise à jour des disponibilités</li>
+      </ul>
+      
+      <h4>C. Entre direction et le système</h4>
+      <ul style="margin-left:20px;">
+        <li>Génération de rapports statistiques</li>
+        <li>Visualisation des tableaux de bord décisionnels</li>
+      </ul>
+      
+      <h4>D. Entre administrateurs et le système</h4>
+      <ul style="margin-left:20px;">
+        <li>Création/modification des comptes</li>
+        <li>Sauvegarde et restauration des données</li>
+        <li>Suivi de la sécurité (mots de passe, logs, accès)</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3.3</span> Outils existants et limites</h3>
+      
+      <h4>Outils en place</h4>
+      <ul style="margin-left:20px;">
+        <li>Tableurs Excel non partagés entre campus</li>
+        <li>Formulaires papier remplis manuellement</li>
+        <li>Échanges de données par email ou WhatsApp</li>
+      </ul>
+      
+      <h4>Limites identifiées</h4>
+      <table class="project-table">
+        <tr>
+          <th>Limites</th>
+          <th>Conséquences</th>
+        </tr>
+        <tr>
+          <td>Gestion non centralisée</td>
+          <td>Doublons, manque de coordination entre campus</td>
+        </tr>
+        <tr>
+          <td>Aucun historique fiable</td>
+          <td>Difficile de retracer les décisions et de détecter les abus</td>
+        </tr>
+        <tr>
+          <td>Risques de perte ou d'erreur</td>
+          <td>Absence de critères harmonisés d'attribution</td>
+        </tr>
+        <tr>
+          <td>Inégalité de traitement</td>
+          <td>Absence de critères harmonisés d'attribution</td>
+        </tr>
+        <tr>
+          <td>Retards dans les affectations</td>
+          <td>Certains étudiants n'ont pas de logement à temps</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3.4</span> Contraintes du projet</h3>
+      
+      <h4>A. Contraintes organisationnelles</h4>
+      <ul style="margin-left:20px;">
+        <li>Autonomie des campus : harmonisation sans brusquer</li>
+        <li>Calendriers différents selon les filières</li>
+        <li>Résistance au changement des gestionnaires</li>
+      </ul>
+      
+      <h4>B. Contraintes réglementaires</h4>
+      <ul style="margin-left:20px;">
+        <li>Protection des données personnelles (RGPD)</li>
+        <li>Conservation des données pour une durée légale</li>
+      </ul>
+      
+      <h4>C. Contraintes techniques</h4>
+      <ul style="margin-left:20px;">
+        <li>Connectivité Internet inégale entre les campus</li>
+        <li>Limitation des ressources matérielles</li>
+        <li>Besoin d'un système léger, rapide, accessible via navigateur</li>
+      </ul>
+      
+      <h4>D. Contraintes budgétaires</h4>
+      <ul style="margin-left:20px;">
+        <li>Budget limité pour l'hébergement cloud et le développement</li>
+        <li>Nécessité de choisir une technologie open-source ou peu coûteuse</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3.5</span> Opportunités liées au contexte</h3>
+      <ul style="margin-left:20px;">
+        <li>Digitalisation des processus internes (stratégie de modernisation)</li>
+        <li>Amélioration de l'équité entre les étudiants via des critères objectifs</li>
+        <li>Collecte de données fiables pour des décisions stratégiques</li>
+        <li>Image positive de l'établissement auprès des parents et partenaires</li>
+        <li>Réplicabilité du système dans d'autres services</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 4 — SPÉCIFICATIONS FONCTIONNELLES
+  ══════════════════════════════ -->
+  <div class="section" id="specs-fonctionnelles">
+    <div class="section-header">
+      <span class="section-num">SECTION 4</span>
+      <h2>Spécifications fonctionnelles</h2>
+    </div>
+
+    <div class="subsection">
+      <ul style="margin-left:20px;">
+        <li><strong><u>Saisie en ligne des demandes</u></strong> : Interface web accessible 24h/24, formulaire simple avec pièces justificatives, sauvegarde de demande incomplète.</li>
+        <li><strong><u>Vérification automatique des critères d'éligibilité</u></strong> : Contrôle en temps réel des conditions, notification en cas de non-éligibilité.</li>
+        <li><strong><u>Suivi de l'état des demandes</u></strong> : Statut consultable (en cours, acceptée, refusée), notifications automatiques, historique conservé.</li>
+        <li><strong><u>Visualisation des logements disponibles</u></strong> : Fiches détaillées par campus, disponibilité en temps réel, filtres de recherche.</li>
+        <li><strong><u>Système de priorisation</u></strong> : Classement selon critères (handicap, éloignement, précarité) via scoring automatique.</li>
+        <li><strong><u>Génération de statistiques</u></strong> : Tableaux de bord pour l'administration (taux d'occupation, délais, répartition).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 5 — SPÉCIFICATIONS NON FONCTIONNELLES
+  ══════════════════════════════ -->
+  <div class="section" id="specs-non-fonctionnelles">
+    <div class="section-header">
+      <span class="section-num">SECTION 5</span>
+      <h2>Spécifications non fonctionnelles</h2>
+    </div>
+
+    <div class="subsection">
+      <ul style="margin-left:20px;">
+        <li><strong><u>Sécurité</u></strong> : Connexion HTTPS, chiffrement des données personnelles, authentification par identifiant/mot de passe, gestion des rôles.</li>
+        <li><strong><u>Performances</u></strong> : Chargement des pages &lt; 3 secondes, traitement des demandes &lt; 5 secondes.</li>
+        <li><strong><u>Disponibilité</u></strong> : 24h/24 et 7j/7, support jusqu'à 200 connexions simultanées.</li>
+        <li><strong><u>Accessibilité</u></strong> : Compatible ordinateurs, tablettes, smartphones ; normes pour personnes malvoyantes.</li>
+        <li><strong><u>Sauvegarde et fiabilité</u></strong> : Sauvegarde automatique quotidienne, restauration en moins de 2 heures.</li>
+        <li><strong><u>Portabilité</u></strong> : Compatible Chrome, Firefox, Edge ; Android et iOS via navigateur.</li>
+        <li><strong><u>Testabilité</u></strong> : Tests automatiques couvrant au moins 80% des fonctionnalités principales.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 6 — PRIORITÉS ET VERSIONS
+  ══════════════════════════════ -->
+  <div class="section" id="priorites">
+    <div class="section-header">
+      <span class="section-num">SECTION 6</span>
+      <h2>Priorités et versions</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Afin d'assurer une mise en œuvre efficace et progressive, nous structurons les livrables en plusieurs versions.</p>
+
+      <h3><span class="version-badge">Version 1</span> Ce qu'il faut absolument dès le départ</h3>
+      <ul style="margin-left:20px;">
+        <li>Création de comptes étudiants et gestionnaires</li>
+        <li>Soumission des demandes de logement</li>
+        <li>Consultation en temps réel des disponibilités par campus</li>
+        <li>Affectation des logements</li>
+        <li>Suivi et historique des affectations</li>
+        <li>Prise en compte de critères sensibles (handicap, éloignement, précarité)</li>
+        <li>Interface web responsive</li>
+        <li>Sécurisation des accès</li>
+      </ul>
+
+      <h3><span class="version-badge">Version 2</span> Rendre le système plus intelligent et plus fluide</h3>
+      <ul style="margin-left:20px;">
+        <li>Moteur de règles pour priorités automatiques</li>
+        <li>Tableau de bord visuel pour gestionnaires</li>
+        <li>Notifications automatiques aux étudiants</li>
+        <li>Meilleure gestion des cas particuliers</li>
+        <li>Génération de statistiques et rapports</li>
+        <li>Traçabilité renforcée</li>
+      </ul>
+
+      <h3><span class="version-badge">Version 3</span> Ouvrir, connecter, améliorer l'expérience globale</h3>
+      <ul style="margin-left:20px;">
+        <li>Connexion avec système d'inscription universitaire</li>
+        <li>Retours et avis sur l'expérience de logement</li>
+        <li>Module de planification des déménagements</li>
+        <li>API pour partenaires externes</li>
+        <li>Interface multilingue</li>
+      </ul>
+
+      <h4>Résumé</h4>
+      <table class="project-table">
+        <tr>
+          <th>Version</th>
+          <th>Objectif principal</th>
+          <th>Exemples de fonctionnalités</th>
+        </tr>
+        <tr>
+          <td>V1</td>
+          <td>Démarrer rapidement avec l'essentiel</td>
+          <td>Comptes, demandes, affectations simples, critères sensibles</td>
+        </tr>
+        <tr>
+          <td>V2</td>
+          <td>Automatiser et améliorer l'expérience</td>
+          <td>Notifications, priorités automatiques, tableaux de bord</td>
+        </tr>
+        <tr>
+          <td>V3</td>
+          <td>Connecter, enrichir, penser à long terme</td>
+          <td>API, feedback, intégrations, version multilingue</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION 7 — ANNEXES
+  ══════════════════════════════ -->
+  <div class="section" id="annexes">
+    <div class="section-header">
+      <span class="section-num">SECTION 7</span>
+      <h2>Annexes</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7.1</span> Maquette de l'interface étudiante (basse fidélité)</h3>
+      
+      <div class="maquette-box">
+        <p><strong>A. Page d'accueil (menu de navigation)</strong></p>
+        <table>
+          <tr><td>PORTAIL LOGEMENT ÉTUDIANT</td></tr>
+          <tr><td>Menu : 1- [Nouvelle demande] 2- [Suivi de demande] 3-[Profil]</td></tr>
+        </table>
+        
+        <p><strong>B. Nouvelle demande</strong></p>
+        <p>[Matricule étudiant] : _____________________<br/>
+        [Nom] : ___________________________<br/>
+        [Prénoms] : ___________________________<br/>
+        [Année académique] : [2025-2026]<br/>
+        [Campus souhaité] : [▼ Lomé]<br/>
+        [Période souhaitée] : [Début] __/__/_____ [Fin] __/__/_____<br/>
+        [Motif de la demande] :<br/>
+        [ ] Handicap<br/>
+        [ ] Précarité<br/>
+        [ ] Éloignement géographique (>100 km)<br/>
+        [ ] Autre (préciser) : _______________________<br/>
+        [Commentaires supplémentaires] : ____________________________<br/>
+        [Bouton : Envoyer la demande]</p>
+        
+        <p><strong>C. Suivi de demande</strong></p>
+        <table>
+          <tr>
+            <td>Date de demande</td>
+            <td>Campus visé</td>
+            <td>Statut</td>
+            <td>Affectation</td>
+          </tr>
+          <tr>
+            <td>15/05/2025</td>
+            <td>Kara</td>
+            <td>En attente</td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td>02/03/2025</td>
+            <td>Lomé</td>
+            <td>Acceptée</td>
+            <td>Résidence Caisse</td>
+          </tr>
+          <tr>
+            <td>20/12/2024</td>
+            <td>Kara</td>
+            <td>Rejetée</td>
+            <td>-</td>
+          </tr>
+        </table>
+        <p>[Bouton : Télécharger l'accusé de réception (PDF)]<br/>
+        [Bouton : Modifier/Annuler une demande]</p>
+        <p><u>Notifications :</u><br/>
+        ✓ Votre demande du 15/05/2025 est toujours en cours d'analyse.<br/>
+        ✓ Le logement attribué à Lomé est toujours actif.<br/>
+        ✗ Aucun logement disponible actuellement à Kara.</p>
+        
+        <p><strong>D. Profil</strong></p>
+        <p>Nom : AYABA Kossi<br/>
+        Matricule : CDPS-2025-2E-45<br/>
+        Filière : Informatique<br/>
+        Niveau : B2<br/>
+        Campus principal : Lomé<br/>
+        Email : ayabakossi@gmail.com<br/>
+        Téléphone : +228 90 67 98 03<br/>
+        Situation particulière : [✔] Éloignement géographique (>100km)<br/>
+        Mot de passe : ************** [Modifier]<br/>
+        Historique des logements attribués :<br/>
+        - Résidence Caisse : Janvier 2025 – Juin 2025<br/>
+        - Aucun logement actif actuellement<br/>
+        [Bouton : Modifier mes informations]<br/>
+        [Bouton : Se déconnecter]</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7.2</span> Schéma des flux d'information du système</h3>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image1.png" alt="Schéma des flux" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible : schéma des flux</span>'">
+        <p>Ce schéma montre les interactions entre les utilisateurs, la plateforme et les composants du système (base de données, direction).</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7.3</span> Tableaux comparatifs (benchmark)</h3>
+      
+      <table class="project-table">
+        <tr>
+          <th>Établissement</th>
+          <th>Outil de gestion actuel</th>
+          <th>Niveau de centralisation</th>
+          <th>Plateforme web disponible ?</th>
+        </tr>
+        <tr>
+          <td>CDPS-Togo</td>
+          <td>Excel, formulaires papier</td>
+          <td>Aucune centralisation</td>
+          <td>Non</td>
+        </tr>
+        <tr>
+          <td>Université de Lomé</td>
+          <td>Formulaires Google + suivi manuel</td>
+          <td>Partielle</td>
+          <td>Oui (limité)</td>
+        </tr>
+        <tr>
+          <td>ISSEA (Cameroun)</td>
+          <td>Logiciel interne dédié</td>
+          <td>Centralisé</td>
+          <td>Oui</td>
+        </tr>
+        <tr>
+          <td>Université Senghor</td>
+          <td>Logiciel interne dédié</td>
+          <td>Centralisé</td>
+          <td>Oui, avec portail logement</td>
+        </tr>
+      </table>
+      
+      <p><u>Analyse :</u> Le CDPS-Togo est en retard sur ses concurrents en matière de digitalisation du logement étudiant. Le projet vise donc à combler cet écart.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7.4</span> Questionnaires</h3>
+      
+      <p>Ces questionnaires ont été répondu par le responsable IT du collège de paris de Lomé M. AHOULOUMI Essowaba</p>
+      
+      <div class="info-box blue">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        <div>
+          <p><strong>Question 1 :</strong> Comment recevez-vous actuellement les demandes de logement ?</p>
+          <p><em>Réponse :</em> Les demandes de logement se font en présentiel au secrétariat. Nos étudiants viennent se présenter au secrétariat pour faire verbalement leur demande et le Secrétaire se charge de remplir ces demandes dans un fichier Excel.</p>
+          
+          <p><strong>Question 2 :</strong> Quels outils utilisez-vous (Excel, papier, mails…) ?</p>
+          <p><em>Réponse :</em> C'est Excel que nous utilisons.</p>
+          
+          <p><strong>Question 3 :</strong> Quels sont les problèmes que vous rencontrez dans le traitement des demandes ?</p>
+          <p><em>Réponse :</em> Nous rencontrons effectivement beaucoup de problèmes :</p>
+          <ul>
+            <li>Le temps pour trouver des logements aux étudiants est long. Un mois en moyenne pour chaque logement trouvé.</li>
+            <li>Nous avons des difficultés à trouver des logements proches du Campus.</li>
+            <li>Nous avons également des difficultés à satisfaire à toutes les demandes. Il y a certains étudiants à qui nous n'arrivons pas à trouver de logement.</li>
+          </ul>
+          
+          <p><strong>Question 4 :</strong> Souhaitez-vous pouvoir affecter les logements automatiquement selon certains critères (handicap, précarité, ancienneté…) ?</p>
+          <p><em>Réponse :</em> Oui bien sûr. Nous aimerions affecter des logements automatiquement selon les critères d'handicap et d'ancienneté.</p>
+          
+          <p><strong>Question 5 :</strong> Avez-vous besoin de filtrer les demandes par date, campus, ou situation particulière ?</p>
+          <p><em>Réponse :</em> Oui effectivement. Nous avons besoin de filtrer les demandes par date, campus, sexe et ancienneté.</p>
+          
+          <p><strong>Question 6 :</strong> Serait-il utile d'avoir un tableau de bord avec les statistiques (nombre de logements disponibles, nombre de demandes en cours, taux d'occupation…) ?</p>
+          <p><em>Réponse :</em> ça serait utile d'avoir un tableau de bord avec les statistiques.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>🏠 Cahier des charges · Gestion des demandes de logement étudiant · CDPS-Togo</p>
+    <p style="margin-top:6px;font-size:11px;">· DOWOU Issa ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box, .practice-item, .project-table').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

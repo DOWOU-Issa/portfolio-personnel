@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Liste des projets de DOWOU ISSA">
+  <title>Projets - DOWOU ISSA</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/projets.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav class="navbar">
+      <div class="logo">DOWOU ISSA</div>
+      <ul class="nav-links">
+        <li><a href="../index.html">Accueil</a></li>
+        <li><a href="../cv.html">CV</a></li>
+        <li><a href="../projets.html" class="active">Projets</a></li>
+        <li><a href="../github.html">GitHub</a></li>
+        <li><a href="../video.html">Vidéos</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Section Projets -->
+  <section class="cv-section projets">
+    <h1>Mes Projets</h1>
+    <p>Voici une sélection de mes projets:</p>
+
+    <!-- Barre de recherche avec bouton -->
+    <div class="search-container">
+      <input type="text" id="searchBar" placeholder="Rechercher un projet...">
+      <button onclick="searchProjects()">Rechercher</button>
+    </div>
+
+    <!-- Liste des projets générée depuis projets.json -->
+    <ul id="projectList" class="liste-projets">
+      <!-- Les projets seront insérés ici par JavaScript -->
+    </ul>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 DOWOU ISSA - Tous droits réservés</p>
+  </footer>
+
+  <!-- Script pour charger projets.json et gérer la recherche -->
+  <script>
+    let projetsData = [];
+
+    // Charger le fichier JSON
+    fetch("../data/projets.json")
+      .then(response => response.json())
+      .then(data => {
+        projetsData = data;
+        afficherProjets(projetsData);
+      })
+      .catch(error => console.error("Erreur de chargement du JSON :", error));
+
+    // Fonction pour afficher les projets
+    function afficherProjets(projets) {
+      const projectList = document.getElementById("projectList");
+      projectList.innerHTML = "";
+      projets.forEach(projet => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="../projets/${projet.fichier}">${projet.titre}</a>`;
+        projectList.appendChild(li);
+      });
+    }
+
+    // Fonction de recherche
+    function searchProjects() {
+      const input = document.getElementById("searchBar").value.toLowerCase();
+      const filtres = projetsData.filter(projet =>
+        projet.titre.toLowerCase().includes(input)
+      );
+      afficherProjets(filtres);
+    }
+  </script>
+</body>
+</html>

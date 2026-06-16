@@ -1,0 +1,241 @@
+.projets {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.projets h1 {
+  text-align: center;
+  color: #0a3d62;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.projets p {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+/* Barre de recherche avec bouton */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+#searchBar {
+  flex: 1;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px 0 0 8px;
+  font-size: 1rem;
+}
+
+#searchBar:focus {
+  border-color: #0a3d62;
+  outline: none;
+}
+
+.search-container button {
+  padding: 0.8rem 1.2rem;
+  border: none;
+  background: #0a3d62;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-container button:hover {
+  background: #60a3bc;
+}
+
+/* Liste des projets */
+.liste-projets {
+  list-style: none;
+  padding: 0;
+}
+
+.liste-projets li {
+  margin: 0.8rem 0;
+  font-size: 1.1rem;
+  background: #f5f6fa;
+  padding: 0.8rem;
+  border-radius: 6px;
+  transition: transform 0.2s, background 0.3s;
+}
+
+.liste-projets li:hover {
+  transform: translateX(5px);
+  background: #eaf0f1;
+}
+
+.liste-projets a {
+  text-decoration: none;
+  color: #0a3d62;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.liste-projets a:hover {
+  color: #60a3bc;
+}
+
+/* Common styles */
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-color {
+  color: #0a3d62;
+}
+
+.text-margin {
+  margin: 0.8rem 0;
+}
+
+.text-background {
+  background: #f5f6fa;
+}
+
+.text-padding {
+  padding: 0.8rem;
+}
+
+.text-transition {
+  transition: transform 0.2s, background 0.3s;
+}
+
+.text-color-hover {
+  color: #60a3bc;
+}
+
+/* Specific styles */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar {
+  flex: 1;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px 0 0 8px;
+  font-size: 1rem;
+}
+
+.search-button {
+  padding: 0.8rem 1.2rem;
+  border: none;
+  background: #0a3d62;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-button:hover {
+  background: #60a3bc;
+}
+
+.project-list {
+  list-style: none;
+  padding: 0;
+}
+
+.project-list li {
+  margin: 0.8rem 0;
+  font-size: 1.1rem;
+  background: #f5f6fa;
+  padding: 0.8rem;
+  border-radius: 6px;
+  transition: transform 0.2s, background 0.3s;
+}
+
+.project-list li:hover {
+  transform: translateX(5px);
+  background: #eaf0f1;
+}
+
+.project-list a {
+  text-decoration: none;
+  color: #0a3d62;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.project-list a:hover {
+  color: #60a3bc;
+}
+
+/* Style général */
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Paragraphes */
+p {
+  text-align: justify;
+  margin-bottom: 1rem;
+}
+
+/* Titres */
+h1, h2, h3, h4 {
+  color: #0a3d62;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+/* Listes */
+ul, ol {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Images */
+img {
+  display: block;
+  max-width: 80%;
+  height: auto;
+  margin: 1.5rem auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Bouton retour */
+.back-button {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.back-button button {
+  background: #0a3d62;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.back-button button:hover {
+  background: #3c6382;
+}

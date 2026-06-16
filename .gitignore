@@ -1,0 +1,9 @@
+# Exclure le dossier Github
+Github/
+
+# Exclure le dossier des vidéos
+assets/videos/
+
+# Exclure les fichiers Word et PowerPoint dans le dossier content
+content/*.docx
+content/*.pptx

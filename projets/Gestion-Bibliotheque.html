@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rapport SQL · Gestion Bibliothèque</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    background: linear-gradient(145deg, #0a1a2f, #0f2a44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS (un seul : DOWOU Issa) ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── INFO PROJET ── */
+  .project-info {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .info-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .info-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .info-value {
+    font-size: 14px;
+    color: var(--text-bright);
+    font-weight: 600;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .subsection h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 16px 0 8px;
+  }
+
+  /* ── TABLES ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+    font-family: var(--mono);
+  }
+  .data-table th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-weight: 600;
+    padding: 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  .data-table td {
+    padding: 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+  }
+  .data-table tr:hover td {
+    background: rgba(0,212,255,0.03);
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+    white-space: pre-wrap;
+  }
+  .code-body .cmd { color: #38bdf8; }
+  .code-body .comment { color: #475569; font-style: italic; }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── PRACTICE CARDS ── */
+  .practice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .practice-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .practice-item:hover { border-color: rgba(0,255,157,0.2); }
+  .practice-item .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .practice-item .check svg { width: 11px; height: 11px; color: var(--accent3); }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .img-placeholder img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── FOLDER STRUCTURE ── */
+  .folder-structure {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 2;
+    color: var(--text);
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc { padding: 20px; }
+    .subsection { padding: 18px; }
+    .back-btn span { display: none; }
+    .data-table { font-size: 11px; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Projet SQL · Application Web</div>
+    <div class="hero-img">
+      <span>📚 Gestion de Bibliothèque</span>
+    </div>
+    <h1>Rapport de conception<br/><span>Application web de gestion</span></h1>
+    <p class="hero-sub">MERISE · PHP · MySQL · Gestion d'emprunts</p>
+  </div>
+
+  <!-- ── MEMBRES (un seul : DOWOU Issa) ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membre du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── INFORMATIONS PROJET ── -->
+  <div class="project-info">
+    <div class="info-item">
+      <span class="info-label">MEMBRES</span>
+      <span class="info-value">DOWOU Issa, ABALO KOMI OLIVIER NESTOR</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">PROFESSEUR</span>
+      <span class="info-value">M. GBOLOVI</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">MATIERE</span>
+      <span class="info-value">SQL</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">NIVEAU</span>
+      <span class="info-value">B3_IABD</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">ÉTABLISSEMENT</span>
+      <span class="info-value">Collège de Paris Supérieur</span>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#cahier-charges">I. Cahier des charges</a>
+        <ul>
+          <li>1. Contexte</li>
+          <li>2. Objectifs</li>
+          <li>3. Utilisateurs</li>
+          <li>4. Périmètre fonctionnel</li>
+          <li>5. Contraintes & règles de gestion</li>
+          <li>6. Livrables</li>
+        </ul>
+      </li>
+      <li><a href="#analyse-conception">II. Analyse et conception (MERISE)</a>
+        <ul>
+          <li>1. Dictionnaire des données</li>
+          <li>2. MCD</li>
+          <li>3. MLD</li>
+        </ul>
+      </li>
+      <li><a href="#base-donnees">III. Base de données</a>
+        <ul>
+          <li>1. Création des tables</li>
+          <li>2. Insertions</li>
+          <li>3. Identifiants de connexion</li>
+        </ul>
+      </li>
+      <li><a href="#application">IV. Conception de l'application</a>
+        <ul>
+          <li>1. Architecture du projet</li>
+          <li>2. Interfaces utilisateur</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       INTRODUCTION
+  ══════════════════════════════ -->
+  <div class="section" id="introduction">
+    <div class="section-header">
+      <span class="section-num">INTRODUCTION</span>
+      <h2>Introduction</h2>
+    </div>
+
+    <div class="subsection">
+      <p>La gestion d'une bibliothèque nécessite aujourd'hui des outils efficaces permettant de centraliser les informations, d'automatiser les procédures et de faciliter l'accès aux ressources. Dans de nombreuses structures, les opérations telles que l'enregistrement des livres, la gestion des emprunts, le suivi des réservations ou encore l'administration des utilisateurs sont souvent réalisées manuellement ou à l'aide d'outils peu adaptés. Cette organisation entraîne des pertes de temps, des erreurs fréquentes et une difficulté à produire des statistiques fiables.</p>
+      
+      <p>Face à ces limites, il devient indispensable de mettre en place une application informatique moderne pour optimiser le fonctionnement global de la bibliothèque. Le présent projet vise donc à concevoir et développer une solution simple, intuitive et sécurisée permettant de gérer efficacement les différentes activités du système.</p>
+      
+      <p>L'objectif principal de l'application est de faciliter la gestion des livres et des adhérents, tout en automatisant les processus d'emprunt et de réservation. Plus spécifiquement, le système permettra :</p>
+      
+      <ul style="margin-left:20px;">
+        <li>L'enregistrement, la classification et la mise à jour des livres ;</li>
+        <li>La gestion des adhérents et de leurs informations ;</li>
+        <li>Le suivi des emprunts, retours et retards éventuels ;</li>
+        <li>La gestion des réservations de livres ;</li>
+        <li>La consultation rapide et fiable des données stockées.</li>
+      </ul>
+      
+      <p>Pour mener à bien ce projet, une démarche rigoureuse a été adoptée. La méthodologie MERISE a été utilisée pour l'analyse et la conception du système à travers le dictionnaire des données, le Modèle Conceptuel de Données (MCD) et le Modèle Logique de Données (MLD). La phase de développement a été réalisée en utilisant PHP pour la partie applicative et MySQL pour la création et la gestion de la base de données. Cette combinaison technologique garantit une application dynamique, évolutive et compatible avec un déploiement sur serveur web.</p>
+      
+      <p>Ce rapport présente l'ensemble du processus de conception et de réalisation de l'application de gestion de bibliothèque, depuis l'analyse des besoins jusqu'au développement des premières interfaces fonctionnelles.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION I — CAHIER DES CHARGES
+  ══════════════════════════════ -->
+  <div class="section" id="cahier-charges">
+    <div class="section-header">
+      <span class="section-num">SECTION I</span>
+      <h2>Cahier des charges</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Contexte</h3>
+      <p>La bibliothèque souhaite automatiser la gestion de son catalogue (livres, auteurs, catégories), la gestion des adhérents, et les opérations d'emprunt, retour et réservation. L'objectif est de gagner en efficacité, réduire les erreurs manuelles et obtenir des rapports fiables.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Objectifs</h3>
+      <ul style="margin-left:20px;">
+        <li>Fournir une application web (PHP + MySQL) simple, sécurisée et maintenable.</li>
+        <li>Permettre la gestion CRUD des livres, auteurs, catégories et adhérents.</li>
+        <li>Gérer les emprunts, retours, pénalités et réservations.</li>
+        <li>Assurer un contrôle d'accès (rôles : admin / bibliothécaire / adhérent).</li>
+        <li>Produire des rapports simples (emprunts en cours, retards, top livres).</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Utilisateurs</h3>
+      <ul style="margin-left:20px;">
+        <li><strong>Admin</strong> : gestion complète, création comptes, maintenance.</li>
+        <li><strong>Bibliothécaire</strong> : gestion quotidienne (livres, adhérents, emprunts/retours, réservations).</li>
+        <li><strong>Adhérent</strong> : consultation du catalogue, consulter ses emprunts, réserver.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">4</span> Périmètre fonctionnel</h3>
+      <ul style="margin-left:20px;">
+        <li>Gestion des livres (titre, auteur, catégorie, isbn, nb_exemplaires, nb_disponible).</li>
+        <li>Gestion des auteurs & catégories.</li>
+        <li>Gestion des adhérents (nom, email, téléphone, rôle, mot de passe, photo).</li>
+        <li>Emprunt : vérifier disponibilité, limiter à 5 emprunts simultanés, durée par défaut 14 jours.</li>
+        <li>Retour : enregistrement de la date de retour, calcul de pénalité si retard (ex : 200 F/jour).</li>
+        <li>Réservation : file d'attente FIFO ; notification (simulé) lorsque disponible.</li>
+        <li>Authentification (login/logout), pages protégées selon rôle.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">5</span> Contraintes & règles de gestion</h3>
+      <ul style="margin-left:20px;">
+        <li>Durée emprunt par défaut : 14 jours (configurable).</li>
+        <li>Max emprunts simultanés par adhérent : 5.</li>
+        <li>Lorsque nb_disponible = 0, l'adhérent peut réserver.</li>
+        <li>Lors du retour, si une réservation existe → statut réservation passe à notifiée/attribuée.</li>
+        <li>Historique des emprunts conservés.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">6</span> Livrables</h3>
+      <ul style="margin-left:20px;">
+        <li>Code source PHP (dossier projet), fichier SQL de la BD, rapport imprimé (10–15 pages), captures écran.</li>
+        <li>Date de rendu : 12/12/2025.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION II — ANALYSE ET CONCEPTION
+  ══════════════════════════════ -->
+  <div class="section" id="analyse-conception">
+    <div class="section-header">
+      <span class="section-num">SECTION II</span>
+      <h2>Analyse et conception avec la méthode MERISE</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Dictionnaire des données</h3>
+      
+      <table class="data-table">
+        <tr>
+          <th>Entité</th>
+          <th>Attribut</th>
+          <th>Type SQL</th>
+          <th>Description</th>
+          <th>Contrainte</th>
+        </tr>
+        <tr>
+          <td rowspan="7"><strong>LIVRE</strong></td>
+          <td>id_livre</td>
+          <td>INT</td>
+          <td>Identifiant unique du livre</td>
+          <td>Clé Primaire</td>
+        </tr>
+        <tr><td>isbn</td><td>VARCHAR(20)</td><td>Numéro international normalisé</td><td>UNIQUE</td></tr>
+        <tr><td>titre</td><td>VARCHAR(255)</td><td>Titre de l'ouvrage</td><td></td></tr>
+        <tr><td>annee_pub</td><td>YEAR</td><td>Année de publication</td><td></td></tr>
+        <tr><td>nb_exemplaires</td><td>INT</td><td>Nombre total d'exemplaires</td><td></td></tr>
+        <tr><td>nb_disponible</td><td>INT</td><td>Exemplaires disponibles</td><td></td></tr>
+        <tr><td>resume</td><td>TEXT</td><td>Résumé du contenu</td><td></td></tr>
+        
+        <tr>
+          <td rowspan="4"><strong>AUTEUR</strong></td>
+          <td>id_auteur</td>
+          <td>INT</td>
+          <td>Identifiant unique de l'auteur</td>
+          <td>Clé Primaire</td>
+        </tr>
+        <tr><td>nom</td><td>VARCHAR(100)</td><td>Nom de l'auteur</td><td></td></tr>
+        <tr><td>prenom</td><td>VARCHAR(100)</td><td>Prénom de l'auteur</td><td></td></tr>
+        <tr><td>bio</td><td>TEXT</td><td>Biographie</td><td></td></tr>
+        
+        <tr>
+          <td rowspan="8"><strong>ADHERENT</strong></td>
+          <td>id_adherent</td>
+          <td>INT</td>
+          <td>Identifiant unique</td>
+          <td>Clé Primaire</td>
+        </tr>
+        <tr><td>nom</td><td>VARCHAR(100)</td><td>Nom</td><td></td></tr>
+        <tr><td>prenom</td><td>VARCHAR(100)</td><td>Prénom</td><td></td></tr>
+        <tr><td>email</td><td>VARCHAR(150)</td><td>Adresse électronique</td><td>UNIQUE</td></tr>
+        <tr><td>telephone</td><td>VARCHAR(20)</td><td>Numéro de téléphone</td><td></td></tr>
+        <tr><td>date_inscription</td><td>DATE</td><td>Date d'enregistrement</td><td></td></tr>
+        <tr><td>role</td><td>ENUM</td><td>Rôle (adhérent/bibliothécaire/admin)</td><td></td></tr>
+        <tr><td>mot_de_passe</td><td>VARCHAR(255)</td><td>Mot de passe haché</td><td></td></tr>
+        
+        <tr>
+          <td rowspan="6"><strong>EMPRUNT</strong></td>
+          <td>id_emprunt</td>
+          <td>INT</td>
+          <td>Identifiant unique</td>
+          <td>Clé Primaire</td>
+        </tr>
+        <tr><td>date_emprunt</td><td>DATE</td><td>Date d'emprunt</td><td></td></tr>
+        <tr><td>date_retour_prevue</td><td>DATE</td><td>Date limite de retour</td><td></td></tr>
+        <tr><td>date_retour_effective</td><td>DATE</td><td>Date réelle de retour</td><td>NULL</td></tr>
+        <tr><td>statut</td><td>ENUM</td><td>en_cours, rendu, retard</td><td></td></tr>
+        <tr><td>penalite</td><td>DECIMAL(7,2)</td><td>Montant de la pénalité</td><td>Défaut 0.00</td></tr>
+        
+        <tr>
+          <td rowspan="2"><strong>CATEGORIE</strong></td>
+          <td>id_categorie</td>
+          <td>INT</td>
+          <td>Identifiant unique</td>
+          <td>Clé Primaire</td>
+        </tr>
+        <tr><td>libelle</td><td>VARCHAR(100)</td><td>Nom de la catégorie</td><td></td></tr>
+        
+        <tr>
+          <td rowspan="3"><strong>RESERVATION</strong></td>
+          <td>id_reservation</td>
+          <td>INT</td>
+          <td>Identifiant unique</td>
+          <td>Clé Primaire</td>
+        </tr>
+        <tr><td>date_reservation</td><td>DATETIME</td><td>Date et heure de réservation</td><td></td></tr>
+        <tr><td>statut</td><td>ENUM</td><td>en_attente, annulée, notifiée, attribuée</td><td></td></tr>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Modèle Conceptuel de Données (MCD)</h3>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image2.png" alt="MCD Bibliothèque" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible : MCD</span>'">
+        <p>Schéma du MCD illustrant les entités et leurs relations</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Modèle Logique de Données (MLD)</h3>
+      <div class="code-block">
+        <div class="code-body">AUTEUR (id_auteur, nom, prenom, bio)
+CATEGORIE (id_categorie, libelle)
+ADHERENT (id_adherent, nom, prenom, email, telephone, date_inscription, role, mot_de_passe)
+LIVRE (id_livre, isbn, titre, annee_pub, nb_exemplaires, nb_disponible, resume, #id_categorie)
+EMPRUNT (id_emprunt, date_emprunt, date_retour_prevue, date_retour_effective, statut, penalite, #id_livre, #id_adherent)
+ECRIRE (#id_auteur, #id_livre)
+RESERVATION (id_reservation, date_reservation, statut, #id_livre, #id_adherent)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION III — BASE DE DONNÉES
+  ══════════════════════════════ -->
+  <div class="section" id="base-donnees">
+    <div class="section-header">
+      <span class="section-num">SECTION III</span>
+      <h2>Base de données</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Création de la base et des tables</h3>
+      
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">SQL</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="comment">-- Création base</span>
+DROP DATABASE IF EXISTS bibliotheque;
+CREATE DATABASE bibliotheque CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE bibliotheque;
+
+<span class="comment">-- Table AUTEUR</span>
+CREATE TABLE auteur (
+  id_auteur INT NOT NULL AUTO_INCREMENT,
+  nom VARCHAR(100) NOT NULL,
+  prenom VARCHAR(100) DEFAULT NULL,
+  bio TEXT,
+  PRIMARY KEY (id_auteur)
+);
+
+<span class="comment">-- Table CATEGORIE</span>
+CREATE TABLE categorie (
+  id_categorie INT NOT NULL AUTO_INCREMENT,
+  libelle VARCHAR(100) NOT NULL,
+  PRIMARY KEY (id_categorie),
+  UNIQUE KEY libelle (libelle)
+);
+
+<span class="comment">-- Table LIVRE</span>
+CREATE TABLE livre (
+  id_livre INT NOT NULL AUTO_INCREMENT,
+  isbn VARCHAR(20) NOT NULL,
+  titre VARCHAR(255) NOT NULL,
+  annee_pub YEAR DEFAULT NULL,
+  nb_exemplaires INT NOT NULL DEFAULT 1,
+  nb_disponible INT NOT NULL DEFAULT 1,
+  resume TEXT,
+  id_categorie INT DEFAULT NULL,
+  PRIMARY KEY (id_livre),
+  UNIQUE KEY isbn (isbn),
+  KEY id_categorie (id_categorie)
+);
+
+<span class="comment">-- Table ADHERENT</span>
+CREATE TABLE adherent (
+  id_adherent INT NOT NULL AUTO_INCREMENT,
+  nom VARCHAR(100) NOT NULL,
+  prenom VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  telephone VARCHAR(20) DEFAULT NULL,
+  date_inscription DATE NOT NULL DEFAULT (CURDATE()),
+  role ENUM('adherent','bibliothecaire','admin') NOT NULL DEFAULT 'adherent',
+  mot_de_passe VARCHAR(255) NOT NULL,
+  photo VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (id_adherent),
+  UNIQUE KEY email (email)
+);
+
+<span class="comment">-- Table ECRIRE (relation N:N)</span>
+CREATE TABLE ecrire (
+  id_auteur INT NOT NULL,
+  id_livre INT NOT NULL,
+  PRIMARY KEY (id_auteur, id_livre),
+  KEY id_livre (id_livre)
+);
+
+<span class="comment">-- Table EMPRUNT</span>
+CREATE TABLE emprunt (
+  id_emprunt INT NOT NULL AUTO_INCREMENT,
+  id_livre INT NOT NULL,
+  id_adherent INT NOT NULL,
+  date_emprunt DATE NOT NULL,
+  date_retour_prevue DATE NOT NULL,
+  date_retour_effective DATE DEFAULT NULL,
+  statut ENUM('en_cours','rendu','retard') NOT NULL DEFAULT 'en_cours',
+  penalite DECIMAL(7,2) DEFAULT 0.00,
+  PRIMARY KEY (id_emprunt),
+  KEY id_livre (id_livre),
+  KEY id_adherent (id_adherent)
+);
+
+<span class="comment">-- Table RESERVATION</span>
+CREATE TABLE reservation (
+  id_reservation INT NOT NULL AUTO_INCREMENT,
+  id_livre INT NOT NULL,
+  id_adherent INT NOT NULL,
+  date_reservation DATETIME NOT NULL,
+  statut ENUM('en_attente','annulee','notifiee','attribuee') NOT NULL DEFAULT 'en_attente',
+  PRIMARY KEY (id_reservation),
+  KEY id_livre (id_livre),
+  KEY id_adherent (id_adherent)
+);</div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image3.png" alt="Tables créées" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image4.png" alt="Structure tables" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image5.png" alt="Structure suite" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image6.png" alt="Structure suite" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image7.png" alt="Structure suite" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image8.png" alt="Structure suite" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image9.png" alt="Structure suite" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Insertions</h3>
+      
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">SQL</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="comment">-- Insertion auteurs</span>
+INSERT INTO auteur (id_auteur, nom, prenom, bio) VALUES
+(1, 'Camus', 'Albert', 'Albert Camus (1913‑1960), écrivain et philosophe français, prix Nobel de littérature en 1957.'),
+(2, 'Brown', 'Dan', 'Dan Brown (né en 1964), romancier américain, célèbre pour ses thrillers ésotériques.'),
+(3, 'Antoine', 'de Saint-Exupéry', 'Antoine de Saint‑Exupéry (1900‑1944), écrivain, poète et aviateur français.');
+
+<span class="comment">-- Insertion catégories</span>
+INSERT INTO categorie (id_categorie, libelle) VALUES
+(1, 'Roman'), (2, 'Science'), (3, 'Histoire'), (4, 'Informatique'),
+(5, 'Philosophie'), (6, 'Poésie'), (7, 'Théâtre'), (8, 'Biographie'),
+(9, 'Essai'), (10, 'Art'), (11, 'Musique'), (12, 'Voyage'),
+(13, 'Cuisine'), (14, 'Santé'), (15, 'Psychologie'), (16, 'Économie'),
+(17, 'Politique'), (18, 'Religion'), (19, 'Enfant'), (20, 'Jeunesse'),
+(21, 'Fantasy'), (22, 'Science-fiction'), (23, 'Policier'), (24, 'Thriller'),
+(25, 'Développement personnel'), (26, 'Littérature française'), (27, 'Littérature étrangère');
+
+<span class="comment">-- Insertion livres</span>
+INSERT INTO livre (id_livre, isbn, titre, annee_pub, nb_exemplaires, nb_disponible, resume, id_categorie) VALUES
+(4, '978-2-07-036822-8', 'L\'Étranger', '1942', 2, 2, 'Roman existentiel où Meursault, indifférent au monde, commet un meurtre.', 1),
+(5, '978-0-7432-7356-5', 'The Da Vinci Code', '2003', 4, 4, 'Thriller mêlant art, religion et énigmes autour du Saint Graal', 24),
+(6, '978-2-07-061275-8', 'Le Petit Prince', '1943', 6, 6, 'Conte philosophique sur l\'amitié, l\'amour et le sens de la vie.', 19),
+(7, '978-2-07-036043-7', 'La Peste', '1947', 7, 7, 'Chronique d\'une épidémie à Oran, métaphore de la condition humaine.', 26),
+(14, '978-2-07-026831-8', 'Grey\'s Anatomy', '1956', 1, 1, 'roh orh', 26);
+
+<span class="comment">-- Insertion ecrire (relations auteur-livre)</span>
+INSERT INTO ecrire (id_auteur, id_livre) VALUES
+(1, 4), (1, 7), (1, 14), (2, 5), (2, 8), (2, 9), (2, 13), (3, 6), (3, 10), (3, 11), (3, 12);
+
+<span class="comment">-- Insertion emprunts</span>
+INSERT INTO emprunt (id_emprunt, id_livre, id_adherent, date_emprunt, date_retour_prevue, date_retour_effective, statut, penalite) VALUES
+(1, 4, 1, '2025-11-27', '2025-12-12', '2025-11-27', 'rendu', 0.00),
+(2, 8, 1, '2025-11-27', '2025-11-30', '2025-11-28', 'rendu', 0.00),
+(3, 8, 5, '2025-11-27', '2025-12-12', '2025-11-28', 'rendu', 0.00);
+
+<span class="comment">-- Insertion réservations</span>
+INSERT INTO reservation (id_reservation, id_livre, id_adherent, date_reservation, statut) VALUES
+(1, 8, 5, '2025-11-27 19:28:20', 'attribuee'),
+(2, 8, 5, '2025-11-27 19:33:02', 'annulee');</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Identifiants de connexion</h3>
+      
+      <div class="info-box blue">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <div>
+          <p><strong>Comptes de test :</strong></p>
+          <ul style="margin-left:20px;">
+            <li><strong>Bibliothécaire :</strong> abaloolivier@gmail.com / Olivier@1234</li>
+            <li><strong>Admin :</strong> madranegreat@gmail.com / Lexuscrypto69</li>
+            <li><strong>Adhérent :</strong> Créer un compte depuis l'interface</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION IV — CONCEPTION APPLICATION
+  ══════════════════════════════ -->
+  <div class="section" id="application">
+    <div class="section-header">
+      <span class="section-num">SECTION IV</span>
+      <h2>Conception de l'application</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Architecture du projet</h3>
+      
+      <div class="folder-structure">
+        gestion_bibliotheque/<br/>
+        │<br/>
+        ├── config/<br/>
+        │   └── config.php                  # Connexion MySQL<br/>
+        │<br/>
+        ├── public/<br/>
+        │   ├── index.php                   # Page d'accueil (catalogue)<br/>
+        │   ├── login.php                   # Connexion<br/>
+        │   ├── logout.php                  # Déconnexion<br/>
+        │   ├── dashboard.php                # Tableau de bord<br/>
+        │   ├── contact.php                  # Page contact<br/>
+        │   └── infos.php                    # Page à propos<br/>
+        │<br/>
+        ├── utilisateurs/<br/>
+        │   ├── inscription.php              # Inscription adhérent<br/>
+        │   ├── profil.php                   # Profil utilisateur<br/>
+        │   └── ajout_user.php               # Gestion des utilisateurs (admin)<br/>
+        │<br/>
+        ├── livres/<br/>
+        │   ├── liste.php                    # Liste des livres<br/>
+        │   ├── ajout.php                    # Ajout d'un livre<br/>
+        │   ├── modifier.php                 # Modification<br/>
+        │   └── supprimer.php                # Suppression<br/>
+        │<br/>
+        ├── emprunts/<br/>
+        │   ├── emprunter.php                # Enregistrer un emprunt<br/>
+        │   ├── historique.php                # Historique des emprunts<br/>
+        │   ├── mes_reservations.php         # Réservations personnelles<br/>
+        │   ├── liste_emprunts.php           # Vue bibliothécaire<br/>
+        │   └── annuler_reservation.php      # Annulation<br/>
+        │<br/>
+        ├── reservations/<br/>
+        │   ├── liste.php                    # Liste des réservations<br/>
+        │   ├── attribuer.php                 # Attribution par bibliothécaire<br/>
+        │   ├── notifier.php                  # Notification de disponibilité<br/>
+        │   ├── retour.php                    # Enregistrement du retour<br/>
+        │   └── fixer_retour.php              # Date limite de retour<br/>
+        │<br/>
+        ├── includes/<br/>
+        │   ├── header.php                   # En-tête commun<br/>
+        │   ├── footer.php                   # Pied de page<br/>
+        │   ├── navbar.php                   # Navigation dynamique<br/>
+        │   └── functions.php                # Fonctions utilitaires<br/>
+        │<br/>
+        └── assets/<br/>
+            ├── css/<br/>
+            │   ├── style.css<br/>
+            │   ├── index.css<br/>
+            │   ├── login.css<br/>
+            │   ├── inscription.css<br/>
+            │   ├── ajout_user.css<br/>
+            │   ├── catalogue.css<br/>
+            │   ├── dashboard.css<br/>
+            │   ├── historique.css<br/>
+            │   ├── contact.css<br/>
+            │   ├── infos.css<br/>
+            │   ├── profil.css<br/>
+            │   └── mes_reservations.css<br/>
+            ├── images/<br/>
+            │   └── profil/                  # Avatars et illustrations<br/>
+            └── js/<br/>
+                ├── script.js<br/>
+                ├── chart.min.js<br/>
+                └── theme.js                 # Scripts JS personnalisés<br/>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Interfaces utilisateur</h3>
+      
+      <p>L'interface utilisateur constitue un élément central de l'application. Elle permet aux différents acteurs d'interagir avec le système de manière simple et intuitive. Le design repose sur Bootstrap et du CSS personnalisé afin d'assurer une expérience fluide, responsive et adaptée à tous les supports.</p>
+      
+      <h4>A. Page d'accueil (index.php)</h4>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image10.png" alt="Page d'accueil" onerror="this.style.display='none'">
+        <p>Page d'accueil avec design immersif et présentation des services</p>
+      </div>
+      <p>La page d'accueil constitue le point d'entrée principal de l'application. Elle présente un design immersif avec une image de fond représentant une bibliothèque universitaire prestigieuse. Le slogan central <em>"Découvrez le Savoir Infini"</em> invite les visiteurs à explorer les ressources disponibles. Deux boutons d'action : Se connecter et Créer un compte. Une section "Pourquoi Choisir Notre Bibliothèque ?" met en avant les avantages du service.</p>
+      
+      <h4>B. Page de connexion (login.php)</h4>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image11.png" alt="Page de connexion" onerror="this.style.display='none'">
+        <p>Formulaire de connexion sécurisé</p>
+      </div>
+      <p>La page de connexion permet aux utilisateurs enregistrés d'accéder à leur espace personnel. Formulaire avec champs email et mot de passe, lien vers l'inscription. Arrière-plan représentant une bibliothèque classique aux boiseries sombres.</p>
+      
+      <h4>C. Page d'inscription (inscription.php)</h4>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image12.png" alt="Page d'inscription" onerror="this.style.display='none'">
+        <p>Formulaire d'inscription d'un nouvel adhérent</p>
+      </div>
+      <p>Formulaire d'inscription complet avec champs : nom, prénom, email, téléphone, mot de passe, photo (optionnelle). Arrière-plan studieux évoquant la recherche et le savoir.</p>
+      
+      <h4>D. Tableau de bord – Adhérent</h4>
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image13.png" alt="Tableau de bord adhérent" onerror="this.style.display='none'">
+        <p>Tableau de bord personnel de l'adhérent</p>
+      </div>
+      <p>Le tableau de bord de l'adhérent constitue son espace personnel après connexion. Il offre une vue synthétique de son activité au sein de la bibliothèque et facilite la navigation vers les fonctionnalités clés. Quatre indicateurs statistiques présentent :</p>
+      <ul style="margin-left:20px;">
+        <li>Nombre total d'emprunts en cours</li>
+        <li>Nombre de réservations actives</li>
+        <li>Livres disponibles</li>
+        <li>Pénalités éventuelles</li>
+      </ul>
+      <p>Des sections dédiées permettent d'accéder rapidement au catalogue, à l'historique des emprunts et aux réservations personnelles.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>📚 Gestion Bibliothèque · Projet SQL · B3_IABD</p>
+    <p style="margin-top:6px;font-size:11px;">· DOWOU Issa ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box, .practice-item, .data-table').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

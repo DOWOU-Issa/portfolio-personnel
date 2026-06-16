@@ -1,0 +1,67 @@
+.cv-section {
+  padding: 2rem;
+  margin: 1rem auto;
+  max-width: 800px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.cv-section h1, .cv-section h2 {
+  color: #0a3d62;
+  margin-bottom: 1rem;
+}
+
+.cv-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.cv-section ul li {
+  margin-bottom: 1rem;
+}
+
+.skills span {
+  display: block;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.2rem;
+  background: #82ccdd;
+  color: #0a3d62;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #60a3bc;
+  color: #fff;
+}
+.cv-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.cv-section ul li {
+  margin-bottom: 1.5rem;
+}
+
+.cv-section ul li strong {
+  color: #0a3d62;
+  font-size: 1.1rem;
+}
+
+.cv-section ul ul {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+}
+
+.cv-section ul ul li {
+  margin-bottom: 0.3rem;
+  color: #333;
+}

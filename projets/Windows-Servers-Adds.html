@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Guide AD DS · Installation et gestion</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    background: linear-gradient(145deg, #0a1a2f, #0f2a44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS (un seul : DOWOU Issa) ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .subsection h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 16px 0 8px;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+    white-space: pre-wrap;
+  }
+  .code-body .cmd { color: #38bdf8; }
+  .code-body .comment { color: #475569; font-style: italic; }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .img-placeholder img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── STEP BADGE ── */
+  .step-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+    background: rgba(0,212,255,0.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* ── WARNING TAG ── */
+  .warning-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(255,165,2,0.15);
+    border: 1px solid var(--warn);
+    border-radius: 4px;
+    color: var(--warn);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+    margin-right: 6px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc { padding: 20px; }
+    .subsection { padding: 18px; }
+    .back-btn span { display: none; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Guide Technique · Active Directory</div>
+    <div class="hero-img">
+      <span>🖥️ Installation et gestion d'un serveur AD DS</span>
+    </div>
+    <h1>Installation et gestion<br/><span>d'Active Directory</span></h1>
+    <p class="hero-sub">Windows Server · Interface graphique · PowerShell · Gestion des objets</p>
+  </div>
+
+  <!-- ── MEMBRES (un seul : DOWOU Issa) ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membre du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#installation-gui">Installation d'un serveur AD DS (interface graphique)</a></li>
+      <li><a href="#installation-powershell">Installation d'un contrôleur de domaine sous PowerShell</a></li>
+      <li><a href="#configuration-foret">Configuration d'une nouvelle forêt en ligne de commande</a></li>
+      <li><a href="#gestion-objets">Gestion des objets AD DS</a>
+        <ul>
+          <li>Gestion des unités organisationnelles</li>
+          <li>Gestion des utilisateurs (interface)</li>
+          <li>Gestion des utilisateurs en PowerShell</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       INSTALLATION INTERFACE GRAPHIQUE
+  ══════════════════════════════ -->
+  <div class="section" id="installation-gui">
+    <div class="section-header">
+      <span class="section-num">SECTION 1</span>
+      <h2>Installation d'un serveur AD DS (interface graphique)</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image1.jpg" alt="Installation AD DS 1" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible</span>'">
+      </div>
+      
+      <p>▪ Il faut choisir l'option <strong>« Installation basée sur un rôle ou une fonctionnalité »</strong>, puisqu'il s'agit d'un nouveau rôle à installer et non pas d'une fonctionnalité complémentaire.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image2.jpg" alt="Sélection du serveur" onerror="this.style.display='none'">
+      </div>
+      
+      <p>▪ Vous devez par la suite sélectionner le serveur sur lequel le rôle doit être installé dans ce cas, il n'y a qu'un seul serveur.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image3.jpg" alt="Sélection rôle AD DS" onerror="this.style.display='none'">
+      </div>
+      
+      <p>▪ Dans cette situation, nous souhaitons mettre en place un réseau d'entreprise « simple » il faut donc sélectionner uniquement <strong>« Services AD DS »</strong>.</p>
+      
+      <p>• Lorsque la case est cochée, des fonctionnalités complémentaires vont être automatiquement sélectionnées aussi. Il est impératif d'avoir tous ces outils pour pouvoir gérer efficacement le serveur AD.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image4.jpg" alt="Présentation rôle" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Après la sélection du rôle AD DS et des fonctionnalités associées (automatiquement), une brève présentation du rôle sera affichée. L'installation va enfin pouvoir se lancer en cliquant sur le bouton « Suivant ».</p>
+      
+      <p>• À la fin du processus d'installation initial, les binaires AD DS sont installés, mais AD DS n'est pas encore configuré sur ce serveur.</p>
+      
+      <p>• Un message à cet effet s'affiche dans le Gestionnaire de serveur. Vous pouvez sélectionner le lien pour <strong>Promouvoir ce serveur en contrôleur de domaine</strong> et l'Assistant Configuration des services de domaine Active Directory s'exécute.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image5.jpg" alt="Bandeau promotion" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Lorsque votre serveur est de nouveau en ligne, vous arriverez directement dans le Gestionnaire de serveur. Un bandeau jaune tout en haut de la fenêtre apparaît, vous rappelant que vous devez <u>configurer le rôle AD DS AVEC AJOUT D'UN NOUVEL DOMAINE (UNE NOUVELLE FORÊT)</u>.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image6.jpg" alt="Assistant configuration" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Cliquer sur le bandeau jaune, une nouvelle fenêtre va s'ouvrir : il s'agit d'un assistant pour la configuration du rôle AD DS – passage obligatoire.</p>
+      
+      <p>• La procédure actuelle consiste en la création d'un nouveau domaine, vous devez donc sélectionner l'option <strong>« Ajouter une nouvelle forêt »</strong>.</p>
+      <p>• Entrer le nom du domaine.</p>
+      
+      <div class="info-box orange">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 0a.75.75 0 0 0 .75.75H15"/></svg>
+        <p><strong>ATTENTION :</strong> Le nom de votre domaine est très important, il faut saisir un nom de domaine réel. Le renommage d'un domaine AD DS est possible, mais l'impact « technique » est très conséquent (pour les PC, les utilisateurs, les services et les logiciels).</p>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image7.jpg" alt="Nom du domaine" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Une fois le nom du domaine saisi, la fenêtre ci-dessus va alors s'afficher.</p>
+      
+      <p>• Le <strong>« niveau fonctionnel »</strong> d'un domaine correspond aux services disponibles pour ce domaine. Plus le niveau fonctionnel est élevé, plus vous aurez de fonctionnalités pour vous et vos utilisateurs.</p>
+      
+      <p>• Il est préférable d'utiliser le niveau fonctionnel le plus haut pour le domaine Active Directory Windows Server 2016.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image8.jpg" alt="Mot de passe restauration" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Une seconde étape obligatoire doit être passée : le <strong>mot de passe de restauration</strong>. Ce mot de passe sera utilisé uniquement dans le cas où votre AD DS se retrouve corrompu et inaccessible, vous pourrez tenter la restauration de votre AD grâce à ce mot de passe.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image9.jpg" alt="Options supplémentaires" onerror="this.style.display='none'">
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image10.jpg" alt="Vérification configuration" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Une dernière étape primordiale est la vérification de votre configuration d'AD DS. Windows Server est en mesure de vous dire si oui ou non les paramètres que vous avez sélectionnés sont corrects pour un domaine AD.</p>
+      
+      <p>• Lorsque tous les paramètres « préliminaires » seront configurés, le serveur doit être obligatoirement redémarré.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       INSTALLATION POWERSHELL
+  ══════════════════════════════ -->
+  <div class="section" id="installation-powershell">
+    <div class="section-header">
+      <span class="section-num">SECTION 2</span>
+      <h2>Installer un contrôleur de domaine sous PowerShell</h2>
+    </div>
+
+    <div class="subsection">
+      <p>• Avant d'installer AD DS, il faut récupérer le nom du serveur en utilisant la commande suivante :</p>
+      
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">powershell</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">Get-WindowsFeature AD*</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image11.jpg" alt="Get-WindowsFeature AD*" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Pour ajouter le rôle AD DS, il faut utiliser la commande :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image12.jpg" alt="Install-WindowsFeature" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Vérifier l'installation :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Get-WindowsFeature AD-Domain-Services</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image13.jpg" alt="Vérification installation" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       CONFIGURATION NOUVELLE FORÊT
+  ══════════════════════════════ -->
+  <div class="section" id="configuration-foret">
+    <div class="section-header">
+      <span class="section-num">SECTION 3</span>
+      <h2>Configurer une nouvelle forêt en ligne de commande PowerShell</h2>
+    </div>
+
+    <div class="subsection">
+      <p>• Une fois le rôle AD DS installé, il faut configurer le serveur en tant que contrôleur de domaine pour une nouvelle forêt Active Directory.</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Install-ADDSForest -DomainName Nomdudomaine</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image14.jpg" alt="Install-ADDSForest" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Si vous avez déjà créé une forêt sur l'interface graphique, après ce passage vous recevrez un message d'erreur de syntaxe.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image15.jpg" alt="Erreur syntaxe" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Vérifier l'installation :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Get-ADDomain</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image16.jpg" alt="Get-ADDomain" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       GESTION DES OBJETS AD DS
+  ══════════════════════════════ -->
+  <div class="section" id="gestion-objets">
+    <div class="section-header">
+      <span class="section-num">SECTION 4</span>
+      <h2>Gestion des objets AD DS</h2>
+    </div>
+
+    <!-- GESTION UO -->
+    <div class="subsection">
+      <h3><span class="num">4.1</span> Gestion des unités organisationnelles</h3>
+      
+      <p>• Pour peupler notre Active Directory, il faut lancer la console <strong>Utilisateurs et ordinateurs Active Directory</strong>.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image17.jpg" alt="Console AD" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Pour créer une unité organisationnelle afin d'y mettre l'ensemble des utilisateurs et groupes, dans l'arbre à la hauteur du domaine, faites un clic droit dans la fenêtre de droite, puis <strong>Nouveau</strong> et on choisit <strong>Unité d'organisation</strong> et on remplit.</p>
+      
+      <p>▪ Pour créer un nouvel utilisateur dans l'unité créée, clic droit sur l'UO ensuite <strong>Nouveau</strong> puis <strong>Utilisateur</strong>.</p>
+    </div>
+
+    <!-- GESTION UTILISATEURS INTERFACE -->
+    <div class="subsection">
+      <h3><span class="num">4.2</span> Gestion des utilisateurs (interface graphique)</h3>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image18.png" alt="Création utilisateur" onerror="this.style.display='none'">
+      </div>
+      
+      <p>▪ Dans notre exemple, nous allons créer un utilisateur qui s'appelle <strong>Dowou Issa</strong> avec le nom d'ouverture de session <strong>Dark_army</strong>.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image19.png" alt="Assistant création utilisateur" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• L'utilisateur a deux moyens pour ouvrir une session :</p>
+      <ul style="margin-left:20px;">
+        <li><strong>UPN</strong> : forme d'adresse email, exemple : Dark_army@ntic.ma</li>
+        <li><strong>Authentification Windows NT ou 2000</strong> : nom du domaine Netbios suivi de l'utilisateur, exemple : NTIC\Dark_army</li>
+      </ul>
+      
+      <p>- Saisir un mot de passe complexe. Le mot de passe doit contenir au moins 7 caractères avec au moins 3 des éléments suivants : une majuscule, une minuscule, un nombre et un symbole.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image20.png" alt="Mot de passe" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• L'option <strong>L'utilisateur doit changer le mot de passe à la prochaine ouverture de session</strong> forcera l'utilisateur à changer le mot de passe transmis à la première connexion sur le domaine. Après avoir entré le mot de passe, nous obtenons un résumé des informations de l'utilisateur.</p>
+      
+      <p>• Cliquer sur <strong>Terminer</strong> et l'utilisateur est créé.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image21.jpg" alt="Utilisateur créé" onerror="this.style.display='none'">
+      </div>
+      
+      <p>• Si on affiche les propriétés de l'utilisateur (clic droit puis Propriétés ou double-clic), on voit que l'on a beaucoup plus d'informations que dans l'assistant. On peut alors remplir le bureau, le numéro de téléphone, etc. de l'utilisateur.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image22.jpg" alt="Propriétés utilisateur" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Dans l'onglet <strong>Compte</strong> on trouve :</p>
+      <ul style="margin-left:20px;">
+        <li>▪ La partie liée à l'ouverture de la session</li>
+        <li>▪ Horaire d'accès : restriction des horaires d'accès</li>
+        <li>▪ Se connecter à : restriction des ordinateurs</li>
+        <li>▪ Verrouillage du compte</li>
+        <li>▪ Option de compte : gestion de mot de passe, activation ou non du compte, chiffrement,…</li>
+        <li>▪ Date d'expiration</li>
+      </ul>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image23.jpg" alt="Onglet Compte" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <!-- GESTION UTILISATEURS POWERSHELL -->
+    <div class="subsection">
+      <h3><span class="num">4.3</span> Gestion des utilisateurs en PowerShell</h3>
+      
+      <p>Le nom du module est <code>&lt;&lt;ADuser&gt;&gt;</code>. Pour obtenir ces commandes, vous pouvez utiliser la commande suivante :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Get-Command -Noun ADUser</span></div>
+      </div>
+      
+      <p>Pour afficher les options de chaque commande, par exemple <code>&lt;&lt;new-aduser&gt;&gt;</code> :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Get-Help "new-aduser"</span></div>
+      </div>
+      
+      <h4>A. Ajouter un utilisateur</h4>
+      <p>La commande qui permet d'ajouter un utilisateur <strong>DOWOU Issa</strong> avec plusieurs options :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">New-ADUser -Name "DOWOU Issa" -GivenName Issa -Surname DOWOU -SamAccountName DOWOU -UserPrincipalName "DOWOU@ntic.ma" -DisplayName "Issa DOWOU" -Description "Utilisateur test TP ADDS" -EmailAddress "issadowou@ntic.ma" -MobilePhone "93803498" -Department NTIC -City Lome -HomePhone "96863112" -Path "dc=osiris,dc=TRI,dc=com" -AccountPassword (Read-Host -AsSecureString "merci de saisir votre mot de passe") -PassThru -ChangePasswordAtLogon $true -CannotChangePassword $false</span></div>
+      </div>
+      
+      <div class="info-box orange">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 0a.75.75 0 0 0 .75.75H15"/></svg>
+        <p><strong>Important :</strong> Pour le <code>Path</code>, utiliser les noms utilisés pour créer le domaine.</p>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image24.jpg" alt="Exemple Path" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image25.jpg" alt="Création utilisateur PowerShell" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>B. Activer et désactiver un compte utilisateur</h4>
+      <ul style="margin-left:20px;">
+        <li><strong>Pour activer le compte DOWOU :</strong></li>
+      </ul>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Enable-ADAccount -Identity dowou</span></div>
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li><strong>Pour désactiver le compte DOWOU :</strong></li>
+      </ul>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Disable-ADAccount -Identity dowou</span></div>
+      </div>
+      
+      <h4>C. Déverrouiller un compte utilisateur</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Unlock-ADAccount dowou</span></div>
+      </div>
+      
+      <h4>D. Supprimer un utilisateur</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Remove-ADUser dowou</span></div>
+      </div>
+      
+      <h4>E. Rechercher un utilisateur</h4>
+      <ul style="margin-left:20px;">
+        <li><strong>Pour chercher tous les utilisateurs présents dans l'UO :</strong></li>
+      </ul>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Get-ADUser -Filter * -SearchBase "dc=osiris,dc=TRI,dc=com"</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image26.jpg" alt="Get-ADUser liste" onerror="this.style.display='none'">
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li><strong>Pour afficher les propriétés de l'utilisateur DOWOU Issa :</strong></li>
+      </ul>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">Get-ADUser dowou -Properties *</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image27.jpg" alt="Get-ADUser propriétés" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>🖥️ Guide AD DS · Installation et gestion d'Active Directory · DOWOU Issa</p>
+    <p style="margin-top:6px;font-size:11px;">· Windows Server · PowerShell · Gestion des objets ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

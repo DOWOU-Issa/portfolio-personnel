@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pipeline CI · GitHub Actions & Tests</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    filter: brightness(0.9) contrast(1.05);
+    background: linear-gradient(145deg, #0a1a2f, #0f2a44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS (un seul) ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .subsection h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 16px 0 8px;
+  }
+
+  /* ── TABLE ── */
+  .ns-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  .ns-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: rgba(0,212,255,0.06);
+    color: var(--accent);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--border);
+  }
+  .ns-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .ns-table tr:last-child td { border-bottom: none; }
+  .ns-table tr:hover td { background: rgba(0,212,255,0.03); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+    white-space: pre-wrap;
+  }
+  .code-body .cmd { color: #38bdf8; }
+  .code-body .flag { color: #a78bfa; }
+  .code-body .val { color: #4ade80; }
+  .code-body .comment { color: #475569; font-style: italic; }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── PRACTICE CARDS ── */
+  .practice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .practice-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .practice-item:hover { border-color: rgba(0,255,157,0.2); }
+  .practice-item .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .practice-item .check svg { width: 11px; height: 11px; color: var(--accent3); }
+
+  /* ── SECTION LETTER BADGE ── */
+  .letter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0a2545, #0d3566);
+    border: 1px solid rgba(0,212,255,0.3);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── CONCLUSION BOX ── */
+  .conclusion-box {
+    background: linear-gradient(135deg, rgba(0,129,255,0.06), rgba(0,212,255,0.04));
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .conclusion-box::before {
+    content: '⚙️';
+    position: absolute;
+    right: 30px; top: 30px;
+    font-size: 80px;
+    opacity: 0.06;
+  }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .img-placeholder img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── STATUS BADGES ── */
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+    margin: 4px 0;
+  }
+  .status-badge.green {
+    background: rgba(0,255,157,0.15);
+    border: 1px solid var(--accent3);
+    color: var(--accent3);
+  }
+  .status-badge.red {
+    background: rgba(255,71,87,0.15);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc, .conclusion-box { padding: 20px; }
+    .subsection { padding: 18px 18px; }
+    .back-btn span { display: none; }
+    .ns-table { font-size: 12px; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Exposé Technique · CI/CD</div>
+    <div class="hero-img">
+      <span>⚙️ Pipeline CI · GitHub Actions</span>
+    </div>
+    <h1>Pipeline d'Intégration<br/><span>Continue (CI)</span></h1>
+    <p class="hero-sub">GitHub · Tests · Linting · Automatisation</p>
+  </div>
+
+  <!-- ── MEMBRES (un seul : DOWOU Issa) ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membre du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#creation-depot">A. Création du dépôt GitHub</a>
+        <ul>
+          <li>1. Création du dossier et initialisation Git</li>
+          <li>2. Ajout du README et premier commit</li>
+          <li>3. Création du dépôt distant et résolution de conflit</li>
+          <li>4. Création et gestion des branches</li>
+          <li>5. Protection des branches</li>
+          <li>6. Convention de commits et CONTRIBUTING.md</li>
+          <li>7. Fusion via Pull Request</li>
+          <li>8. Workflow Git et ajout des fichiers de test</li>
+        </ul>
+      </li>
+      <li><a href="#responsable-ci">B. Responsable du pipeline CI</a>
+        <ul>
+          <li>1. Introduction</li>
+          <li>2. Création du fichier YAML</li>
+          <li>3. Commandes Git</li>
+          <li>4. Pull Request vers develop</li>
+          <li>5. Déclenchement automatique</li>
+          <li>6. Génération d'un pipeline rouge</li>
+          <li>7. Correction de l'erreur</li>
+        </ul>
+      </li>
+      <li><a href="#responsable-tests">C. Responsable des tests</a>
+        <ul>
+          <li>1. Introduction</li>
+          <li>2. Mise en place des tests</li>
+          <li>3. Commandes Git</li>
+          <li>4. Déclenchement du pipeline</li>
+          <li>5. Résultat attendu</li>
+          <li>6. Conclusion</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION A — CRÉATION DU DÉPÔT
+  ══════════════════════════════ -->
+  <div class="section" id="creation-depot">
+    <div class="section-header">
+      <span class="section-num">SECTION A</span>
+      <h2>Création du dépôt GitHub</h2>
+    </div>
+
+    <!-- 1. Création du dossier -->
+    <div class="subsection">
+      <h3><span class="num">1</span> Création du dossier et initialisation de Git</h3>
+      
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="comment"># Créer un dossier pour le projet</span>
+<span class="cmd">mkdir Pipeline_CI</span>
+
+<span class="comment"># Se déplacer dans ce dossier</span>
+<span class="cmd">cd Pipeline_CI</span>
+
+<span class="comment"># Initialiser Git dans ce dossier</span>
+<span class="cmd">git init</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/eaac6a3b90c2925c69c44c4866ae3359f8d93be8.png" alt="Initialisation Git" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible : initialisation Git</span>'">
+      </div>
+
+      <div class="info-box blue">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p><strong>Explications :</strong><br/>
+        - <code>mkdir Pipeline_CI</code> : crée un dossier pour le projet<br/>
+        - <code>cd Pipeline_CI</code> : entre dans le dossier<br/>
+        - <code>git init</code> : initialise un dépôt Git local</p>
+      </div>
+    </div>
+
+    <!-- 2. README et premier commit -->
+    <div class="subsection">
+      <h3><span class="num">2</span> Ajouter un fichier README et premier commit</h3>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="comment"># Créer un fichier README avec un titre</span>
+<span class="cmd">echo</span> "# Projet Pipeline CI" >> README.md
+
+<span class="comment"># Vérifier que le fichier est bien créé</span>
+<span class="cmd">dir</span> <span class="comment"># (ou ls sur Linux/Mac)</span>
+
+<span class="comment"># Ajouter le fichier au suivi Git</span>
+<span class="cmd">git add README.md</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/75e545f90fc9a0459de4bc05f1fbfca51dbbd890.png" alt="Création README" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/0ec1179ddb661159146ae753d2589a5d48427eec.png" alt="git add README" onerror="this.style.display='none'">
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="comment"># Créer le premier commit</span>
+<span class="cmd">git commit -m</span> "docs: ajout du README initial"</div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/adba89f10517c846ac57bbd37d5fd5666edbc11c.png" alt="Premier commit" onerror="this.style.display='none'">
+      </div>
+
+      <div class="info-box blue">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p><strong>Explications :</strong> Le README sert de documentation de base. <code>git add</code> prépare le fichier, <code>git commit</code> l'enregistre dans l'historique.</p>
+      </div>
+    </div>
+
+    <!-- 3. Dépôt distant et conflit -->
+    <div class="subsection">
+      <h3><span class="num">3</span> Créer le dépôt distant sur GitHub et lier au local</h3>
+      
+      <p><strong>Via le web :</strong></p>
+      <ul>
+        <li>Connectez-vous à GitHub</li>
+        <li>Cliquez sur "New Repository"</li>
+        <li>Repository name : <code>Pipeline_CI</code></li>
+        <li>Public ou Privé selon besoin</li>
+        <li>Ne pas cocher "Add a README" (déjà créé localement)</li>
+      </ul>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/55b5d9994f984a3457f1fda31a61a25653df29b7.png" alt="Création dépôt GitHub" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/90a2293b3d46e6b6471dd1cc93e5854693a30dbf.png" alt="URL dépôt" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>En local :</strong></p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="comment"># Lier le dépôt local au dépôt distant</span>
+<span class="cmd">git remote add origin</span> https://github.com/&lt;ton-username&gt;/Pipeline_CI.git
+
+<span class="comment"># Renommer la branche master en main</span>
+<span class="cmd">git branch -M main</span>
+
+<span class="comment"># Pousser le code vers GitHub</span>
+<span class="cmd">git push -u origin main</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/d23cd890a790a83e4716641c9ea804f85d36be27.png" alt="git push" onerror="this.style.display='none'">
+      </div>
+
+      <div class="info-box orange">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 0a.75.75 0 0 0 .75.75H15"/></svg>
+        <p><strong>Résolution de conflit possible :</strong> si GitHub a un README par défaut, un conflit apparaît.</p>
+      </div>
+
+      <p><strong>1. Ouvrir le fichier README.md :</strong> marqueurs de conflit :</p>
+      <div class="code-block">
+        <div class="code-body">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+# Projet Pipeline CI
+=======
+# Pipeline_CI
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; 4d468cb (Initial commit)</div>
+      </div>
+
+      <p><strong>2. Choisir le contenu à garder :</strong> fusionner ou choisir.</p>
+      <p><strong>3. Marquer le conflit comme résolu :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">git add README.md</span>
+<span class="cmd">git rebase --continue</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/b1cdd5e3f3d335fa20a84b81f0adb79be1427336.png" alt="Conflit résolu" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>4. Vérifier l'historique :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">git log --oneline</span></div>
+      </div>
+
+      <p><strong>5. Pousser vers GitHub :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">git push -u origin main</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/ebec9e19488cc2a0a3b2d9e7944ec9f7dfaa0656.png" alt="Push réussi" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <!-- 4. Créer et gérer les branches -->
+    <div class="subsection">
+      <h3><span class="num">4</span> Créer et gérer les branches</h3>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="comment"># Créer une branche develop à partir de main</span>
+<span class="cmd">git checkout -b develop</span>
+
+<span class="comment"># Envoyer la branche develop vers GitHub</span>
+<span class="cmd">git push -u origin develop</span>
+
+<span class="comment"># Créer une branche de fonctionnalité (exemple : tests)</span>
+<span class="cmd">git checkout -b feature/tests</span>
+
+<span class="comment"># Envoyer la branche feature/tests vers GitHub</span>
+<span class="cmd">git push -u origin feature/tests</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/1b334e93f314f9af514e2131649d7791e59b35c7.png" alt="Création branches" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/fcbb62c6ed4214d251ec22dbf640648d8e16e424.png" alt="Branches sur GitHub" onerror="this.style.display='none'">
+      </div>
+
+      <div class="info-box blue">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p><strong>Commentaires :</strong><br/>
+        - <code>git checkout -b develop</code> : crée et bascule sur develop<br/>
+        - <code>feature/tests</code> : branche dédiée aux tests<br/>
+        - <code>git push -u origin</code> : envoie et configure le suivi</p>
+      </div>
+    </div>
+
+    <!-- 5. Protection des branches -->
+    <div class="subsection">
+      <h3><span class="num">5</span> Protection des branches sur GitHub</h3>
+
+      <p><strong>Procédure :</strong></p>
+      <ol>
+        <li>Aller dans <strong>Settings</strong> → <strong>Branches</strong></li>
+        <li>Cliquer sur <strong>Add rule</strong></li>
+      </ol>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/6f23250922a504eaa4f1617560631d5f34b9be57.png" alt="Ajout règle" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>Configurer pour <code>main</code> :</strong></p>
+      <ul>
+        <li>Branch name pattern : <code>main</code></li>
+        <li>Cocher :</li>
+        <ul>
+          <li><em>Require a pull request before merging</em></li>
+          <li><em>Require approvals</em></li>
+          <li><em>Require status checks to pass before merging</em></li>
+        </ul>
+      </ul>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/0516b0d7a315c0f3ce384a8edfad8470e320f5c8.png" alt="Configuration protection" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>Pour <code>develop</code> :</strong> moins strict mais utile :</p>
+      <ul>
+        <li>Require a pull request before merging</li>
+        <li>Require status checks to pass before merging</li>
+        <li>Require conversation resolution before merging</li>
+      </ul>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/db77cf6e1daf703e8e6e9714c1c4aeee516d49dd.png" alt="Protection develop" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/b1c69ac08fd9a7fb6ea2862ab1c01df8e99929d6.png" alt="Règles appliquées" onerror="this.style.display='none'">
+      </div>
+
+      <div class="info-box blue">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p><strong>Commentaires :</strong> La protection des branches empêche les commits directs sur main et force l'utilisation des Pull Requests avec validation CI.</p>
+      </div>
+    </div>
+
+    <!-- 6. Convention de commits et CONTRIBUTING.md -->
+    <div class="subsection">
+      <h3><span class="num">6</span> Convention de commits et fichier CONTRIBUTING.md</h3>
+
+      <h4>6.1. Convention de commits</h4>
+      <p>Format : <code>&lt;type&gt;(scope): &lt;description&gt;</code></p>
+      <p><strong>Types principaux :</strong> feat, fix, docs, style, refactor, test, chore</p>
+      <p><strong>Exemples :</strong></p>
+      <div class="code-block">
+        <div class="code-body">feat(api): ajout d'un endpoint pour les tests
+fix(ci): correction du script de pipeline
+docs(readme): mise à jour des instructions d'installation</div>
+      </div>
+
+      <h4>6.2. Fichier CONTRIBUTING.md</h4>
+      <p>Guide les contributeurs sur la manière de participer.</p>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">markdown</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"># Guide de contribution
+
+Merci de contribuer au projet **Pipeline_CI** 🎉
+
+## Workflow Git
+- Les contributions se font via des **branches de fonctionnalité** (`feature/...`).
+- Les branches doivent être fusionnées dans `develop` via **Pull Request**.
+- La branche `main` est protégée et ne reçoit que du code validé.
+
+## Convention de commits
+Nous utilisons [Conventional Commits](https://www.conventionalcommits.org/).
+Format : `&lt;type&gt;(scope): &lt;description&gt;`
+
+Types autorisés : feat, fix, docs, style, refactor, test, chore
+
+## Pull Requests
+- Chaque PR doit être approuvée par au moins un membre.
+- Les tests et la CI doivent passer avant la fusion.
+- Les discussions doivent être résolues avant merge.</div>
+      </div>
+
+      <p><strong>Application :</strong></p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="cmd">git add CONTRIBUTING.md</span>
+<span class="cmd">git commit -m</span> "docs: ajout du fichier CONTRIBUTING.md"
+<span class="cmd">git push origin develop</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/a15c044043be095ae1dd9bddec25ab52608960c3.png" alt="Commit CONTRIBUTING" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>Vérification :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">git branch</span>  <span class="comment"># * feature/tests</span>
+<span class="cmd">git push origin feature/tests</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/4e9c691d630c3840de5839a3bd4b25af889db8b9.png" alt="PR feature/tests" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <!-- 7. Fusion via Pull Request -->
+    <div class="subsection">
+      <h3><span class="num">7</span> Étapes pour fusionner via GitHub (Pull Request)</h3>
+
+      <p><strong>7.1 Créer la Pull Request</strong></p>
+      <ul>
+        <li>Sur GitHub, cliquer sur "Create pull request"</li>
+        <li>Titre : <code>docs: ajout de CONTRIBUTING.md et mise à jour du README</code></li>
+        <li>Ajouter une description si besoin</li>
+      </ul>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/a3de72b85f6332666b7c62be764ce22637904d24.png" alt="Création PR" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>7.2 Valider la Pull Request</strong></p>
+      <ul>
+        <li>Approuver la PR (si règle d'approbation)</li>
+        <li>Vérifier que les checks CI passent</li>
+      </ul>
+
+      <p><strong>7.3 Fusionner</strong></p>
+      <ul>
+        <li>Cliquer sur "Merge pull request"</li>
+        <li>Choisir "Create a merge commit" ou "Squash and merge"</li>
+        <li>Confirmer avec "Confirm merge"</li>
+      </ul>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/8ef90c82ade3c39743d015f1f07eb4aa8b4ab409.png" alt="Fusion PR" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/00f1fa25d072ef927035ae6a4c0c775640d99321.png" alt="Confirmation fusion" onerror="this.style.display='none'">
+      </div>
+
+      <div class="info-box orange">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 0a.75.75 0 0 0 .75.75H15"/></svg>
+        <p>Avant de configurer le pipeline CI, ajouter une application Python simple (calculatrice) et des tests unitaires.</p>
+      </div>
+    </div>
+
+    <!-- 8. Workflow Git -->
+    <div class="subsection">
+      <h3><span class="num">8</span> Workflow Git</h3>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="cmd">git add calculatrice.py test_calculatrice.py</span>
+<span class="cmd">git commit -m</span> "feat(calculatrice): ajout de l'application et des tests unitaires"
+<span class="cmd">git push origin develop</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/33afe4c7f72134c513bdabdb3701e0f864dfbf73.png" alt="Ajout fichiers test" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION B — RESPONSABLE PIPELINE CI
+  ══════════════════════════════ -->
+  <div class="section" id="responsable-ci">
+    <div class="section-header">
+      <span class="section-num">SECTION B</span>
+      <h2>Responsable du pipeline CI</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Introduction</h3>
+      <p>Le responsable du pipeline CI est chargé de mettre en place une intégration continue (CI) permettant d'automatiser les tests et de garantir la qualité du code. Cette automatisation permet de détecter rapidement les erreurs, de maintenir un code propre et de faciliter le travail en équipe.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Création locale du fichier YAML</h3>
+
+      <p><strong>Création du dossier caché :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">mkdir -p .github/workflows</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/cf90efd85296adf7f0f6e77c056568c53f839a85.png" alt="Dossier workflows" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>Fichier <code>.github/workflows/ci.yml</code> :</strong></p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body">name: CI Pipeline
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest flake8
+
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run tests
+        run: |
+          pytest</div>
+      </div>
+
+      <div class="info-box blue">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+        <p><strong>Explications :</strong><br/>
+        - Installation des dépendances : pytest, flake8<br/>
+        - Build : préparation Python 3.12<br/>
+        - Tests : exécution pytest<br/>
+        - Linting : vérification style avec flake8</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Commandes Git utilisées</h3>
+
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="cmd">git branch</span>                     <span class="comment"># Vérifier la branche active</span>
+<span class="cmd">git checkout feature/tests</span>    <span class="comment"># Revenir sur la branche</span>
+<span class="cmd">git status</span>                     <span class="comment"># Vérifier l'état</span>
+<span class="cmd">git add .github/workflows/ci.yml</span>
+<span class="cmd">git commit -m</span> "ci: ajout du pipeline GitHub Actions"
+<span class="cmd">git push origin feature/tests</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/c69fcb8727993c658cf2d47fc4ba377fa7b9ec13.png" alt="Commit pipeline" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">4</span> Pull Request vers develop</h3>
+      <p>Une fois le fichier ci.yml poussé sur feature/tests, créer une PR vers develop pour revue.</p>
+      <div class="img-placeholder">
+        <img src="../assets/images/b28156b8f0b347319be04a9f6a48d9649b5bc09d.png" alt="PR pipeline" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/60e26926e71f87120d0c4e901c072401edc41d28.png" alt="PR créée" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">5</span> Déclenchement automatique du pipeline</h3>
+      <p>Le pipeline se déclenche à chaque push ou PR sur main/develop. Dans l'onglet Actions :</p>
+      <ul>
+        <li><span class="status-badge green">Vert</span> = succès</li>
+        <li><span class="status-badge red">Rouge</span> = échec</li>
+      </ul>
+      <div class="img-placeholder">
+        <img src="../assets/images/359ef4e289e6849803ef0c34907e46ee3e2a1f6c.png" alt="Pipeline vert" onerror="this.style.display='none'">
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">6</span> Étapes pour générer un pipeline rouge</h3>
+
+      <p><strong>6.1 Modifier <code>test_calculatrice.py</code> :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">def test_fail():</span>
+    assert 2 + 2 == 5</div>
+      </div>
+
+      <p><strong>6.2 Commit et push :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">git add test_calculatrice.py</span>
+<span class="cmd">git commit -m</span> "test: ajout d'un test volontairement erroné pour démonstration CI"
+<span class="cmd">git push origin feature/tests</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/5644605ee3e8b2662b72aead63a957445028481a.png" alt="Commit test erroné" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>6.3 Créer ou mettre à jour la PR vers develop :</strong></p>
+      <div class="img-placeholder">
+        <img src="../assets/images/a44a880f39a6d967cb20234afe948e8abe2ad14d.png" alt="Nouvelle demande tirage" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/10e1a15784decdcde3eb6ec0f4f6a0f9a968fbaa.png" alt="Comparaison branches" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/75b1a7fac812a911bf2dc386dacd901776a3d21e.png" alt="Erreur détectée" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/6444dc04cf89409357ce9cb7a5093d5a91ebb65b.png" alt="Pipeline rouge" onerror="this.style.display='none'">
+      </div>
+
+      <div class="info-box red">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <p>Le pipeline CI détecte automatiquement les erreurs et bloque la fusion tant que le code n'est pas corrigé.</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">7</span> Correction de l'erreur</h3>
+
+      <p><strong>7.1 Corriger le test :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">def test_fail():</span>
+    assert 2 + 2 == 4  <span class="comment"># ou supprimer le test</span></div>
+      </div>
+
+      <p><strong>7.2 Commit et push la correction :</strong></p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">git add test_calculatrice.py</span>
+<span class="cmd">git commit -m</span> "fix(tests): suppression du test erroné pour valider le pipeline CI"
+<span class="cmd">git push origin feature/tests</span></div>
+      </div>
+
+      <div class="img-placeholder">
+        <img src="../assets/images/d5653804d9762bba5f3fe459b754f6b7a98c12cf.png" alt="Commit correction" onerror="this.style.display='none'">
+      </div>
+
+      <p><strong>7.3 GitHub relance le pipeline :</strong></p>
+      <div class="img-placeholder">
+        <img src="../assets/images/cc17262ea5c3e448ed129d2ba22f3cda74038c27.png" alt="PR correction" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/50bd443d16e091a039e266249060ca65c12309a9.png" alt="Tests ok" onerror="this.style.display='none'">
+      </div>
+      <div class="img-placeholder">
+        <img src="../assets/images/da7552b838cd3ce6e50ab6ca6cb84a9382fca810.png" alt="Pipeline vert" onerror="this.style.display='none'">
+      </div>
+
+      <div class="info-box green">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <p>Le problème est résolu, le pipeline passe au vert.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SECTION C — RESPONSABLE DES TESTS
+  ══════════════════════════════ -->
+  <div class="section" id="responsable-tests">
+    <div class="section-header">
+      <span class="section-num">SECTION C</span>
+      <h2>Responsable des tests</h2>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">1</span> Introduction</h3>
+      <p>Le responsable des tests joue un rôle essentiel dans le projet. Il est chargé de garantir la qualité du code en écrivant et en validant des tests unitaires. Ces tests permettent de vérifier que chaque fonction du programme se comporte comme prévu, et de détecter rapidement les erreurs lors des modifications du code.</p>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">2</span> Mise en place des tests</h3>
+      <ul>
+        <li>Création du fichier <code>test_calculatrice.py</code></li>
+        <li>Ajout de tests unitaires pour chaque fonction : addition, soustraction, multiplication, division, puissance, modulo</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">3</span> Commandes Git utilisées</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copier</button></div>
+        <div class="code-body"><span class="cmd">git branch</span>
+<span class="cmd">git checkout feature/tests</span>
+<span class="cmd">git status</span>
+<span class="cmd">git add test_calculatrice.py</span>
+<span class="cmd">git commit -m</span> "test(calculatrice): ajout des tests unitaires"
+<span class="cmd">git push origin feature/tests</span></div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">4</span> Déclenchement du pipeline CI</h3>
+      <p>Le pipeline CI exécute automatiquement les tests unitaires à chaque push ou pull request sur <code>main</code> ou <code>develop</code>.</p>
+      <p><strong>Exemples :</strong></p>
+      <ul>
+        <li><span class="status-badge green">Pipeline vert</span> : tous les tests passent</li>
+        <li><span class="status-badge red">Pipeline rouge</span> : un test échoue (comme démonstration avec <code>assert 2+2 == 5</code>)</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">5</span> Résultat attendu</h3>
+      <ul>
+        <li><strong>Pipeline vert</strong> : tous les tests passent et le code est validé</li>
+        <li><strong>Pipeline rouge</strong> : une erreur est détectée et la fusion est bloquée</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h3><span class="num">6</span> Conclusion</h3>
+      <div class="conclusion-box" style="margin:0;">
+        <p>Le responsable des tests assure la fiabilité du projet en validant le bon fonctionnement du code. Les tests unitaires intégrés au pipeline CI garantissent que chaque modification est contrôlée avant d'être fusionnée. Cela permet de maintenir un haut niveau de qualité et de stabilité dans le projet.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>⚙️ Pipeline CI · GitHub Actions · Tests unitaires</p>
+    <p style="margin-top:6px;font-size:11px;">· DOWOU Issa ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box, .practice-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

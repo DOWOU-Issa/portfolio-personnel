@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Guide Nmap · Scan réseau et sécurité</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1420;
+    --surface2: #111a2c;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0081ff;
+    --accent3: #00ff9d;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --text: #c8d8f0;
+    --text-dim: #5a7499;
+    --text-bright: #e8f4ff;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,129,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatOrb 12s ease-in-out infinite;
+  }
+
+  @keyframes floatOrb {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    position: fixed;
+    top: 20px; left: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(13, 20, 32, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.08);
+  }
+  .back-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+    transform: translateX(-3px);
+  }
+  .back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    z-index: 2000;
+    transition: width 0.1s;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── WRAPPER ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero-img {
+    width: 100%;
+    max-width: 700px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin: 0 auto 36px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+    background: linear-gradient(145deg, #0a1a2f, #0f2a44);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  /* ── MEMBERS (un seul : DOWOU Issa) ── */
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 32px 0;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .member-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s 0.15s ease both;
+  }
+  .toc::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li {
+    margin: 8px 0;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .toc a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { padding-left: 20px; margin: 6px 0; }
+  .toc ul li { list-style: none; position: relative; padding-left: 14px; color: var(--text-dim); font-size: 13px; }
+  .toc ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin: 56px 0;
+    animation: fadeInUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .section h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .subsection:hover { border-color: rgba(0,212,255,0.15); }
+  .subsection h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .subsection h3 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .subsection h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 16px 0 8px;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-family: var(--mono);
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dots .d1 { background: #ff5f57; }
+  .code-dots .d2 { background: #febc2e; }
+  .code-dots .d3 { background: #28c840; }
+  .code-lang {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .code-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7dd3fc;
+    white-space: pre-wrap;
+  }
+  .code-body .cmd { color: #38bdf8; }
+  .code-body .comment { color: #475569; font-style: italic; }
+
+  /* ── COPY BTN ── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── INFO / WARN BOXES ── */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .info-box.blue { background: rgba(0,129,255,0.07); border: 1px solid rgba(0,129,255,0.2); }
+  .info-box.green { background: rgba(0,255,157,0.06); border: 1px solid rgba(0,255,157,0.2); }
+  .info-box.orange { background: rgba(255,165,2,0.07); border: 1px solid rgba(255,165,2,0.2); }
+  .info-box.red { background: rgba(255,71,87,0.07); border: 1px solid rgba(255,71,87,0.2); }
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box p { color: var(--text); line-height: 1.6; }
+
+  /* ── IMAGE PLACEHOLDER ── */
+  .img-placeholder {
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 12px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  
+  .img-placeholder img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── OPTION TAG ── */
+  .option-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--mono);
+    margin-right: 6px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .wrapper { padding: 50px 16px 60px; }
+    .toc { padding: 20px; }
+    .subsection { padding: 18px; }
+    .back-btn span { display: none; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<!-- BACK BUTTON -->
+<a href="projets.html" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  <span>Retour aux projets</span>
+</a>
+
+<div class="wrapper">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><span></span> Guide Technique · Sécurité Réseau</div>
+    <div class="hero-img">
+      <span>🌐 Scanner un réseau avec Nmap</span>
+    </div>
+    <h1>Scanner un réseau<br/><span>avec Nmap</span></h1>
+    <p class="hero-sub">Analyse de ports · Détection OS · Contournement pare-feu · Scripts NSE</p>
+  </div>
+
+  <!-- ── MEMBRES (un seul : DOWOU Issa) ── -->
+  <div style="animation: fadeInUp 0.8s 0.05s ease both;">
+    <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:14px;">Membre du groupe</p>
+    <div class="members-grid">
+      <div class="member-card"><div class="member-avatar">DI</div><div class="member-name">DOWOU Issa</div></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE DES MATIÈRES ── -->
+  <div class="toc">
+    <div class="toc-title">📋 Table des matières</div>
+    <ol>
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#installation">Installation de Nmap</a></li>
+      <li><a href="#options-base">Quelques options Nmap</a></li>
+      <li><a href="#scan-ip">Scanner une adresse IP et contourner un pare-feu</a></li>
+      <li><a href="#detect-os">Détecter le système d'exploitation</a></li>
+      <li><a href="#versions-services">Identifier la version des services</a></li>
+      <li><a href="#scan-port">Scan de port spécifique</a></li>
+      <li><a href="#spoofing">Spoofing d'adresse MAC</a></li>
+      <li><a href="#analyse-approfondie">Analyse approfondie (-A)</a></li>
+      <li><a href="#scan-furtif">Scan furtif (-sS)</a></li>
+      <li><a href="#plage-reseau">Scan d'une plage réseau</a></li>
+      <li><a href="#vulnerabilites">Scan des vulnérabilités</a></li>
+      <li><a href="#verbose">Verbose (-V)</a></li>
+      <li><a href="#export">Exporter les résultats</a></li>
+      <li><a href="#conclusion">Conclusion</a></li>
+    </ol>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       INTRODUCTION
+  ══════════════════════════════ -->
+  <div class="section" id="introduction">
+    <div class="section-header">
+      <span class="section-num">INTRODUCTION</span>
+      <h2>Introduction</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Nmap (Network Mapper) est un outil puissant utilisé pour analyser un réseau informatique et identifier les services actifs sur une machine. Ce guide explique de manière simple comment utiliser Nmap pour scanner des ports, contourner les pare-feux et obtenir des informations sur un système distant.</p>
+      <p>L'objectif est d'aider les administrateurs réseau et les débutants en cybersécurité à mieux comprendre l'utilisation de Nmap pour évaluer la sécurité d'un réseau.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       INSTALLATION
+  ══════════════════════════════ -->
+  <div class="section" id="installation">
+    <div class="section-header">
+      <span class="section-num">SECTION 1</span>
+      <h2>Installation de Nmap</h2>
+    </div>
+
+    <div class="subsection">
+      <p>L'installation de Nmap est simple :</p>
+      <ul style="margin-left:20px;">
+        <li><strong>Windows</strong> : Téléchargez le programme depuis <a href="https://nmap.org" style="color:var(--accent);">https://nmap.org</a> et installez-le.</li>
+        <li><strong>Linux</strong> : Utilisez la commande suivante dans le terminal :</li>
+      </ul>
+      
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copier</button>
+        </div>
+        <div class="code-body"><span class="cmd">sudo apt install nmap</span>  <span class="comment"># Sur Ubuntu/Debian</span>
+<span class="cmd">sudo yum install nmap</span>  <span class="comment"># Sur CentOS/RHEL</span></div>
+      </div>
+      
+      <p>Une fois installé, vous pouvez vérifier la version de Nmap avec :</p>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap -V</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       OPTIONS DE BASE
+  ══════════════════════════════ -->
+  <div class="section" id="options-base">
+    <div class="section-header">
+      <span class="section-num">SECTION 2</span>
+      <h2>Quelques options Nmap</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Lancer <code>nmap</code> est très simple : il suffit de l'exécuter directement dans l'invite de commande sous Windows, ou dans le terminal sur les systèmes d'exploitation Linux.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image1.jpg" alt="Nmap help 1" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible</span>'">
+        <img src="../assets/images/media/image2.jpg" alt="Nmap help 2" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image3.jpg" alt="Nmap help 3" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image4.jpg" alt="Nmap help 4" onerror="this.style.display='none'">
+      </div>
+      
+      <p>En entrant simplement <code>nmap</code>, vous obtiendrez une liste des options disponibles pour cette commande. Vous pouvez également consulter la documentation complète des commandes de nmap sur leur site officiel : <a href="https://nmap.org/book/man.html" style="color:var(--accent);">https://nmap.org/book/man.html</a></p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SCAN IP ET CONTOURNEMENT
+  ══════════════════════════════ -->
+  <div class="section" id="scan-ip">
+    <div class="section-header">
+      <span class="section-num">SECTION 3</span>
+      <h2>Scanner une adresse IP et contourner un pare-feu</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Commençons par une commande simple : utiliser <code>nmap</code> suivi d'une adresse IP. Par exemple, scannons votre propre adresse IP. Cela correspond à un scan ciblé sur une seule adresse.</p>
+      
+      <p>Nous pourrions également décider de scanner une plage complète d'adresses IP, comme dans cet exemple :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap 192.168.43.1-254</span></div>
+      </div>
+      
+      <p>Pour illustrer le comportement de ces commandes, j'ai utilisé deux machines :</p>
+      <ul style="margin-left:20px;">
+        <li>Une machine virtuelle Kali, qui servira de machine distante tentant d'accéder à la machine cible.</li>
+        <li>Une machine réelle sous Windows, qui sera la cible du scan.</li>
+      </ul>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image5.jpg" alt="Scan sans résultat" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Depuis ma machine distante, j'ai tenté de scanner mon adresse IP, mais je n'ai reçu aucun résultat. Cela s'explique par le fait que mon adresse IP est protégée par un pare-feu. Si le pare-feu bloque mes requêtes, une solution consiste à ajouter l'option <code>-Pn</code> à la commande <code>nmap</code>. Cela permet de contourner le pare-feu et d'effectuer le filtrage des ports.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image6.jpg" alt="Scan avec -Pn" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Nous constatons maintenant que nous avons accès aux ports ouverts ainsi qu'aux services associés. Avec ces informations, il est déjà possible d'agir et d'exploiter ces données pour des analyses ou des actions spécifiques.</p>
+      
+      <p>Essayons maintenant depuis ma machine réelle :</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image7.jpg" alt="Scan depuis Windows" onerror="this.style.display='none'">
+      </div>
+      
+      <p>En exécutant la commande depuis mon système Windows, auquel appartient l'adresse IP, je n'ai rencontré aucun problème avec le pare-feu. Ce dernier considère cette action comme une opération de routine de sécurité, visant à surveiller les ports ouverts. De plus, le fait que la commande ait été lancée depuis ma propre machine explique cette absence de blocage.</p>
+      
+      <p>Bien sûr, il est possible d'obtenir davantage d'informations en ajoutant des options spécifiques. C'est ce que nous allons explorer ici.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       DÉTECTION OS
+  ══════════════════════════════ -->
+  <div class="section" id="detect-os">
+    <div class="section-header">
+      <span class="section-num">SECTION 4</span>
+      <h2>Détecter le système d'exploitation</h2>
+    </div>
+
+    <div class="subsection">
+      <p>La commande <code>nmap -O</code> permet de déterminer le système d'exploitation (OS) sur lequel tourne la machine cible. Il est important de noter que nmap envoie des dizaines, voire des milliers de requêtes à la cible, ce qui peut allonger considérablement le temps nécessaire pour effectuer l'analyse.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image8.jpg" alt="Scan OS" onerror="this.style.display='none'">
+      </div>
+      
+      <h4>Ports ouverts détectés :</h4>
+      <p>Voici une liste des ports ouverts, chacun étant associé à un service spécifique :</p>
+      
+      <ul style="margin-left:20px;">
+        <li><strong>135/tcp (msrpc)</strong> : Utilisé pour Microsoft RPC (Remote Procedure Call). Ce port est utilisé par le service RPC de Windows, qui permet à des programmes de communiquer entre eux sur différents ordinateurs d'un réseau.</li>
+        <li><strong>139/tcp (netbios-ssn)</strong> : Associé à NetBIOS, utilisé pour le partage de fichiers dans les réseaux Windows. Ce port est utilisé pour les services NetBIOS Session, notamment pour le partage de fichiers et d'imprimantes.</li>
+        <li><strong>445/tcp (microsoft-ds)</strong> : Port SMB pour le partage de fichiers sous Windows.</li>
+        <li><strong>902/tcp et 912/tcp</strong> : Probablement liés à des services ou logiciels spécifiques exécutés sur l'hôte.</li>
+        <li><strong>2179/tcp (vmrdp)</strong> : VMware Remote Desktop Protocol.</li>
+        <li><strong>3306/tcp (mysql)</strong> : Indique une base de données MySQL accessible sur ce port. L'annotation "(unauthorized)" suggère qu'il est accessible sans autorisation, ce qui peut poser un risque de sécurité.</li>
+        <li><strong>5000/tcp (upnp)</strong> : Service UPnP, souvent utilisé pour la découverte automatique de périphériques.</li>
+        <li><strong>7070/tcp (realserver)</strong> : Utilisé pour RTSP (Real-Time Streaming Protocol).</li>
+      </ul>
+      
+      <p>On remarque donc que des ports ouverts sont associés à différents services. Si vous le souhaitez, vous pouvez approfondir en recherchant à quoi ces services sont destinés. Cependant, ce qui nous intéresse ici est le suivant...</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image9.jpg" alt="OS non déterminé" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Cette ligne montre que l'on n'a pas pu déterminer avec exactitude le système d'exploitation trouvé. Ce n'est pas très grave. Ce qui va nous intéresser maintenant se trouve dans le <strong>TCP/IP Fingerprint</strong>.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image10.jpg" alt="TCP/IP Fingerprint" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Dans le résultat, il est indiqué que le système d'exploitation de la machine est Windows, mais la version exacte n'a pas pu être déterminée. Toutefois, cette information peut déjà être suffisante dans le cadre d'une analyse. Par exemple en sachant qu'il s'agit de Windows, vous pouvez utiliser des scripts spécifiques du moteur NSE pour aller plus loin dans l'analyse, comme la détection de failles SMB.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       VERSIONS DES SERVICES
+  ══════════════════════════════ -->
+  <div class="section" id="versions-services">
+    <div class="section-header">
+      <span class="section-num">SECTION 5</span>
+      <h2>Identifier la version des services</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Cette fois-ci, nous utilisons la commande suivante :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap -sV 192.168.43.244</span></div>
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li><span class="option-tag">-sV</span> Cette option active la détection des versions des services. Le 's' indique un scan des services actifs, tandis que le 'V' permet de déterminer les versions exactes des logiciels associés aux ports ouverts.</li>
+        <li><strong>Objectif :</strong> Cette commande permet d'identifier, pour chaque port ouvert, la version précise des services ou logiciels en cours d'exécution sur l'hôte cible.</li>
+      </ul>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image11.jpg" alt="Scan versions services" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Ici, la commande fournit des informations détaillées, notamment sur les ports ouverts, les services exécutés et les versions spécifiques de ces services. Si, sur le réseau, l'une de ces versions correspond à un logiciel connu pour avoir une vulnérabilité répertoriée, il serait alors possible de l'exploiter en utilisant un outil comme <strong>Metasploit</strong>, qui permet de lancer des exploits ciblés pour des failles identifiées. Cette étape est cruciale dans le cadre d'une analyse de sécurité ou d'un test d'intrusion.</p>
+      
+      <p>Voici le résultat obtenu depuis ma machine Kali, en utilisant l'option permettant de contourner le pare-feu, une étape essentielle à ne pas négliger.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image12.jpg" alt="Scan depuis Kali" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SCAN DE PORT SPÉCIFIQUE
+  ══════════════════════════════ -->
+  <div class="section" id="scan-port">
+    <div class="section-header">
+      <span class="section-num">SECTION 6</span>
+      <h2>Scan de port spécifique</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Il est également possible de cibler des ports spécifiques pour le scan. Par exemple, si vous souhaitez vérifier la présence d'un serveur web actif sur une machine, vous pouvez concentrer l'analyse sur le port 80. Cette méthode réduit le nombre de requêtes envoyées, ce qui accélère la réponse.</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap -p [numéro_du_port] [adresse_IP]</span></div>
+      </div>
+      
+      <p>Remplacez <code>[numéro_du_port]</code> par le port à scanner (par exemple, <code>80</code>) et <code>[adresse_IP]</code> par l'adresse cible. Cette approche est particulièrement utile pour analyser des services précis.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image13.jpg" alt="Scan port 80" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Dans ce cas, le résultat indique que le port 80 est fermé, ce qui signifie qu'aucun service n'écoute sur ce port à l'adresse IP ciblée.</p>
+      
+      <h4>Avantages de cette commande</h4>
+      <ul style="margin-left:20px;">
+        <li><strong>Réduction du nombre de requêtes :</strong> Vous limitez l'analyse à un seul port, ce qui évite de scanner des milliers de ports inutiles.</li>
+        <li><strong>Gain de temps :</strong> En ciblant directement le port qui vous intéresse, le scan est beaucoup plus rapide.</li>
+        <li><strong>Efficacité :</strong> Idéal lorsque vous recherchez la présence d'un service spécifique, comme un serveur web (port 80 pour HTTP).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SPOOFING MAC
+  ══════════════════════════════ -->
+  <div class="section" id="spoofing">
+    <div class="section-header">
+      <span class="section-num">SECTION 7</span>
+      <h2>Spoofing d'adresse MAC</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap --spoof-mac 7A:8D:C4:11:A1:57 127.0.0.1</span></div>
+      </div>
+      
+      <p><strong>Explication technique :</strong></p>
+      <ul style="margin-left:20px;">
+        <li><span class="option-tag">--spoof-mac</span> : Cette option permet de falsifier (spoof) une adresse MAC. Dans cet exemple, l'adresse MAC spécifiée est 7A:8D:C4:11:A1:57.</li>
+        <li><strong>Contexte :</strong> Dans certains réseaux locaux, des mécanismes de contrôle d'accès reposent sur le filtrage des adresses MAC. Seules les adresses MAC autorisées peuvent accéder au réseau, tandis que les autres sont bloquées.</li>
+      </ul>
+      
+      <p><strong>Objectif de la commande :</strong> En falsifiant l'adresse MAC, l'utilisateur peut contourner ces restrictions et simuler une adresse MAC autorisée par le réseau cible. Cela permet à un appareil qui aurait été bloqué de potentiellement accéder au réseau si l'adresse MAC correspond à celles autorisées.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image14.jpg" alt="Spoofing MAC" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Dans notre exemple avec une adresse MAC quelconque, on remarque que l'adresse MAC spécifiée a été utilisée, bien qu'elle ne corresponde pas à un fabricant connu (selon la base de données d'adresses MAC).</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       ANALYSE APPROFONDIE -A
+  ══════════════════════════════ -->
+  <div class="section" id="analyse-approfondie">
+    <div class="section-header">
+      <span class="section-num">SECTION 8</span>
+      <h2>Analyse approfondie (-A)</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap -A [adresse_IP]</span></div>
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li><span class="option-tag">-A</span> : Active plusieurs fonctionnalités avancées de nmap en une seule commande, ce qui simplifie l'analyse approfondie. Elle combine :</li>
+        <ul style="margin-left:20px;">
+          <li><strong>Détection des versions des services (-sV)</strong> : Identifie les versions précises des logiciels associés aux ports ouverts.</li>
+          <li><strong>Détection du système d'exploitation (-O)</strong> : Tente de déterminer le système d'exploitation de la cible.</li>
+          <li><strong>Traceroute</strong> : Analyse le chemin réseau emprunté pour atteindre la cible.</li>
+          <li><strong>Scripts NSE spécifiques</strong> : Exécute des scripts pour collecter davantage d'informations sur les services détectés.</li>
+        </ul>
+      </ul>
+      
+      <p><strong>Avantages :</strong> En utilisant -A, vous n'avez pas besoin de spécifier individuellement des options telles que -sV ou -O. Cette commande est idéale pour obtenir une vue globale et détaillée de la machine cible en une seule étape.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image15.jpeg" alt="Scan -A 1" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image16.jpg" alt="Scan -A 2" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Avec l'option -A, toutes les informations sont regroupées en une seule commande : les ports ouverts, les services associés, leurs versions, ainsi que les logiciels en cours d'exécution. Bien que cette commande soit la plus recommandée pour obtenir une analyse complète, elle peut être relativement longue à exécuter en raison de la quantité de données collectées.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SCAN FURTIF -sS
+  ══════════════════════════════ -->
+  <div class="section" id="scan-furtif">
+    <div class="section-header">
+      <span class="section-num">SECTION 9</span>
+      <h2>Scan furtif (-sS)</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Pour effectuer un scan en mode "stealth" (furtif) :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap -sS 192.168.43.244</span></div>
+      </div>
+      
+      <p>La particularité du <strong>scan furtif (stealth scan)</strong> (-sS) par rapport à un scan simple (nmap sans option) réside dans la méthode utilisée pour détecter les ports ouverts et sa discrétion. Même si on obtient les mêmes résultats, la façon de procéder reste différente.</p>
+      
+      <h4>1. Méthode utilisée :</h4>
+      <ul style="margin-left:20px;">
+        <li><strong>Scan simple (par défaut)</strong> : nmap effectue un <strong>scan TCP Connect</strong>, ce qui signifie qu'il établit une connexion complète en utilisant le protocole TCP (handshake complet : SYN → SYN/ACK → ACK). Cette méthode est plus visible pour les pare-feu ou systèmes de détection d'intrusion (IDS).</li>
+        <li><strong>Scan furtif (-sS)</strong> : Il envoie uniquement un paquet <strong>SYN</strong> au port cible, puis attend une réponse. Si le port est ouvert, il reçoit un paquet <strong>SYN/ACK</strong>. Immédiatement après, il répond avec un <strong>RST</strong> au lieu de compléter la connexion. Ainsi, la connexion n'est jamais établie complètement.</li>
+      </ul>
+      
+      <h4>2. Discrétion :</h4>
+      <ul style="margin-left:20px;">
+        <li><strong>Scan simple</strong> : Très facile à détecter et consigner sur la cible.</li>
+        <li><strong>Scan furtif (-sS)</strong> : Conçu pour échapper aux systèmes de détection d'intrusion, il laisse moins de traces.</li>
+      </ul>
+      
+      <h4>3. Performance :</h4>
+      <ul style="margin-left:20px;">
+        <li><strong>Scan simple</strong> : Plus lent, car chaque port nécessite un handshake complet.</li>
+        <li><strong>Scan furtif (-sS)</strong> : Plus rapide, car il n'établit pas de connexions complètes.</li>
+      </ul>
+      
+      <h4>Utilisation typique :</h4>
+      <ul style="margin-left:20px;">
+        <li><strong>Scan simple</strong> : Utile pour des environnements où la discrétion n'est pas une priorité.</li>
+        <li><strong>Scan furtif</strong> : Idéal pour des tests de sécurité où vous souhaitez minimiser la détection.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       PLAGE RÉSEAU
+  ══════════════════════════════ -->
+  <div class="section" id="plage-reseau">
+    <div class="section-header">
+      <span class="section-num">SECTION 10</span>
+      <h2>Scan d'une plage réseau</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Pour scanner un réseau complet :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap 192.168.1.0/24</span></div>
+      </div>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image17.jpg" alt="Scan plage réseau" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Dans ce contexte, le suffixe <code>/24</code> représente une plage de 256 adresses IP, allant de <code>192.168.43.0</code> à <code>192.168.43.255</code>.</p>
+      
+      <p>On observe également la présence d'adresses MAC inconnues associées à différents appareils sur le réseau, ainsi que leurs ports ouverts. Ces informations peuvent être utiles pour identifier des périphériques non reconnus ou pour analyser les services actifs sur chaque appareil.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       SCAN DES VULNÉRABILITÉS
+  ══════════════════════════════ -->
+  <div class="section" id="vulnerabilites">
+    <div class="section-header">
+      <span class="section-num">SECTION 11</span>
+      <h2>Scan des vulnérabilités</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Si vous avez le script NSE de nmap, vous pouvez exécuter une analyse spécifique pour détecter les vulnérabilités :</p>
+      
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap --script vuln 192.168.43.244</span></div>
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li>Cette option utilise les scripts de détection de vulnérabilités du moteur de scripts NSE (Nmap Scripting Engine).</li>
+        <li>Les scripts inclus dans la catégorie "vuln" sont conçus pour détecter les vulnérabilités connues dans les services exécutés sur les ports ouverts de l'hôte cible.</li>
+      </ul>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image18.jpg" alt="Scan vulnérabilités" onerror="this.style.display='none'">
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li><strong>samba-vuln-cve-2012-1182</strong> : Ce script vérifie une vulnérabilité critique dans Samba. Dans ce cas, il n'a pas pu établir une connexion SMB avec l'hôte.</li>
+        <li><strong>smb-vuln-ms10-054</strong> : Ce script vérifie une vulnérabilité SMB liée à Microsoft (MS10-054). Résultat : Aucun problème détecté.</li>
+        <li><strong>smb-vuln-ms10-061</strong> : Ce script vérifie une autre vulnérabilité SMB. Résultat : Échec de la connexion.</li>
+      </ul>
+      
+      <p>Les scripts ont tenté de détecter des failles connues dans les services SMB et Samba, mais les résultats montrent que les connexions n'ont pas pu être établies (ou que les services sont sécurisés).</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       VERBOSE
+  ══════════════════════════════ -->
+  <div class="section" id="verbose">
+    <div class="section-header">
+      <span class="section-num">SECTION 12</span>
+      <h2>Verbose (-V)</h2>
+    </div>
+
+    <div class="subsection">
+      <p>L'option <code>-V</code> permet d'activer un mode verbeux (verbose), offrant une visualisation en temps réel de la progression de la détection et du scan. Elle affiche des mises à jour détaillées à chaque étape, ce qui est utile pour surveiller l'état et les éventuelles interruptions pendant l'exécution de la commande.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       EXPORT DES RÉSULTATS
+  ══════════════════════════════ -->
+  <div class="section" id="export">
+    <div class="section-header">
+      <span class="section-num">SECTION 13</span>
+      <h2>Exporter les résultats</h2>
+    </div>
+
+    <div class="subsection">
+      <p>Dans les options de commande de nmap, la section <strong>OUTPUT</strong> permet d'enregistrer les résultats du scan dans différents formats, tels que des fichiers texte (.txt) ou XML (.xml), facilitant ainsi l'analyse ultérieure.</p>
+      
+      <h4>Options disponibles :</h4>
+      <ul style="margin-left:20px;">
+        <li><span class="option-tag">-oN &lt;file&gt;</span> : Enregistre la sortie dans un format normal, lisible pour l'utilisateur.</li>
+        <li><span class="option-tag">-oX &lt;file&gt;</span> : Enregistre la sortie au format XML, utile pour les traitements automatisés ou l'importation dans d'autres outils.</li>
+        <li><span class="option-tag">-oS &lt;file&gt;</span> : Enregistre la sortie dans un format "script kiddie" (moins utilisé, principalement humoristique).</li>
+        <li><span class="option-tag">-oG &lt;file&gt;</span> : Enregistre la sortie dans un format "grepable", permettant une recherche rapide avec des outils comme grep.</li>
+      </ul>
+      
+      <h4>Exemple de commande :</h4>
+      <div class="code-block">
+        <div class="code-body"><span class="cmd">nmap -oN issa.txt 127.0.0.1</span></div>
+      </div>
+      
+      <ul style="margin-left:20px;">
+        <li><span class="option-tag">-oN</span> : La sortie sera enregistrée dans un fichier nommé issa.txt.</li>
+        <li><strong>127.0.0.1</strong> : L'adresse IP scannée, ici l'hôte local (localhost).</li>
+      </ul>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image19.jpg" alt="Export résultats 1" onerror="this.style.display='none'">
+      </div>
+      
+      <p>Ces options sont très utiles pour archiver les résultats, les partager ou les intégrer dans d'autres processus d'analyse.</p>
+      
+      <div class="img-placeholder">
+        <img src="../assets/images/media/image20.jpg" alt="Export résultats 2" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════
+       CONCLUSION
+  ══════════════════════════════ -->
+  <div class="section" id="conclusion">
+    <div class="section-header">
+      <span class="section-num">CONCLUSION</span>
+      <h2>Conclusion</h2>
+    </div>
+
+    <div class="subsection">
+      <div class="info-box green">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <p>Nmap est un outil essentiel pour identifier les services ouverts, analyser la sécurité d'un réseau et détecter d'éventuelles vulnérabilités. Son utilisation doit être responsable et conforme aux lois en vigueur, car scanner un réseau sans autorisation peut être illégal.</p>
+      </div>
+      
+      <p style="margin-top:16px;">Grâce à ce guide, vous devriez être capable de réaliser vos propres analyses et mieux comprendre la sécurité réseau.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>🌐 Guide Nmap · Scan réseau et sécurité · DOWOU Issa</p>
+    <p style="margin-top:6px;font-size:11px;">· Utilisation responsable et légale ·</p>
+  </footer>
+
+</div>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Copy code
+  function copyCode(btn) {
+    const body = btn.closest('.code-block').querySelector('.code-body');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--accent3)';
+      btn.style.borderColor = 'var(--accent3)';
+      setTimeout(() => {
+        btn.textContent = 'copier';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    });
+  }
+
+  // Intersection Observer for fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.subsection, .info-box').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
