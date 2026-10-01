@@ -480,6 +480,8 @@
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Instrument+Sans:wght@400&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/rapport.css">
 </head>
 <body>
 
@@ -499,7 +501,7 @@
   <div class="hero">
     <div class="hero-badge"><span></span> Guide Technique · Active Directory</div>
     <div class="hero-img">
-      <span>🖥️ Installation et gestion d'un serveur AD DS</span>
+      <span>Installation et gestion d'un serveur AD DS</span>
     </div>
     <h1>Installation et gestion<br/><span>d'Active Directory</span></h1>
     <p class="hero-sub">Windows Server · Interface graphique · PowerShell · Gestion des objets</p>
@@ -515,7 +517,7 @@
 
   <!-- ── TABLE DES MATIÈRES ── -->
   <div class="toc">
-    <div class="toc-title">📋 Table des matières</div>
+    <div class="toc-title">Table des matières</div>
     <ol>
       <li><a href="#installation-gui">Installation d'un serveur AD DS (interface graphique)</a></li>
       <li><a href="#installation-powershell">Installation d'un contrôleur de domaine sous PowerShell</a></li>
@@ -546,19 +548,19 @@
         <img src="../assets/images/media/image1.jpg" alt="Installation AD DS 1" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible</span>'">
       </div>
       
-      <p>▪ Il faut choisir l'option <strong>« Installation basée sur un rôle ou une fonctionnalité »</strong>, puisqu'il s'agit d'un nouveau rôle à installer et non pas d'une fonctionnalité complémentaire.</p>
+      <p>Il faut choisir l'option <strong>« Installation basée sur un rôle ou une fonctionnalité »</strong>, puisqu'il s'agit d'un nouveau rôle à installer et non pas d'une fonctionnalité complémentaire.</p>
       
       <div class="img-placeholder">
         <img src="../assets/images/media/image2.jpg" alt="Sélection du serveur" onerror="this.style.display='none'">
       </div>
       
-      <p>▪ Vous devez par la suite sélectionner le serveur sur lequel le rôle doit être installé dans ce cas, il n'y a qu'un seul serveur.</p>
+      <p>Vous devez par la suite sélectionner le serveur sur lequel le rôle doit être installé dans ce cas, il n'y a qu'un seul serveur.</p>
       
       <div class="img-placeholder">
         <img src="../assets/images/media/image3.jpg" alt="Sélection rôle AD DS" onerror="this.style.display='none'">
       </div>
       
-      <p>▪ Dans cette situation, nous souhaitons mettre en place un réseau d'entreprise « simple » il faut donc sélectionner uniquement <strong>« Services AD DS »</strong>.</p>
+      <p>Dans cette situation, nous souhaitons mettre en place un réseau d'entreprise « simple » il faut donc sélectionner uniquement <strong>« Services AD DS »</strong>.</p>
       
       <p>• Lorsque la case est cochée, des fonctionnalités complémentaires vont être automatiquement sélectionnées aussi. Il est impératif d'avoir tous ces outils pour pouvoir gérer efficacement le serveur AD.</p>
       
@@ -734,7 +736,7 @@
       
       <p>• Pour créer une unité organisationnelle afin d'y mettre l'ensemble des utilisateurs et groupes, dans l'arbre à la hauteur du domaine, faites un clic droit dans la fenêtre de droite, puis <strong>Nouveau</strong> et on choisit <strong>Unité d'organisation</strong> et on remplit.</p>
       
-      <p>▪ Pour créer un nouvel utilisateur dans l'unité créée, clic droit sur l'UO ensuite <strong>Nouveau</strong> puis <strong>Utilisateur</strong>.</p>
+      <p>Pour créer un nouvel utilisateur dans l'unité créée, clic droit sur l'UO ensuite <strong>Nouveau</strong> puis <strong>Utilisateur</strong>.</p>
     </div>
 
     <!-- GESTION UTILISATEURS INTERFACE -->
@@ -745,7 +747,7 @@
         <img src="../assets/images/media/image18.png" alt="Création utilisateur" onerror="this.style.display='none'">
       </div>
       
-      <p>▪ Dans notre exemple, nous allons créer un utilisateur qui s'appelle <strong>Dowou Issa</strong> avec le nom d'ouverture de session <strong>Dark_army</strong>.</p>
+      <p>Dans notre exemple, nous allons créer un utilisateur qui s'appelle <strong>Dowou Issa</strong> avec le nom d'ouverture de session <strong>Dark_army</strong>.</p>
       
       <div class="img-placeholder">
         <img src="../assets/images/media/image19.png" alt="Assistant création utilisateur" onerror="this.style.display='none'">
@@ -779,12 +781,12 @@
       
       <p>Dans l'onglet <strong>Compte</strong> on trouve :</p>
       <ul style="margin-left:20px;">
-        <li>▪ La partie liée à l'ouverture de la session</li>
-        <li>▪ Horaire d'accès : restriction des horaires d'accès</li>
-        <li>▪ Se connecter à : restriction des ordinateurs</li>
-        <li>▪ Verrouillage du compte</li>
-        <li>▪ Option de compte : gestion de mot de passe, activation ou non du compte, chiffrement,…</li>
-        <li>▪ Date d'expiration</li>
+        <li>La partie liée à l'ouverture de la session</li>
+        <li>Horaire d'accès : restriction des horaires d'accès</li>
+        <li>Se connecter à : restriction des ordinateurs</li>
+        <li>Verrouillage du compte</li>
+        <li>Option de compte : gestion de mot de passe, activation ou non du compte, chiffrement,…</li>
+        <li>Date d'expiration</li>
       </ul>
       
       <div class="img-placeholder">
@@ -876,7 +878,7 @@
   </div>
 
   <footer>
-    <p>🖥️ Guide AD DS · Installation et gestion d'Active Directory · DOWOU Issa</p>
+    <p>Guide AD DS · Installation et gestion d'Active Directory · DOWOU Issa</p>
     <p style="margin-top:6px;font-size:11px;">· Windows Server · PowerShell · Gestion des objets ·</p>
   </footer>
 
@@ -922,5 +924,7 @@
     observer.observe(el);
   });
 </script>
+<script src="../assets/js/projet-bar.js"></script>
+<script src="../assets/js/palette.js" defer></script>
 </body>
 </html>

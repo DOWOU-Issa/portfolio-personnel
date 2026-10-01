@@ -324,11 +324,13 @@
   .card, .stat-badge, .toc { animation: fadeUp 0.6s ease backwards; }
   .section { animation: fadeUp 0.5s ease both; }
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Instrument+Sans:wght@400&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/rapport.css">
 </head>
 <body>
 <div class="progress-container"><div class="progress-bar" id="scrollProgress"></div></div>
 <div class="wrapper">
-  <a href="#" class="back-link" onclick="history.back();return false;">← Retour aux projets</a>
+  <a href="projets.html" class="back-link" >← Retour aux projets</a>
   
   <div class="hero">
     <div class="badge"><span></span> ANALYSE PLUVIOMÉTRIQUE · 43 ANS · 1982–2024</div>
@@ -342,7 +344,7 @@
 
   <!-- TABLE DES MATIÈRES -->
   <div class="toc">
-    <div class="toc-title">📑 SOMMAIRE ANALYTIQUE</div>
+    <div class="toc-title">SOMMAIRE ANALYTIQUE</div>
     <div class="toc-grid">
       <div class="toc-item">1. <a href="#qualite">Qualité des données</a></div>
       <div class="toc-item">2. <a href="#stats-annuelles">Statistiques annuelles</a></div>
@@ -364,7 +366,7 @@
         <thead><tr><th>Année</th><th>Jour</th><th>Valeur imputée</th><th>Méthode</th><th>Justification</th></tr></thead>
         <tbody><tr><td>2024</td><td>1 (1 Jan)</td><td>0.0 mm</td><td>Médiane historique du jour 1</td><td>100% des années 1982-2023 : 0 mm</td></tr></tbody>
       </table>
-      <div class="info-note">🔍 <strong>Valeurs extrêmes (IQR)</strong> : 71 valeurs détectées au-delà de Q3+3×IQR, toutes météorologiquement cohérentes (max 149.2 mm/jour). Décision de conservation. Inventaire complet dans Excel.</div>
+      <div class="info-note"><strong>Valeurs extrêmes (IQR)</strong> : 71 valeurs détectées au-delà de Q3+3×IQR, toutes météorologiquement cohérentes (max 149.2 mm/jour). Décision de conservation. Inventaire complet dans Excel.</div>
 
     </div>
   </div>
@@ -382,10 +384,10 @@
         <div class="stat-badge"><div class="stat-value">~180 j/an</div><div>Jours de pluie moyen</div></div>
       </div>
       <div class="img-placeholder">
-        📊 Figure 1 — Totaux pluviométriques annuels (1982–2024) avec droite de tendance et moyenne.
-        <img src="..\\assets\\images\\figure1_totaux_annuels.png" alt="Figure 1 : Totaux annuels 1982-2024" onerror="this.style.display='none'">
+        Figure 1 — Totaux pluviométriques annuels (1982–2024) avec droite de tendance et moyenne.
+        <img src="../assets/images/figure1_totaux_annuels.png" alt="Figure 1 : Totaux annuels 1982-2024" onerror="this.style.display='none'">
       </div>
-      <div class="info-note">Indicateurs calculés par année : =SUM, =COUNTIF, =STDEV, =PERCENTILE. Colonne ⚠ indique le nombre d'extrêmes IQR par année.</div>
+      <div class="info-note">Indicateurs calculés par année : =SUM, =COUNTIF, =STDEV, =PERCENTILE. Colonne indique le nombre d'extrêmes IQR par année.</div>
     </div>
   </div>
 
@@ -411,10 +413,10 @@
         </tbody>
       </table>
       <div class="img-placeholder">
-        📊 Figure 2 — Régime pluviométrique mensuel moyen (barres = somme, losanges rouges = jours de pluie).
-        <img src="..\\assets\\images\\figure2_mensuel.png" alt="Figure 2 : Régime mensuel" onerror="this.style.display='none'">
+        Figure 2 — Régime pluviométrique mensuel moyen (barres = somme, losanges rouges = jours de pluie).
+        <img src="../assets/images/figure2_mensuel.png" alt="Figure 2 : Régime mensuel" onerror="this.style.display='none'">
       </div>
-      <div class="info-note">🌧️ <strong>Régime unimodal typique</strong> : saison des pluies Juin–Octobre (76% du total). Pic maximal en Août (752 mm, 27.6 jours). Saison sèche Nov–Fév (3% annuel).</div>
+      <div class="info-note"><strong>Régime unimodal typique</strong> : saison des pluies Juin–Octobre (76% du total). Pic maximal en Août (752 mm, 27.6 jours). Saison sèche Nov–Fév (3% annuel).</div>
     </div>
   </div>
 
@@ -433,7 +435,7 @@
         </tbody>
       </table>
       <div class="img-placeholder">
-        📈 Figure 3 — Nuages de points : Somme vs Jours de pluie, Écart-type, Max journalier (droite de régression en rouge).
+        Figure 3 — Nuages de points : Somme vs Jours de pluie, Écart-type, Max journalier (droite de régression en rouge).
         <img src="../assets/images/figure3_nuages_points.png" alt="Figure 3 : Nuages de points" onerror="this.style.display='none'">
       </div>
       <div class="info-note">Corrélation maximale Somme vs P95 (r=0.78). Les années humides génèrent davantage d'épisodes intenses.</div>
@@ -453,14 +455,14 @@
         </tbody>
       </table>
       <div class="img-placeholder">
-        📉 Figure 4 — Évolution du nombre annuel de jours de pluie (1982–2024) avec tendance.
+        Figure 4 — Évolution du nombre annuel de jours de pluie (1982–2024) avec tendance.
         <img src="../assets/images/figure4_jours_pluie.png" alt="Figure 4 : Évolution jours de pluie" onerror="this.style.display='none'">
       </div>
       <div class="img-placeholder">
-        📊 Figure 5 — Distribution des totaux annuels par décennie (violinplot + observations individuelles).
+        Figure 5 — Distribution des totaux annuels par décennie (violinplot + observations individuelles).
         <img src="../assets/images/figure5_distribution_decennie.png" alt="Figure 5 : Distribution par décennie" onerror="this.style.display='none'">
       </div>
-      <div class="info-note">✅ <strong>Conclusion robuste :</strong> aucune tendance significative détectée sur 43 ans (régression, Mann-Kendall). Régime pluviométrique stationnaire.</div>
+      <div class="info-note"><strong>Conclusion robuste :</strong> aucune tendance significative détectée sur 43 ans (régression, Mann-Kendall). Régime pluviométrique stationnaire.</div>
     </div>
   </div>
 
@@ -477,7 +479,7 @@
         </tbody>
       </table>
       <div class="img-placeholder">
-        📊 Figure 6 — Gauche : scores des années sur PC1×PC2 (couleur = année). Droite : cercle de corrélation des variables.
+        Figure 6 — Gauche : scores des années sur PC1×PC2 (couleur = année). Droite : cercle de corrélation des variables.
         <img src="../assets/images/figure6_acp_biplot.png" alt="Figure 6 : ACP biplot" onerror="this.style.display='none'">
       </div>
       <div class="info-note">PC1 (53.4%) : Somme, P95, Écart-type, Jours_Pluie positifs. PC2 (29.3%) : oppose Jours_Pluie (fréquence) à Écart-type et Max (intensité). Années humides et intenses : 2003, 2008.</div>
@@ -497,10 +499,10 @@
         </tbody>
       </table>
       <div class="img-placeholder">
-        📈 Figure 7 — Prévision pluviométrique 2025–2031 avec intervalle de confiance 90% (bootstrap 500 itérations).
+        Figure 7 — Prévision pluviométrique 2025–2031 avec intervalle de confiance 90% (bootstrap 500 itérations).
         <img src="../assets/images/figure7_prevision.png" alt="Figure 7 : Prévision 2025-2031" onerror="this.style.display='none'">
       </div>
-      <div class="info-note">⚠️ Prévision basée sur tendance polynomiale degré 2 + bootstrap. IC90 large (±1100 mm) reflète la forte variabilité naturelle. Ne remplace pas un modèle climatique régional.</div>
+      <div class="info-note">Prévision basée sur tendance polynomiale degré 2 + bootstrap. IC90 large (±1100 mm) reflète la forte variabilité naturelle. Ne remplace pas un modèle climatique régional.</div>
     </div>
   </div>
 
@@ -508,19 +510,19 @@
   <div class="section" id="excel">
     <div class="section-header"><span class="section-num">08</span><h2>Données brutes & fichier Excel associé</h2></div>
     <div class="drive-link">
-      <p>📁 <strong>Fichier Excel complet</strong> — Données originales, statistiques annuelles, corrélations, ACP, détection d'extrêmes, analyse mensuelle et prévision.</p>
-      <p><a href="https://docs.google.com/spreadsheets/d/1_TnTu44O_pT2gx57RPwpeMwmAnSd5yJP/edit?usp=sharing&ouid=108677796220446355884&rtpof=true&sd=true" target="_blank" rel="noopener">🔗 Accéder au classeur Google Sheets (analyse pluviométrique complète)</a></p>
+      <p><strong>Fichier Excel complet</strong> — Données originales, statistiques annuelles, corrélations, ACP, détection d'extrêmes, analyse mensuelle et prévision.</p>
+      <p><a href="https://docs.google.com/spreadsheets/d/1_TnTu44O_pT2gx57RPwpeMwmAnSd5yJP/edit?usp=sharing&ouid=108677796220446355884&rtpof=true&sd=true" target="_blank" rel="noopener">Accéder au classeur Google Sheets (analyse pluviométrique complète)</a></p>
       <p style="font-size:0.7rem; margin-top:6px;">Feuilles incluses : DONNEES_BRUTES, STATISTIQUES_ANNUELLES, CORRELATION, ANALYSE_MENSUELLE, ACP_RESUME, NUAGE_DE_POINTS, QUALITE_DONNEES, TENDANCE.</p>
     </div>
     <div class="card">
       <p><strong>Résumé méthodologique :</strong> valeurs manquantes imputées par médiane historique ; détection d'extrêmes par IQR (71 valeurs conservées) ; tendances par régression linéaire + Mann-Kendall ; ACP normalisée ; prévisions par bootstrap polynomial (500 itérations).</p>
-      <div class="info-note">💡 L'inventaire complet des 71 valeurs extrêmes avec seuils et Z-scores est disponible dans la feuille QUALITE_DONNEES du classeur Excel.</div>
+      <div class="info-note">L'inventaire complet des 71 valeurs extrêmes avec seuils et Z-scores est disponible dans la feuille QUALITE_DONNEES du classeur Excel.</div>
     </div>
   </div>
 
   <!-- ========== CONCLUSION ========= -->
   <div class="section">
-    <div class="section-header"><span class="section-num">✔</span><h2>Conclusion générale</h2></div>
+    <div class="section-header"><span class="section-num"></span><h2>Conclusion générale</h2></div>
     <div class="card">
       <p>- <strong>Qualité des données :</strong> excellente (1 NaN / 15 695 obs.). 71 extrêmes documentés et conservés — tous météorologiquement cohérents.</p>
       <p>- <strong>Régime pluviométrique :</strong> tropical unimodal, pic en Août (752 mm). Saison sèche marquée Nov–Fév (3% du total).</p>
@@ -529,13 +531,13 @@
       <p>- <strong>Tendance :</strong> AUCUNE tendance significative détectée (Mann-Kendall, régression, p>0.05 sur toutes variables). Régime stationnaire.</p>
       <p>- <strong>ACP :</strong> 2 composantes expliquent 82.6% de la variance. Structure humidité/intensité robuste et interprétable.</p>
       <p>- <strong>Prévision :</strong> stationnarité attendue à court terme (~3 860 mm/an), incertitude ±1 100 mm (IC 90%).</p>
-      <p style="margin-top:1rem; font-family:var(--font-mono); font-size:0.8rem; border-top: 1px solid #1f3552; padding-top:1rem;">📧 Contact : dowouissa69@gmail.com· IABD B3 · Mai 2026</p>
+      <p style="margin-top:1rem; font-family:var(--font-mono); font-size:0.8rem; border-top: 1px solid #1f3552; padding-top:1rem;">Contact : dowouissa69@gmail.com· IABD B3 · Mai 2026</p>
     </div>
   </div>
 
   <footer>
     <p>Analyse pluviométrique exhaustive · DOWOU Issa · 1982–2024 (43 ans) · Méthodes : IQR, Pearson, Mann-Kendall, ACP, Bootstrap</p>
-    <p style="margin-top:6px;">⚡ Données validées · Stationnarité statistique confirmée · Fichier Excel complet accessible via lien Google Drive</p>
+    <p style="margin-top:6px;">Données validées · Stationnarité statistique confirmée · Fichier Excel complet accessible via lien Google Drive</p>
   </footer>
 </div>
 
@@ -564,5 +566,8 @@
     observer.observe(el);
   });
 </script>
+<script src="../assets/js/projet-bar.js"></script>
+<script src="../assets/js/relief-pluie.js"></script>
+<script src="../assets/js/palette.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /Github/
+Disallow: /merci.html
+
+Sitemap: https://dowou-issa.github.io/portfolio-personnel/sitemap.xml

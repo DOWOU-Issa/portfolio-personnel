@@ -594,6 +594,8 @@
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Instrument+Sans:wght@400&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/rapport.css">
 </head>
 <body>
 
@@ -613,7 +615,7 @@
   <div class="hero">
     <div class="hero-badge"><span></span> Exposé Technique · Virtualisation</div>
     <div class="hero-img">
-      <span>📦 VM Cloning · Hyperviseurs</span>
+      <span>VM Cloning · Hyperviseurs</span>
     </div>
     <h1>Clonage de Machines<br/><span>Virtuelles</span></h1>
     <p class="hero-sub">Full Clone · Linked Clone · Sysprep · Bonnes Pratiques</p>
@@ -629,7 +631,7 @@
 
   <!-- ── TABLE DES MATIÈRES ── -->
   <div class="toc">
-    <div class="toc-title">📋 Table des matières</div>
+    <div class="toc-title">Table des matières</div>
     <ol>
       <li><a href="#intro">Introduction au clonage de machines virtuelles</a></li>
       <li>
@@ -716,14 +718,14 @@
       
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
-          <p style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;">✅ Avantages</p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;">Avantages</p>
           <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
             <li><strong>Autonomie totale</strong> : La machine clonée reste pleinement fonctionnelle même si la VM source est supprimée ou modifiée.</li>
             <li><strong>Meilleure stabilité à long terme</strong> : L'absence de dépendances garantit que le clone évoluera sans problème avec le temps.</li>
           </ul>
         </div>
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
-          <p style="font-family:var(--mono);font-size:12px;color:var(--danger);margin-bottom:6px;">⚠️ Inconvénients</p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--danger);margin-bottom:6px;">Inconvénients</p>
           <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
             <li><strong>Temps de création plus long</strong> : Le processus peut être lent, surtout si la VM source est volumineuse.</li>
             <li><strong>Occupation importante d'espace de stockage</strong> : Chaque clonage complet double les besoins en espace disque.</li>
@@ -739,14 +741,14 @@
       
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
-          <p style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;">✅ Avantages</p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;">Avantages</p>
           <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
             <li><strong>Création très rapide</strong> : Le processus est presque instantané.</li>
             <li><strong>Économie d'espace disque</strong> : Seule une fraction des données est dupliquée.</li>
           </ul>
         </div>
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
-          <p style="font-family:var(--mono);font-size:12px;color:var(--danger);margin-bottom:6px;">⚠️ Inconvénients</p>
+          <p style="font-family:var(--mono);font-size:12px;color:var(--danger);margin-bottom:6px;">Inconvénients</p>
           <ul style="font-size:13px;color:var(--text-dim);padding-left:18px;">
             <li><strong>Dépendance à la machine source</strong> : Si la VM originale est supprimée, toutes les VM liées deviennent inutilisables.</li>
             <li><strong>Performances parfois réduites</strong> : Surcharge possible du disque partagé avec de nombreux clones.</li>
@@ -1193,7 +1195,7 @@
   </div>
 
   <footer>
-    <p>📦 Clonage de machines virtuelles · Groupe 2025</p>
+    <p>Clonage de machines virtuelles · Groupe 2025</p>
     <p style="margin-top:6px;font-size:11px;">· DOWOU Issa ·</p>
   </footer>
 
@@ -1239,5 +1241,7 @@
     observer.observe(el);
   });
 </script>
+<script src="../assets/js/projet-bar.js"></script>
+<script src="../assets/js/palette.js" defer></script>
 </body>
 </html>

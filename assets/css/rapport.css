@@ -1,0 +1,61 @@
+/* =========================================================
+   Harmonisation des rapports de projet avec le thème du site.
+   Chargé APRÈS le <style> propre à chaque rapport : on remappe
+   ses variables sur la palette du site, puis on aligne la
+   typographie, les angles et les composants récurrents.
+   ========================================================= */
+:root{
+  /* rapports type « Nmap / Docker / ERP… » */
+  --bg:#070b10!important; --surface:#0c1219!important; --surface2:#111a23!important; --border:#1c2a36!important;
+  --accent:#5fd0c4!important; --accent2:#3d8fa8!important; --accent3:#e8b86a!important;
+  --text:#c3d1de!important; --text-dim:#8aa0b3!important; --text-bright:#ffffff!important; --text-muted:#8aa0b3!important;
+  --code-bg:#0c1219!important; --radius:0px!important;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace!important;
+  --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  /* rapport « Précipitations » */
+  --bg-deep:#070b10!important; --bg-surface:#0c1219!important; --bg-elevated:#111a23!important; --border-glow:#1c2a36!important;
+  --accent-primary:#5fd0c4!important; --accent-secondary:#3d8fa8!important; --accent-tertiary:#e8b86a!important;
+  --text-main:#d7e3ee!important;
+  --font-sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  --font-mono:"JetBrains Mono",ui-monospace,Consolas,monospace!important;
+}
+html body{background:#070b10!important;color:#c3d1de;font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif!important}
+html body::before,html body::after{display:none!important;animation:none!important}
+
+/* Éléments remplacés par la barre et la fiche communes */
+.back-btn,.back-link,.wrapper>.hero,.hero:not(.dw-hero),.progress-container,#progress-bar{display:none!important}
+div:has(> .members-grid),.members-grid{display:none!important}
+
+/* Mise en page */
+.wrapper{max-width:1120px!important;padding:24px clamp(16px,4vw,32px) 64px!important}
+
+/* Titres */
+html body h1,html body h2,html body h3{font-family:"Bricolage Grotesque",system-ui,sans-serif!important;letter-spacing:-.01em;color:#fff!important;-webkit-text-fill-color:currentColor!important;background:none!important;text-shadow:none!important}
+html body h2{font-weight:700!important}
+.section-num{font-family:"JetBrains Mono",ui-monospace,monospace!important;color:#5fd0c4!important;background:none!important;border:0!important;padding:0!important;letter-spacing:.08em}
+.section-header{border-bottom:1px solid #1c2a36!important;border-image:none!important}
+
+/* Cartes, encadrés, sommaire : angles droits, pas de halos */
+.toc,.card,.practice-item,.info-note,.subsection>.note,.flag,.img-placeholder,.code-block,.member-card,[class*="callout"],[class*="box"]{border-radius:0!important;box-shadow:none!important}
+.toc{background:#0c1219!important;border:1px solid #1c2a36!important}
+.toc a{color:#8aa0b3!important}.toc a:hover{color:#5fd0c4!important}
+.divider{background:#1c2a36!important;height:1px!important;box-shadow:none!important}
+
+/* Code */
+pre,code,.code-body,.cmd,kbd{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace!important;border-radius:0!important}
+.code-block{border:1px solid #1c2a36!important;background:#0c1219!important}
+.code-header{background:#111a23!important;border-bottom:1px solid #1c2a36!important}
+
+/* Tableaux et images */
+table{border-radius:0!important}
+th{font-family:"JetBrains Mono",ui-monospace,monospace!important;font-weight:500!important}
+img{border-radius:0!important}
+.img-placeholder{background:repeating-linear-gradient(135deg,#0c1219 0 8px,#0a0f15 8px 16px)!important;border:1px solid #1c2a36!important;color:#5d7184!important}
+
+/* Liens et boutons */
+.wrapper a:not(.dw-bar a){color:#5fd0c4}
+button,.copy-btn{border-radius:0!important}
+
+/* Animations décoratives coupées si l'utilisateur les réduit */
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.footer,.footer-brand{display:none!important}

@@ -388,6 +388,8 @@
     .back-btn span { display: none; }
   }
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Instrument+Sans:wght@400&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/rapport.css">
 </head>
 <body>
 
@@ -412,9 +414,9 @@
         <div class="hero-role">Auteur</div>
       </div>
     </div>
-    <span class="badge">🌐 Dnsmasq</span>
-    <span class="badge green">📂 NFS</span>
-    <span class="badge">🐧 Ubuntu</span>
+    <span class="badge">Dnsmasq</span>
+    <span class="badge green">NFS</span>
+    <span class="badge">Ubuntu</span>
   </div>
 </header>
 
@@ -478,7 +480,7 @@
     <p>Comment configurer un serveur léger DNS et DHCP alias <strong>Dnsmasq</strong> ?</p>
 
     <div class="callout info">
-      <span class="callout-icon">🔵</span>
+      <span class="callout-icon"></span>
       <div class="callout-body">
         <div class="callout-title">Qu'est-ce que Dnsmasq ?</div>
         <p>DnsMasq est un petit serveur DNS (cache DNS) qui intègre un serveur DHCP. Peu gourmand en ressources et très simple à configurer, il est bien adapté à une installation sur une solution embarquée telle qu'un routeur ou point d'accès wifi (sous OpenWRT par exemple).</p>
@@ -619,7 +621,7 @@
         <img src="../assets/images/media/image5.jpg" alt="hosts" onerror="this.parentElement.style.display='none'"/>
       </div>
       <div class="callout success">
-        <span class="callout-icon">💡</span>
+        <span class="callout-icon"></span>
         <div class="callout-body">
           <div class="callout-title">Astuce</div>
           <p>Dans l'exemple ci-dessus, l'ordinateur <strong>192.168.1.1</strong> aura comme nom DNS <code>mail</code> et <code>mail.local.lan</code>. Pas besoin d'ajouter tous les ordinateurs — ceux ayant fait une demande DHCP auront leur nom DNS directement configuré.</p>
@@ -650,7 +652,7 @@
     </div>
 
     <div class="callout warn">
-      <span class="callout-icon">⚠️</span>
+      <span class="callout-icon"></span>
       <div class="callout-body">
         <div class="callout-title">En cas de conflit</div>
         <p>Si dnsmasq ne démarre pas, un autre service occupe peut-être le port 53. Suivez les étapes ci-dessous pour le résoudre.</p>
@@ -848,7 +850,7 @@
     </div>
 
     <div class="callout info">
-      <span class="callout-icon">📂</span>
+      <span class="callout-icon"></span>
       <div class="callout-body">
         <div class="callout-title">Qu'est-ce que NFS ?</div>
         <p><strong>NFS</strong> (Network File Share) est un protocole qui vous permet de partager des répertoires et des fichiers avec d'autres clients Linux dans un réseau. Il s'avère pratique lorsque vous devez partager des données communes entre les systèmes clients, en particulier lorsqu'ils manquent d'espace.</p>
@@ -873,7 +875,7 @@
           </div>
 
           <div class="callout warn">
-            <span class="callout-icon">⚠️</span>
+            <span class="callout-icon"></span>
             <div class="callout-body">
               <div class="callout-title">Problème de DNS lors de l'installation ?</div>
               <p>Si l'installation échoue, vérifiez d'abord vos interfaces réseau avec <code>ip a</code>, puis modifiez <code>/etc/resolv.conf</code> en utilisant les DNS publics de Google :</p>
@@ -994,7 +996,7 @@
 <span class="kw">sudo</span> ufw status</pre>
           </div>
           <div class="callout info">
-            <span class="callout-icon">🔒</span>
+            <span class="callout-icon"></span>
             <div class="callout-body">
               <div class="callout-title">Port par défaut NFS</div>
               <p>Le port <strong>2049</strong> est le port de partage de fichiers NFS par défaut. Vérifiez qu'il est bien ouvert dans le statut du pare-feu.</p>
@@ -1100,7 +1102,7 @@
             <img src="../assets/images/media/image24.jpg" alt="ls nfs_clientshare" onerror="this.parentElement.style.display='none'"/>
           </div>
           <div class="callout success">
-            <span class="callout-icon">✅</span>
+            <span class="callout-icon"></span>
             <div class="callout-body">
               <div class="callout-title">Partage NFS opérationnel</div>
               <p>Si les fichiers créés sur le serveur apparaissent dans le répertoire client, la configuration NFS est fonctionnelle !</p>
@@ -1119,28 +1121,28 @@
     </div>
     <div class="links-grid">
       <a href="https://doc.ubuntu-fr.org/configuration_serveur_dns_pour_son_poste_de_travail" class="link-card" target="_blank" rel="noopener">
-        <div class="link-icon">🐧</div>
+        <div class="link-icon"></div>
         <div class="link-text">
           Serveur DNS avec Dnsmasq
           <span>doc.ubuntu-fr.org</span>
         </div>
       </a>
       <a href="http://www.thekelleys.org.uk/dnsmasq/doc.html" class="link-card" target="_blank" rel="noopener">
-        <div class="link-icon">🌐</div>
+        <div class="link-icon"></div>
         <div class="link-text">
           Site officiel Dnsmasq
           <span>thekelleys.org.uk</span>
         </div>
       </a>
       <a href="https://askubuntu.com/questions/150135/how-to-block-specific-domains-in-hosts-file" class="link-card" target="_blank" rel="noopener">
-        <div class="link-icon">🔗</div>
+        <div class="link-icon"></div>
         <div class="link-text">
           Bloquer des domaines
           <span>askubuntu.com</span>
         </div>
       </a>
       <a href="https://doc.ubuntu-fr.org/tutoriel/comment_editer_un_fichier" class="link-card" target="_blank" rel="noopener">
-        <div class="link-icon">📝</div>
+        <div class="link-icon"></div>
         <div class="link-text">
           Éditer un fichier sous Ubuntu
           <span>doc.ubuntu-fr.org</span>
@@ -1201,5 +1203,7 @@
     });
   }
 </script>
+<script src="../assets/js/projet-bar.js"></script>
+<script src="../assets/js/palette.js" defer></script>
 </body>
 </html>

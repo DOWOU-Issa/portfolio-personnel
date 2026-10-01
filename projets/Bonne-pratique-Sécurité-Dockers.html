@@ -548,6 +548,8 @@
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.3); }
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Instrument+Sans:wght@400&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/rapport.css">
 </head>
 <body>
 
@@ -586,7 +588,7 @@
 
   <!-- ── TABLE DES MATIÈRES ── -->
   <div class="toc">
-    <div class="toc-title">📋 Table des matières</div>
+    <div class="toc-title">Table des matières</div>
     <ol>
       <li><a href="#intro">Introduction à la sécurité Docker</a></li>
       <li>
@@ -744,7 +746,7 @@
 
     <!-- Exemple concret -->
     <div class="subsection" style="border-color:rgba(0,212,255,0.15);">
-      <h3 style="font-size:15px;color:var(--accent);margin-bottom:14px;">🔬 Exemple concret — Démontrer l'isolation</h3>
+      <h3 style="font-size:15px;color:var(--accent);margin-bottom:14px;">Exemple concret — Démontrer l'isolation</h3>
       <div class="code-block">
         <div class="code-header">
           <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
@@ -869,7 +871,7 @@ ps aux
       </div>
 
       <div style="margin-top:20px;">
-        <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent3);margin-bottom:12px;">✅ Bonnes pratiques</p>
+        <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent3);margin-bottom:12px;">Bonnes pratiques</p>
         <div class="practice-list">
           <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Utiliser un utilisateur dédié plutôt que <code style="font-family:var(--mono);">nobody</code> — créer un utilisateur spécifique avec permissions minimales.</p></div>
           <div class="practice-item"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div><p>Éviter l'exécution en root — utiliser <code style="font-family:var(--mono);">USER</code> dans le Dockerfile pour définir un utilisateur non privilégié.</p></div>
@@ -1067,7 +1069,7 @@ ip a</div>
   </div>
 
   <footer>
-    <p>🐳 Sécurité &amp; Isolation Docker · Groupe 2025</p>
+    <p>Sécurité &amp; Isolation Docker · Groupe 2025</p>
     <p style="margin-top:6px;font-size:11px;">· DOWOU ·</p>
   </footer>
 
@@ -1113,5 +1115,7 @@ ip a</div>
     observer.observe(el);
   });
 </script>
+<script src="../assets/js/projet-bar.js"></script>
+<script src="../assets/js/palette.js" defer></script>
 </body>
 </html>

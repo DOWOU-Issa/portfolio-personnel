@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prédiction du churn — Dowou Issa</title>
+  <meta name="description" content="Prédiction du churn de 2,3 millions de clients télécom : KNN et régression logistique, AUC-ROC de 0,89.">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+</head>
+<body data-net="page">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="site-head"><div class="in"><a class="brand" href="../index.html">dowou<i>.</i>issa</a>
+    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="../index.html">accueil</a></li><li><a href="../cv.html">cv</a></li><li><a href="../projets/projets.html" aria-current="page">projets</a></li><li><a href="../github.html">github</a></li><li><a href="../video.html">vidéos</a></li><li><a href="../contact.html">contact</a></li></ul></nav></div></header>
+  <main id="contenu" class="wrap">
+    <header class="p-head">
+      <p class="path reveal"><a href="projets.html">~/projets</a>/<span>prediction-churn</span></p>
+      <h1 class="title reveal d1">Repérer les clients <em>sur le départ</em> parmi 2,3 millions.</h1>
+      <div class="p-meta reveal d2"><span>contexte <b>Projet de machine learning · opérateur télécom</b></span><span>outils <b>Python, pandas, scikit-learn, matplotlib</b></span></div>
+    </header>
+
+    <section class="tldr reveal d3" aria-label="Résumé en 30 secondes">
+      <div><h2>Problème</h2><p>Un opérateur perd 18,75 % de ses clients. Il faut prédire qui va partir pour cibler les actions de rétention.</p></div>
+      <div><h2>Ce que j'ai fait</h2><p>Nettoyage de 2,3 M de lignes, analyse des variables, puis KNN et régression logistique optimisés et comparés.</p></div>
+      <div class="res"><h2>Résultat</h2><strong>AUC 0,89</strong><p>avec la régression logistique (L1, C = 0,1), le modèle recommandé : plus interprétable et meilleur F1.</p></div>
+    </section>
+
+    <div class="p-layout">
+      <nav class="p-toc" aria-label="Sections">
+        <a href="#donnees">données</a><a href="#exploration">exploration</a><a href="#modeles">modèles</a><a href="#resultats">résultats</a><a href="#conclusion">conclusion</a>
+        <a class="btn p" href="https://github.com/DOWOU-Issa/churn-prediction-telecom" target="_blank" rel="noopener">Code sur GitHub</a>
+      </nav>
+      <div>
+        <section class="p-sec" id="donnees">
+          <h2><small>données</small>Un jeu volumineux et déséquilibré</h2>
+          <div class="kpis">
+            <div><strong>2 334 059</strong><span>clients</span></div>
+            <div><strong>19</strong><span>variables</span></div>
+            <div><strong>18,75 %</strong><span>de churn</span></div>
+            <div><strong>80 / 20</strong><span>train / test stratifié</span></div>
+          </div>
+          <p>Variables de consommation (montant, fréquence de recharge, revenu, volume data, régularité) et variables qualitatives (région, ancienneté). Les valeurs manquantes sont remplacées par la moyenne pour les variables quantitatives et par « Inconnu » pour les qualitatives.</p>
+          <figure class="fig"><div class="pad"><img src="../assets/images/projets/churn/churn_distribution.png" alt="Répartition des clients : 81,25 % restent, 18,75 % partent" loading="lazy"></div><figcaption>Répartition de la variable cible : 1 896 360 clients restent, 437 699 partent.</figcaption></figure>
+        </section>
+
+        <section class="p-sec" id="exploration">
+          <h2><small>exploration</small>Ce qui distingue les clients qui partent</h2>
+          <ul>
+            <li><strong>La régularité</strong> est la variable la plus discriminante : les clients qui partent utilisent le réseau moins régulièrement.</li>
+            <li>Les <strong>fréquences d'usage et de recharge</strong> sont plus basses chez eux.</li>
+            <li>Piège repéré : une régression linéaire sur REVENUE donne R² = 1, mais c'est un artefact, car ARPU_SEGMENT lui est corrélé à 0,9999. J'ai écarté ce résultat au lieu de le présenter comme une performance.</li>
+          </ul>
+          <figure class="fig"><div class="pad"><img src="../assets/images/projets/churn/boxplots_bivariate.png" alt="Boxplots des variables quantitatives selon le churn" loading="lazy"></div><figcaption>Analyse bivariée : distribution de chaque variable selon que le client part ou reste.</figcaption></figure>
+        </section>
+
+        <section class="p-sec" id="modeles">
+          <h2><small>modèles</small>Réglage des deux classifieurs</h2>
+          <p>Les classes étant déséquilibrées, un modèle qui prédit toujours « reste » aurait déjà 81 % d'accuracy. J'ai donc choisi les hyperparamètres sur le <strong>F1-score</strong> du churn, pas sur l'accuracy.</p>
+          <div class="figs">
+            <figure class="fig"><div class="pad"><img src="../assets/images/projets/churn/knn_optimization_k.png" alt="Accuracy et F1 du KNN pour k de 1 à 20" loading="lazy"></div><figcaption>KNN : k testé de 1 à 20, k = 15 retenu.</figcaption></figure>
+            <figure class="fig"><div class="pad"><img src="../assets/images/projets/churn/logistic_regression_roc.png" alt="Courbe ROC de la régression logistique, AUC 0,89" loading="lazy"></div><figcaption>Régression logistique : courbe ROC, AUC = 0,8918.</figcaption></figure>
+          </div>
+          <div class="t3" id="tuning3d" role="img" aria-label="Colonnes 3D du F1-score selon la pénalité L1 ou L2 et la valeur de C. Meilleur : L1, C = 0,1, F1 0,6149."></div>
+          <p class="t3-cap">Réglage de la régression logistique en 3D : une colonne par configuration, hauteur = F1 du churn (axe à partir de 0,40). Survolez une colonne pour lire ses scores.</p>
+          <p>Régularisation testée avec C de 0,001 à 100, en L1 et L2. La meilleure configuration est L1 avec C = 0,1. La pénalité L1 met à zéro les variables redondantes, ce qui règle le problème de multicolinéarité.</p>
+        </section>
+
+        <section class="p-sec" id="resultats">
+          <h2><small>résultats</small>Comparaison finale sur le jeu de test</h2>
+          <div class="tbl"><table>
+            <thead><tr><th>Modèle</th><th>Accuracy</th><th>Précision</th><th>Rappel</th><th>F1</th></tr></thead>
+            <tbody>
+              <tr><td>KNN (k = 15)</td><td>0,8570</td><td>0,6239</td><td>0,6038</td><td>0,6137</td></tr>
+              <tr class="best"><td>Régression logistique (L1, C = 0,1)</td><td>0,8586</td><td>0,6303</td><td>0,6002</td><td>0,6149</td></tr>
+            </tbody>
+          </table></div>
+          <figure class="fig"><div class="pad"><img src="../assets/images/projets/churn/comparaison_modeles.png" alt="Comparaison des métriques KNN et régression logistique" loading="lazy"></div><figcaption>Les deux modèles sont proches ; la régression logistique l'emporte d'une courte tête.</figcaption></figure>
+        </section>
+
+        <section class="p-sec" id="conclusion">
+          <h2><small>conclusion métier</small>Pourquoi la régression logistique</h2>
+          <ul>
+            <li>Meilleur F1 et meilleure précision, avec une AUC de 0,89.</li>
+            <li>Elle donne une <strong>probabilité de départ</strong> par client, utile pour prioriser les appels de rétention.</li>
+            <li>Ses coefficients s'expliquent à une équipe métier, contrairement au KNN.</li>
+            <li>Elle prédit 2,3 M de clients en quelques secondes, là où le KNN doit comparer chaque client à tout le jeu d'entraînement.</li>
+          </ul>
+          <p class="note">Limite : le rappel reste autour de 60 %, donc 4 départs sur 10 passent inaperçus. Prochaine étape : rééquilibrer les classes ou ajuster le seuil de décision selon le coût d'un client perdu.</p>
+        </section>
+
+        <nav class="next" aria-label="Autres projets data">
+          <a href="Classification-NLP-AG-News.html"><small>projet data</small><b>Classification NLP AG News</b></a>
+          <a href="Analyse-de-sentiments-IMDb.html"><small>projet data</small><b>Analyse de sentiments IMDb</b></a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <script src="../assets/js/net3d.js" defer></script>
+  <script src="../assets/js/churn-3d.js" defer></script>
+<script src="../assets/js/palette.js" defer></script>
+</body>
+</html>

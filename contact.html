@@ -3,123 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Page de contact de DOWOU ISSA - Data Engineer Junior">
-  <title>Contact - DOWOU ISSA</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/contact.css">
+  <title>Contact — Dowou Issa</title>
+  <meta name="description" content="Contacter Dowou Issa par e-mail, téléphone, WhatsApp ou via le formulaire.">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/theme.css">
 </head>
-<body>
-  <!-- Navbar -->
-  <header>
-    <nav class="navbar">
-      <div class="logo">DOWOU ISSA</div>
-      <ul class="nav-links">
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="cv.html">CV</a></li>
-        <li><a href="projets/projets.html">Projets</a></li>
-        <li><a href="github.html">GitHub</a></li>
-        <li><a href="video.html">Vidéos</a></li>
-        <li><a href="contact.html" class="active">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+<body data-net="page">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="site-head"><div class="in"><a class="brand" href="index.html">dowou<i>.</i>issa</a>
+    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="index.html">accueil</a></li><li><a href="cv.html">cv</a></li><li><a href="projets/projets.html">projets</a></li><li><a href="github.html">github</a></li><li><a href="video.html">vidéos</a></li><li><a href="contact.html" aria-current="page">contact</a></li></ul></nav></div></header>
 
-  <!-- Section Contact -->
-  <section class="cv-section contact">
-    <h1>Contactez-moi</h1>
-    <p>Vous pouvez me joindre directement par téléphone, WhatsApp ou email :</p>
-    <ul class="contact-info">
-      <li>
-        📞 +228 96 86 31 12 
-        <a href="tel:+22896863112" class="btn small">Appeler</a>
-        <a href="https://wa.me/22896863112" target="_blank" rel="noopener" class="btn small whatsapp">WhatsApp</a>
-      </li>
-      <li>
-        📞 +228 93 80 34 98 
-        <a href="tel:+22893803498" class="btn small">Appeler</a>
-        <a href="https://wa.me/22893803498" target="_blank" rel="noopener" class="btn small whatsapp">WhatsApp</a>
-      </li>
-      <li>
-        ✉️ <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a>
-      </li>
-    </ul>
+  <main id="contenu" class="contact-section">
+    <header class="page-head">
+      <p class="path reveal">~/contact</p>
+      <h1 class="title reveal d1">Écrivez-moi.</h1>
+      <p class="lead reveal d2">Disponible pour une alternance ou un stage en data, IA ou infrastructure. Je réponds en général sous 48 heures.</p>
+    </header>
 
-    <!-- Localisation -->
-    <h2>Ma localisation</h2>
-    <div class="map-container">
-      <iframe id="mapFrame"
-        src="" 
-        class="map-frame"
-        allowfullscreen
-        
-        title="Localisation de DOWOU ISSA">
-      </iframe>
+    <div class="contact-grid">
+      <div>
+        <ul class="contact-info">
+          <li><div><span class="lbl">linkedin</span><a class="val" href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">issa-dowou</a></div></li>
+          <li><div><span class="lbl">e-mail</span><a class="val" href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></div></li>
+          <li><div><span class="lbl">téléphone · whatsapp</span><span class="val">+228 96 86 31 12</span></div>
+            <div class="acts"><a href="tel:+22896863112" class="btn small">Appeler</a><a href="https://wa.me/22896863112" target="_blank" rel="noopener" class="btn small">WhatsApp</a></div></li>
+          <li><div><span class="lbl">téléphone · whatsapp</span><span class="val">+228 93 80 34 98</span></div>
+            <div class="acts"><a href="tel:+22893803498" class="btn small">Appeler</a><a href="https://wa.me/22893803498" target="_blank" rel="noopener" class="btn small">WhatsApp</a></div></li>
+        </ul>
+        <h2 class="h-sub">Localisation</h2>
+        <div class="map-link">
+          <div><span class="lbl">ville</span><strong>Lomé, Togo</strong></div>
+          <a class="btn small" href="https://www.google.com/maps?q=6.192244,1.178881" target="_blank" rel="noopener">Ouvrir dans Google Maps</a>
+        </div>
+      </div>
+
+      <form id="contactForm" action="https://formspree.io/f/xkovllje" method="POST" class="contact-form">
+        <label for="name">nom<input type="text" id="name" name="name" autocomplete="name" required></label>
+        <label for="email">e-mail<input type="email" id="email" name="email" autocomplete="email" required></label>
+        <label for="message">message<textarea id="message" name="message" rows="7" required></textarea></label>
+        <button type="submit" class="btn p">Envoyer le message</button>
+        <p id="confirmation" class="confirmation" role="status">Message envoyé. Redirection…</p>
+      </form>
     </div>
+  </main>
 
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const map = document.getElementById("mapFrame");
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        map.src = "https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d378.10937620851684!2d1.1788813126886333!3d6.192243996665979!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sfr!2stg!4v1772553504853!5m2!1sfr!2stg"; // ton lien complet
-        observer.disconnect();
-      }
-    });
-    observer.observe(map);
-  });
-</script>
-
-
-    <!-- Formulaire -->
-    <h3>Formulaire de contact</h3>
-    <form id="contactForm" action="https://formspree.io/f/xkovllje" method="POST" class="contact-form">
-      <label for="name">Nom :</label>
-      <input type="text" id="name" name="name" required>
-
-      <label for="email">Email :</label>
-      <input type="email" id="email" name="email" required>
-
-      <label for="message">Message :</label>
-      <textarea id="message" name="message" rows="5" required></textarea>
-
-      <button type="submit" class="btn">Envoyer</button>
-    </form>
-
-    <!-- Message de confirmation -->
-    <p id="confirmation" class="confirmation">
-      ✅ Votre message a été envoyé avec succès !
-    </p>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 DOWOU ISSA - Tous droits réservés</p>
-  </footer>
-
-  <!-- Script pour gérer la confirmation et redirection -->
+  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
   <script>
-    const form = document.getElementById('contactForm');
-    const confirmation = document.getElementById('confirmation');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault(); 
-      const data = new FormData(form);
-      const response = await fetch(form.action, {
-        method: form.method,
-        body: data,
-        headers: { 'Accept': 'application/json' }
-      });
-      if (response.ok) {
-        form.reset();
-        confirmation.style.display = 'block';
-        setTimeout(() => {
-          window.location.href = "merci.html";
-        }, 2000);
-      } else {
-        alert("❌ Une erreur est survenue, réessayez plus tard.");
+    var form = document.getElementById("contactForm");
+    var confirmation = document.getElementById("confirmation");
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var btn = form.querySelector("button"); btn.disabled = true; btn.textContent = "Envoi…";
+      try {
+        var response = await fetch(form.action, { method: form.method, body: new FormData(form), headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error();
+        form.reset(); confirmation.style.display = "block";
+        setTimeout(function () { window.location.href = "merci.html"; }, 2000);
+      } catch (err) {
+        confirmation.style.display = "block"; confirmation.style.color = "var(--warm)";
+        confirmation.textContent = "L'envoi a échoué. Réessayez, ou écrivez directement à dowouissa69@gmail.com.";
+        btn.disabled = false; btn.textContent = "Envoyer le message";
       }
     });
   </script>
+  <script src="assets/js/net3d.js" defer></script>
+<script src="assets/js/palette.js" defer></script>
 </body>
 </html>

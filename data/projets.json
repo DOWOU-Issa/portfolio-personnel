@@ -1,58 +1,86 @@
 [
   {
-    "titre": "Bonne-pratique-Sécurité-Dockers",
-    "fichier": "Bonne-pratique-Sécurité-Dockers.html",
-    "description": "Sécurité et isolation des conteneurs Docker"
+    "titre": "Classification NLP AG News",
+    "fichier": "Classification-NLP-AG-News.html",
+    "description": "TF-IDF contre DistilBERT fine-tuné : 92,3 % d'accuracy, +1,7 point sur la baseline.",
+    "categorie": "data"
   },
   {
-    "titre": "Configuration-DNS-DHCP-NFS",
-    "fichier": "Configuration-DNS-DHCP-NFS.html",
-    "description": "Comment configurer un serveur léger dns et dhcp alias Dnsmasq ?"
+    "titre": "Prédiction du churn client",
+    "fichier": "Prediction-churn-telecom.html",
+    "description": "2,3 M de clients télécom, KNN et régression logistique : AUC 0,89.",
+    "categorie": "data"
   },
   {
-    "titre": "Exposé-Virtualisation",
-    "fichier": "Exposé-Virtualisation.html",
-    "description": "SOMMAIRE :"
+    "titre": "Analyse de sentiments IMDb",
+    "fichier": "Analyse-de-sentiments-IMDb.html",
+    "description": "50 000 critiques, trois modèles comparés : 88,6 % d'accuracy.",
+    "categorie": "data"
   },
   {
-    "titre": "Pipeline-Ci-GithubActions",
-    "fichier": "Pipeline-Ci-GithubActions.html",
-    "description": "A.Création du dépôt GitHub"
-  },
-  {
-    "titre": "Plan-ERP-ONOMO",
-    "fichier": "Plan-ERP-ONOMO.html",
-    "description": "Mise en place d’un ERP à l’hôtel ONOMO"
-  },
-  {
-    "titre": "Projet-Ingénieurie-du-besoin",
-    "fichier": "Projet-Ingénieurie-du-besoin.html",
-    "description": "Introduction"
-  },
-  {
-    "titre": "Gestion d une bibliotheque",
-    "fichier": "Gestion-Bibliotheque.html",
-    "description": "INTRODUCTION"
-  },
-  {
-    "titre": "Rapport-virtualisation-de-stockage",
-    "fichier": "Rapport-virtualisation-de-stockage.html",
-    "description": "Rapport de Virtualisation de Stockage sur Ubuntu Server avec Cockpit"
-  },
-  {
-    "titre": "SCANNER-UN-RESEAU-AVEC-NMAP",
-    "fichier": "SCANNER-UN-RESEAU-AVEC-NMAP.html",
-    "description": "SCANNER UN RESEAU AVEC NMAP"
-  },
-  {
-    "titre": "Windows-Servers-Adds",
-    "fichier": "Windows-Servers-Adds.html",
-    "description": "Installation d un serveur"
-  },
-  {
-    "titre": "Analyses des precipitations 1982-2024",
+    "titre": "Précipitations 1982–2024",
     "fichier": "Analyses-des-precipitations-1982-2024.html",
-    "description": "Installation d un serveur"
+    "description": "15 695 observations : tendance Mann-Kendall, ACP et prévision 2025–2031.",
+    "categorie": "data"
+  },
+  {
+    "titre": "Bonnes pratiques de sécurité Docker",
+    "fichier": "Bonne-pratique-Sécurité-Dockers.html",
+    "description": "Isolation et durcissement des conteneurs : images, utilisateurs, réseau.",
+    "categorie": "infra"
+  },
+  {
+    "titre": "DNS, DHCP et NFS avec Dnsmasq",
+    "fichier": "Configuration-DNS-DHCP-NFS.html",
+    "description": "Configurer un serveur DNS/DHCP léger et un partage NFS sous Linux.",
+    "categorie": "infra"
+  },
+  {
+    "titre": "Exposé : la virtualisation",
+    "fichier": "Exposé-Virtualisation.html",
+    "description": "Types d'hyperviseurs, conteneurs et cas d'usage.",
+    "categorie": "infra"
+  },
+  {
+    "titre": "Pipeline CI avec GitHub Actions",
+    "fichier": "Pipeline-Ci-GithubActions.html",
+    "description": "Du dépôt au workflow : build et tests automatisés.",
+    "categorie": "infra"
+  },
+  {
+    "titre": "Virtualisation de stockage",
+    "fichier": "Rapport-virtualisation-de-stockage.html",
+    "description": "Ubuntu Server et Cockpit : volumes, partages et accès distant.",
+    "categorie": "infra"
+  },
+  {
+    "titre": "Scanner un réseau avec Nmap",
+    "fichier": "SCANNER-UN-RESEAU-AVEC-NMAP.html",
+    "description": "Découverte d'hôtes, de ports et de services sur un réseau de test.",
+    "categorie": "infra"
+  },
+  {
+    "titre": "Windows Server et AD DS",
+    "fichier": "Windows-Servers-Adds.html",
+    "description": "Installation d'un serveur, annuaire Active Directory et GPO.",
+    "categorie": "infra"
+  },
+  {
+    "titre": "Plan ERP pour l'hôtel ONOMO",
+    "fichier": "Plan-ERP-ONOMO.html",
+    "description": "Mise en place d'un ERP : besoins, choix de la solution, déploiement.",
+    "categorie": "gestion"
+  },
+  {
+    "titre": "Ingénierie du besoin",
+    "fichier": "Projet-Ingénieurie-du-besoin.html",
+    "description": "Recueil, analyse et spécification des exigences d'un projet.",
+    "categorie": "gestion"
+  },
+  {
+    "titre": "Gestion d'une bibliothèque",
+    "fichier": "Gestion-Bibliotheque.html",
+    "description": "Conception d'une application de gestion des prêts et des ouvrages.",
+    "categorie": "gestion"
   }
-
 ]

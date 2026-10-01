@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classification NLP AG News — Dowou Issa</title>
+  <meta name="description" content="Classification d'articles de presse AG News : baseline TF-IDF + régression logistique comparée au fine-tuning de DistilBERT. 92,3 % d'accuracy.">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+</head>
+<body data-net="page">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="site-head"><div class="in"><a class="brand" href="../index.html">dowou<i>.</i>issa</a>
+    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="../index.html">accueil</a></li><li><a href="../cv.html">cv</a></li><li><a href="../projets/projets.html" aria-current="page">projets</a></li><li><a href="../github.html">github</a></li><li><a href="../video.html">vidéos</a></li><li><a href="../contact.html">contact</a></li></ul></nav></div></header>
+  <main id="contenu" class="wrap">
+    <header class="p-head">
+      <p class="path reveal"><a href="projets.html">~/projets</a>/<span>classification-nlp-ag-news</span></p>
+      <h1 class="title reveal d1">Classer l'actualité : <em>TF-IDF</em> contre DistilBERT.</h1>
+      <div class="p-meta reveal d2"><span>contexte <b>Contrôle continu, Introduction au Deep Learning · B3 IABD</b></span><span>outils <b>PyTorch, Hugging Face, scikit-learn, Colab GPU</b></span></div>
+    </header>
+
+    <section class="tldr reveal d3" aria-label="Résumé en 30 secondes">
+      <div><h2>Problème</h2><p>Ranger automatiquement des articles de presse dans 4 rubriques : World, Sports, Business, Sci/Tech.</p></div>
+      <div><h2>Ce que j'ai fait</h2><p>Une baseline TF-IDF + régression logistique, puis le fine-tuning de DistilBERT, entraînés sur les mêmes 20 000 articles et évalués sur le jeu de test officiel.</p></div>
+      <div class="res"><h2>Résultat</h2><strong>92,3 %</strong><p>d'accuracy avec DistilBERT, soit +1,7 point sur la baseline (90,6 %), pour 2,7 minutes d'entraînement sur GPU.</p></div>
+    </section>
+
+    <div class="p-layout">
+      <nav class="p-toc" aria-label="Sections">
+        <a href="#donnees">données</a><a href="#methode">méthode</a><a href="#resultats">résultats</a><a href="#analyse">analyse</a><a href="#limites">limites</a>
+        <a class="btn p" href="https://github.com/DOWOU-Issa/ag-news-distilbert" target="_blank" rel="noopener">Code sur GitHub</a>
+        <a class="btn" href="https://github.com/DOWOU-Issa/TransformerAGNews" target="_blank" rel="noopener">Version from scratch</a>
+      </nav>
+      <div>
+        <section class="p-sec" id="donnees">
+          <h2><small>données</small>AG News, un jeu parfaitement équilibré</h2>
+          <div class="kpis">
+            <div><strong>120 000</strong><span>articles</span></div>
+            <div><strong>4</strong><span>classes, 25 % chacune</span></div>
+            <div><strong>50</strong><span>tokens en médiane</span></div>
+            <div><strong>99,2 %</strong><span>des textes ≤ 128 tokens</span></div>
+          </div>
+          <p>Chaque article combine un titre et une description courte. Les classes étant équilibrées, l'accuracy est une métrique fiable ; on suit aussi le F1 macro. Les deux modèles sont entraînés sur un échantillon de 20 000 articles et évalués sur les 7 600 articles du jeu de test officiel.</p>
+        </section>
+
+        <section class="p-sec" id="methode">
+          <h2><small>méthode</small>Deux approches, mêmes métriques</h2>
+          <ol>
+            <li><strong>Baseline</strong> : TF-IDF sur uni- et bigrammes (50 000 termes max), puis régression logistique multinomiale. Vectorisation en 9 s et entraînement en 9 s.</li>
+            <li><strong>Transformer</strong> : tokenisation WordPiece, <code>max_length = 128</code>, fine-tuning de <code>distilbert-base-uncased</code> pendant 2 epochs sur GPU (2,7 minutes), avec warmup et sélection du meilleur modèle sur le F1.</li>
+            <li><strong>Évaluation</strong> : accuracy, précision, rappel et F1 macro, puis comparaison classe par classe et inspection d'erreurs.</li>
+          </ol>
+        </section>
+
+        <section class="p-sec" id="resultats">
+          <h2><small>résultats</small>Comparaison des deux modèles</h2>
+          <div class="tbl"><table>
+            <thead><tr><th>Modèle</th><th>Accuracy</th><th>F1 macro</th><th>Données d'entraînement</th><th>Temps</th></tr></thead>
+            <tbody>
+              <tr><td>TF-IDF + régression logistique</td><td>90,58 %</td><td>90,54 %</td><td>20 000 articles</td><td>18 s (CPU)</td></tr>
+              <tr class="best"><td>DistilBERT fine-tuné</td><td>92,32 %</td><td>92,31 %</td><td>20 000 articles</td><td>2,7 min (GPU)</td></tr>
+            </tbody>
+          </table></div>
+          <div class="tbl"><table>
+            <thead><tr><th>Classe</th><th>F1 baseline</th><th>F1 DistilBERT</th><th>Écart</th></tr></thead>
+            <tbody>
+              <tr class="best"><td>World</td><td>0,9084</td><td>0,9326</td><td>+0,024</td></tr>
+              <tr><td>Sports</td><td>0,9608</td><td>0,9780</td><td>+0,017</td></tr>
+              <tr><td>Business</td><td>0,8690</td><td>0,8834</td><td>+0,014</td></tr>
+              <tr><td>Sci/Tech</td><td>0,8836</td><td>0,8985</td><td>+0,015</td></tr>
+            </tbody>
+          </table></div>
+        </section>
+
+        <section class="p-sec" id="analyse">
+          <h2><small>analyse</small>Ce que montrent les chiffres</h2>
+          <p>À données égales, DistilBERT gagne sur les quatre rubriques. Le plus gros gain est sur World (+2,4 points de F1) : le contexte de la phrase aide à distinguer l'actualité internationale des autres sujets.</p>
+          <p>Business et Sci/Tech restent les rubriques les plus difficiles pour les deux modèles, car elles partagent beaucoup de vocabulaire (entreprises tech, résultats financiers). Exemple corrigé par DistilBERT : « Storage, servers bruise HP earnings », classé Business par la baseline, reconnu Sci/Tech par le Transformer.</p>
+          <p class="note">À retenir : le Transformer apporte un gain réel mais modeste (+1,7 point) sur des textes courts, pour un modèle 1 000 fois plus gros (67 M de paramètres) qui demande un GPU. La baseline reste un bon choix quand le budget de calcul est limité.</p>
+        </section>
+
+        <section class="p-sec" id="limites">
+          <h2><small>limites et suites</small>Pistes d'amélioration</h2>
+          <ul>
+            <li>Entraîner les deux modèles sur les 120 000 articles pour mesurer si l'écart se maintient.</li>
+            <li>Tester <code>bert-base-uncased</code> ou <code>roberta-base</code>.</li>
+            <li>Mesurer le coût d'inférence : 66 millions de paramètres contre un modèle TF-IDF de quelques Mo.</li>
+          </ul>
+        </section>
+
+        <nav class="next" aria-label="Autres projets data">
+          <a href="Analyse-de-sentiments-IMDb.html"><small>projet data</small><b>Analyse de sentiments IMDb</b></a>
+          <a href="Prediction-churn-telecom.html"><small>projet data</small><b>Prédiction du churn client</b></a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <script src="../assets/js/net3d.js" defer></script>
+<script src="../assets/js/palette.js" defer></script>
+</body>
+</html>

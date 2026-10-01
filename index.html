@@ -3,57 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Portfolio et CV en ligne de DOWOU ISSA - Data Engineer Junior, projets pratiques en cybersécurité et développement.">
-  <title>Accueil - DOWOU ISSA</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/index.css">
+  <title>Dowou Issa — Data, IA et systèmes</title>
+  <meta name="description" content="Portfolio de Dowou Issa, étudiant en Licence IT IA & Big Data : projets de machine learning, NLP, réseaux, virtualisation et cybersécurité, documentés de bout en bout.">
+  <meta property="og:title" content="Dowou Issa — Data, IA et systèmes">
+  <meta property="og:description" content="Projets de machine learning, NLP, réseaux et cybersécurité, documentés de bout en bout.">
+  <meta property="og:image" content="https://dowou-issa.github.io/portfolio-personnel/assets/images/profil.jpeg">
+  <meta property="og:url" content="https://dowou-issa.github.io/portfolio-personnel/">
+  <link rel="canonical" href="https://dowou-issa.github.io/portfolio-personnel/">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/theme.css">
 </head>
-<body>
-  <!-- Barre de navigation -->
-  <header>
-    <nav class="navbar">
-      <div class="logo">DOWOU ISSA</div>
-      <ul class="nav-links">
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="cv.html">CV</a></li>
-        <li><a href="projets/projets.html">Projets</a></li>
-        <li><a href="github.html">GitHub</a></li>
-        <li><a href="video.html">Vidéos</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        
-      </ul>
-    </nav>
-  </header>
+<body data-net="home">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="site-head"><div class="in"><a class="brand" href="index.html">dowou<i>.</i>issa</a>
+    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="index.html" aria-current="page">accueil</a></li><li><a href="cv.html">cv</a></li><li><a href="projets/projets.html">projets</a></li><li><a href="github.html">github</a></li><li><a href="video.html">vidéos</a></li><li><a href="contact.html">contact</a></li></ul></nav></div></header>
 
-  <!-- Section Hero -->
-  <section class="hero">
-    <img src="assets/images/profil.jpeg" alt="Photo de DOWOU ISSA" class="profil-img">
-    <h1>Bienvenue sur mon portfolio</h1>
-    <p>Étudiant en informatique passionné par les systèmes intelligents, la cybersécurité et l’
-    automatisation, je conçois des solutions robustes et
-    reproductibles adaptées à des environnements contraints. Je transforme les incidents techniques en opportunités d’
-    optimisation, en
-    documentant chaque étape pour garantir la clarté et la transmission des savoirs. Mon ambition est d’intégrer une formation spécialisée en
-    IA et Big Data afin de contribuer à des projets éthiques et stratégiques, en alliant innovation technologique, sécurité numérique et
-    accessibilité pour les équipes pluridisciplinaires.
-    </p>
-    <div class="hero-buttons">
-      <a href="cv.html" class="btn">Voir mon CV</a>
-      <a href="projets/projets.html" class="btn">Explorer mes projets</a>
-    </div>
-  </section>
+  <main id="contenu">
+    <section class="wrap home">
+      <div>
+        <div class="seeking reveal">Recherche d'alternance · data, IA, infrastructure</div>
+        <p class="path reveal">~/accueil</p>
+        <h1 class="title reveal d1">Data, IA et systèmes, <em>documentés</em> de bout en bout.</h1>
+        <p class="lead reveal d2">Étudiant en Licence IT, IA &amp; Big Data au Collège de Paris Supérieur. Je conçois des solutions robustes et reproductibles, du modèle de NLP au déploiement d'infrastructure, et je documente chaque étape pour qu'une équipe puisse la reprendre.</p>
+        <div class="btns reveal d3">
+          <a href="projets/projets.html" class="btn p">Voir les projets</a>
+          <a href="cv.html" class="btn">Lire le CV</a>
+          <a href="assets/pdf/CV_DOWOU-Issa.pdf" class="btn" download>CV en PDF</a>
+          <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" class="btn" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+        <div class="stats reveal d3">
+          <div><strong>14</strong><span>projets documentés</span></div>
+          <div><strong>13</strong><span>démos vidéo</span></div>
+          <div><strong>2026</strong><span>fin de licence</span></div>
+        </div>
+      </div>
+      <div class="portrait reveal d2">
+        <img src="assets/images/profil.jpeg" alt="Portrait de Dowou Issa" width="340" height="340" fetchpriority="high">
+        <span class="tag" style="top:4%;left:58%">ml.nlp</span>
+        <span class="tag" style="top:47%;right:-2%">infra.docker</span>
+        <span class="tag" style="bottom:6%;left:6%">net.nmap</span>
+      </div>
+    </section>
 
-  <!-- Animation légère -->
-  <section class="highlight">
-    <h2>Ce que vous trouverez ici</h2>
-    <p>Des projets pratiques documentés, des démonstrations vidéo, et mes codes sur GitHub.</p>
-  </section>
+    <section class="wrap" aria-label="Ce que vous trouverez ici">
+      <div class="home-links">
+        <a href="projets/projets.html"><i>projets</i><b>Rapports techniques</b><span>Réseaux, virtualisation, CI/CD, analyse de données.</span></a>
+        <a href="github.html"><i>github</i><b>Applications</b><span>Le code source et la démo en ligne de chaque application.</span></a>
+        <a href="video.html"><i>vidéos</i><b>Démonstrations</b><span>Treize démos courtes, de l'interface au modèle.</span></a>
+      </div>
+    </section>
+  </main>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 DOWOU ISSA - Tous droits réservés</p>
-  </footer>
-
-  <script src="assets/js/script.js"></script>
+  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <script src="assets/js/net3d.js" defer></script>
+<script src="assets/js/palette.js" defer></script>
 </body>
 </html>

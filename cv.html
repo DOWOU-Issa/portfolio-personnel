@@ -3,148 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="CV en ligne de DOWOU ISSA - Data Engineer Junior, compétences en cybersécurité, IA et projets pratiques.">
-  <title>CV - DOWOU ISSA</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="assets/css/cv.css">
+  <title>CV — Dowou Issa</title>
+  <meta name="description" content="CV de Dowou Issa : Licence IT IA & Big Data, projets en NLP, machine learning, Power BI, cybersécurité et virtualisation.">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/theme.css">
 </head>
-<body>
-  <!-- Navbar -->
-  <header>
-    <nav class="navbar">
-      <div class="logo">DOWOU ISSA</div>
-      <ul class="nav-links">
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="cv.html" class="active">CV</a></li>
-        <li><a href="projets/projets.html">Projets</a></li>
-        <li><a href="github.html">GitHub</a></li>
-        <li><a href="video.html">Vidéos</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+<body data-net="page">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="site-head"><div class="in"><a class="brand" href="index.html">dowou<i>.</i>issa</a>
+    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="index.html">accueil</a></li><li><a href="cv.html" aria-current="page">cv</a></li><li><a href="projets/projets.html">projets</a></li><li><a href="github.html">github</a></li><li><a href="video.html">vidéos</a></li><li><a href="contact.html">contact</a></li></ul></nav></div></header>
 
-  <!-- Section Profil -->
-  <section class="cv-section">
-    <h1>Profil</h1>
-    <p>Étudiant en IA & Big Data passionné par le Machine Learning, le NLP et la cybersécurité. Expérience pratique en classification de texte, prédiction du churn et analyse de sentiments. Capable de concevoir des solutions robustes et documentées, du prototype au déploiement.</p>
-    <a href="assets/pdf/CV_DOWOU-Issa.pdf" class="btn" download>Télécharger mon CV en PDF</a>
-  </section>
+  <main id="contenu" class="wrap">
+    <header class="page-head">
+      <p class="path reveal">~/cv</p>
+      <h1 class="title reveal d1">Curriculum</h1>
+      <div class="btns reveal d2" style="margin-top:0"><a href="assets/pdf/CV_DOWOU-Issa.pdf" class="btn p" download>Télécharger le CV en PDF</a></div>
+    </header>
 
-  <!-- Section Expériences -->
-  <section class="cv-section">
-    <h2>Expériences</h2>
-    <ul>
-      <li><strong>CDP – Bureau des Étudiants | Responsable Intégration & Logistique</strong><br></li>
-      <li>+ Organisation d’événements associatifs : planification, coordination logistique, gestion des ressources</li>
-      <li>+ Accueil et intégration des nouveaux arrivants</li>
-      <li>+ Communication interculturelle et gestion d’équipe</li>
-    </ul>
-  </section>
+    <div class="cv-layout">
+      <nav class="cv-toc" aria-label="Sections du CV">
+        <a href="#profil">profil</a><a href="#experiences">expériences</a><a href="#projets">projets</a><a href="#formation">formation</a><a href="#competences">compétences</a><a href="#certificats">certificats</a>
+      </nav>
+      <div>
+        <section class="cv-section" id="profil"><h2>Profil</h2><div>
+          <p>Étudiant en IA &amp; Big Data passionné par le Machine Learning, le NLP et la cybersécurité. Expérience pratique en classification de texte, prédiction du churn et analyse de sentiments. Capable de concevoir des solutions robustes et documentées, du prototype au déploiement.</p>
+        </div></section>
 
-  <!-- Section Projets -->
-  <section class="cv-section">
-    <h2>Projets</h2>
-    <ul>
-      <li>
-        <strong>Classification de texte NLP (AG News)</strong><br>
-        <ul>
-          <li>+ Prétraitement, vectorisation TF-IDF et fine-tuning de DistilBERT</li>
-          <li>+ Comparaison des approches sur accuracy et F1-score</li>
-          <li>+ Analyse des apports du Transformer</li>
-        </ul>
-      </li>
+        <section class="cv-section" id="experiences"><h2>Expériences</h2><div>
+          <h3>Responsable Intégration &amp; Logistique</h3>
+          <p>CDP, Bureau des Étudiants</p>
+          <ul>
+            <li>Organisation d'événements associatifs : planification, coordination logistique, gestion des ressources</li>
+            <li>Accueil et intégration des nouveaux arrivants</li>
+            <li>Communication interculturelle et gestion d'équipe</li>
+          </ul>
+        </div></section>
 
-      <li>
-        <strong>Analyse de sentiments</strong><br>
-        <ul>
-          <li>+ Classification positive / négative / neutre sur corpus de commentaires</li>
-          <li>+ Feature engineering textuel et cross-validation</li>
-          <li>+ Visualisation des erreurs pour interprétabilité</li>
-        </ul>
-      </li>
+        <section class="cv-section" id="projets"><h2>Projets</h2><div>
+          <div class="item"><h3>Classification de texte NLP (AG News)</h3><ul><li>Prétraitement, vectorisation TF-IDF et fine-tuning de DistilBERT</li><li>Comparaison des approches sur accuracy et F1-score</li><li>Analyse des apports du Transformer</li></ul></div>
+          <div class="item"><h3>Analyse de sentiments</h3><ul><li>Classification positive / négative / neutre sur corpus de commentaires</li><li>Feature engineering textuel et cross-validation</li><li>Visualisation des erreurs pour interprétabilité</li></ul></div>
+          <div class="item"><h3>Prédiction du churn client</h3><ul><li>Feature engineering sur données clients</li><li>Comparaison Random Forest / Gradient Boosting / Régression Logistique</li><li>Évaluation AUC-ROC et interprétabilité avec SHAP</li></ul></div>
+          <div class="item"><h3>Segmentation clients &amp; Dashboard Power BI</h3><ul><li>ACP pour réduction de dimensionnalité</li><li>Clustering K-Means pour profils clients</li><li>Tableau de bord interactif Power BI pour suivi du churn</li></ul></div>
+          <div class="item"><h3>Bot social avec LLM local (Ollama)</h3><ul><li>Chatbot interactif avec gestion des sessions</li><li>Intégration locale de modèles LLM pour confidentialité</li></ul></div>
+          <div class="item"><h3>Plateforme de chat &amp; API REST</h3><ul><li>Messagerie temps réel avec WebSocket</li><li>Authentification JWT et documentation Swagger</li></ul></div>
+          <div class="item"><h3>Plateforme de paiement sécurisée (Node.js + Stripe)</h3><ul><li>Intégration API Stripe et webhooks temps réel</li><li>Journalisation structurée et anonymisation des logs</li></ul></div>
+          <div class="item"><h3>Virtualisation de stockage (Nextcloud &amp; NFS)</h3><ul><li>Déploiement d'un cloud privé avec Ubuntu Server</li><li>Stockage partagé NFS et accès distant via IP</li></ul></div>
+        </div></section>
 
-      <li>
-        <strong>Prédiction du churn client</strong><br>
-        <ul>
-          <li>+ Feature engineering sur données clients</li>
-          <li>+ Comparaison Random Forest / Gradient Boosting / Régression Logistique</li>
-          <li>+ Évaluation AUC-ROC et interprétabilité avec SHAP</li>
-        </ul>
-      </li>
+        <section class="cv-section" id="formation"><h2>Formation</h2><div>
+          <div class="item"><h3>Licence IT, IA &amp; Big Data</h3><p>Collège de Paris Supérieur (CDP) · 2023 – 2026</p></div>
+          <div class="item"><h3>BAC Série C (Maths &amp; Physique)</h3><p>Collège Protestant Lomé · 2023</p></div>
+        </div></section>
 
-      <li>
-        <strong>Segmentation clients & Dashboard Power BI</strong><br>
-        <ul>
-          <li>+ ACP pour réduction de dimensionnalité</li>
-          <li>+ Clustering K-Means pour profils clients</li>
-          <li>+ Tableau de bord interactif Power BI pour suivi du churn</li>
-        </ul>
-      </li>
+        <section class="cv-section" id="competences"><h2>Compétences</h2><div class="skills">
+          <div><b>langages</b><span class="chips"><span>Python</span><span>React</span><span>Java</span></span></div>
+          <div><b>bases de données</b><span class="chips"><span>MySQL</span><span>MongoDB</span></span></div>
+          <div><b>visualisation</b><span class="chips"><span>Power BI</span></span></div>
+          <div><b>cybersécurité &amp; OSINT</b><span class="chips"><span>audit réseau</span><span>anonymisation</span><span>monitoring</span><span>bonnes pratiques</span></span></div>
+        </div></section>
 
-      <li>
-        <strong>Bot social avec LLM local (Ollama)</strong><br>
-        <ul>
-          <li>+ Chatbot interactif avec gestion des sessions</li>
-          <li>+ Intégration locale de modèles LLM pour confidentialité</li>
-        </ul>
-      </li>
-
-      <li>
-        <strong>Plateforme de chat & API REST</strong><br>
-        <ul>
-          <li>+ Messagerie temps réel avec WebSocket</li>
-          <li>+ Authentification JWT et documentation Swagger</li>
-        </ul>
-      </li>
-
-      <li>
-        <strong>Plateforme de paiement sécurisée (Node.js + Stripe)</strong><br>
-        <ul>
-          <li>+ Intégration API Stripe et webhooks temps réel</li>
-          <li>+ Journalisation structurée et anonymisation des logs</li>
-        </ul>
-      </li>
-
-      <li>
-        <strong>Virtualisation de stockage (Nextcloud & NFS)</strong><br>
-        <ul>
-          <li>+ Déploiement d’un cloud privé avec Ubuntu Server</li>
-          <li>+ Stockage partagé NFS et accès distant via IP</li>
-        </ul>
-      </li>
-    </ul>
-  </section>
-
-  <!-- Section Formation -->
-  <section class="cv-section">
-    <h2>Formation</h2>
-    <p>Licence IT – IA & Big Data (2023-2026) – Collège de Paris Supérieur (CDP)</p>
-    <p>BAC Série C (Maths & Physique) – Collège Protestant Lomé, 2023</p>
-  </section>
-
-  <!-- Section Compétences -->
-  <section class="cv-section">
-    <h2>Compétences</h2>
-    <div class="skills">
-      <span>💻 Langages : Python, React, Java</span>
-      <span>🗄️ Bases de données : MySQL, MongoDB</span>
-      <span>🗄️ Visualisation : Power BI</span>
-      <span>🔒 Cybersécurité & OSINT : audit réseau, anonymisation, monitoring et bonnes pratiques</span>
+        <section class="cv-section" id="certificats"><h2>Certificats</h2><div>
+          <p>--------------------------------------------</p>
+        </div></section>
+      </div>
     </div>
-  </section>
+  </main>
 
-  <!-- Section Certificats -->
-  <section class="cv-section">
-    <h2>Certificats</h2>
-    <ul>
-      <li>Certification interne – Projet Power BI (Segmentation & Churn)</li>
-    </ul>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 DOWOU ISSA - Tous droits réservés</p>
-  </footer>
+  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <script src="assets/js/net3d.js" defer></script>
+<script src="assets/js/palette.js" defer></script>
 </body>
 </html>

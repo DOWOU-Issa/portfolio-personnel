@@ -3,81 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Liste des projets de DOWOU ISSA">
-  <title>Projets - DOWOU ISSA</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/projets.css">
+  <title>Projets — Dowou Issa</title>
+  <meta name="description" content="Projets documentés de Dowou Issa : analyse de données, réseaux, virtualisation, sécurité Docker, CI/CD et gestion de projet.">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/theme.css">
 </head>
-<body>
-  <!-- Navbar -->
-  <header>
-    <nav class="navbar">
-      <div class="logo">DOWOU ISSA</div>
-      <ul class="nav-links">
-        <li><a href="../index.html">Accueil</a></li>
-        <li><a href="../cv.html">CV</a></li>
-        <li><a href="../projets.html" class="active">Projets</a></li>
-        <li><a href="../github.html">GitHub</a></li>
-        <li><a href="../video.html">Vidéos</a></li>
-        <li><a href="../contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+<body data-net="page">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="site-head"><div class="in"><a class="brand" href="../index.html">dowou<i>.</i>issa</a>
+    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="../index.html">accueil</a></li><li><a href="../cv.html">cv</a></li><li><a href="../projets/projets.html" aria-current="page">projets</a></li><li><a href="../github.html">github</a></li><li><a href="../video.html">vidéos</a></li><li><a href="../contact.html">contact</a></li></ul></nav></div></header>
 
-  <!-- Section Projets -->
-  <section class="cv-section projets">
-    <h1>Mes Projets</h1>
-    <p>Voici une sélection de mes projets:</p>
+  <main id="contenu" class="wrap">
+    <section class="proj-top">
+      <div>
+        <p class="path reveal">~/projets</p>
+        <h1 class="title reveal d1">Du <em>modèle</em> au réseau.</h1>
+        <p class="lead reveal d2">Chaque projet est documenté : contexte, étapes, problèmes rencontrés et solution retenue.</p>
+        <div class="filters reveal d3" id="filters" role="group" aria-label="Filtrer par domaine">
+          <button type="button" data-f="" aria-pressed="true">tous</button>
+          <button type="button" data-f="data" aria-pressed="false">data</button>
+          <button type="button" data-f="infra" aria-pressed="false">infra &amp; sécurité</button>
+          <button type="button" data-f="gestion" aria-pressed="false">gestion de projet</button>
+        </div>
+      </div>
+      <div>
+        <div class="stage" id="stage" tabindex="0" aria-label="Pile de projets. Flèches ou molette pour faire défiler."></div>
+        <div class="stage-ctrl"><button class="btn small" type="button" id="prev" aria-label="Projet précédent">←</button><button class="btn small" type="button" id="next" aria-label="Projet suivant">→</button><span>molette, flèches ou clic</span></div>
+      </div>
+    </section>
 
-    <!-- Barre de recherche avec bouton -->
-    <div class="search-container">
-      <input type="text" id="searchBar" placeholder="Rechercher un projet...">
-      <button onclick="searchProjects()">Rechercher</button>
-    </div>
+    <section aria-labelledby="tous">
+      <div class="toolbar">
+        <h2 id="tous" class="path" style="margin:0">tous les projets <span id="count"></span></h2>
+        <input type="search" id="searchBar" class="search" placeholder="Rechercher un projet…" aria-label="Rechercher un projet">
+      </div>
+      <ul id="projectList" class="proj-list"></ul>
+    </section>
+  </main>
 
-    <!-- Liste des projets générée depuis projets.json -->
-    <ul id="projectList" class="liste-projets">
-      <!-- Les projets seront insérés ici par JavaScript -->
-    </ul>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 DOWOU ISSA - Tous droits réservés</p>
-  </footer>
-
-  <!-- Script pour charger projets.json et gérer la recherche -->
+  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <script type="application/json" id="projets-data">[{"titre": "Classification NLP AG News", "fichier": "Classification-NLP-AG-News.html", "description": "TF-IDF contre DistilBERT fine-tuné : 92,3 % d'accuracy, +1,7 point sur la baseline.", "categorie": "data"}, {"titre": "Prédiction du churn client", "fichier": "Prediction-churn-telecom.html", "description": "2,3 M de clients télécom, KNN et régression logistique : AUC 0,89.", "categorie": "data"}, {"titre": "Analyse de sentiments IMDb", "fichier": "Analyse-de-sentiments-IMDb.html", "description": "50 000 critiques, trois modèles comparés : 88,6 % d'accuracy.", "categorie": "data"}, {"titre": "Précipitations 1982–2024", "fichier": "Analyses-des-precipitations-1982-2024.html", "description": "15 695 observations : tendance Mann-Kendall, ACP et prévision 2025–2031.", "categorie": "data"}, {"titre": "Bonnes pratiques de sécurité Docker", "fichier": "Bonne-pratique-Sécurité-Dockers.html", "description": "Isolation et durcissement des conteneurs : images, utilisateurs, réseau.", "categorie": "infra"}, {"titre": "DNS, DHCP et NFS avec Dnsmasq", "fichier": "Configuration-DNS-DHCP-NFS.html", "description": "Configurer un serveur DNS/DHCP léger et un partage NFS sous Linux.", "categorie": "infra"}, {"titre": "Exposé : la virtualisation", "fichier": "Exposé-Virtualisation.html", "description": "Types d'hyperviseurs, conteneurs et cas d'usage.", "categorie": "infra"}, {"titre": "Pipeline CI avec GitHub Actions", "fichier": "Pipeline-Ci-GithubActions.html", "description": "Du dépôt au workflow : build et tests automatisés.", "categorie": "infra"}, {"titre": "Virtualisation de stockage", "fichier": "Rapport-virtualisation-de-stockage.html", "description": "Ubuntu Server et Cockpit : volumes, partages et accès distant.", "categorie": "infra"}, {"titre": "Scanner un réseau avec Nmap", "fichier": "SCANNER-UN-RESEAU-AVEC-NMAP.html", "description": "Découverte d'hôtes, de ports et de services sur un réseau de test.", "categorie": "infra"}, {"titre": "Windows Server et AD DS", "fichier": "Windows-Servers-Adds.html", "description": "Installation d'un serveur, annuaire Active Directory et GPO.", "categorie": "infra"}, {"titre": "Plan ERP pour l'hôtel ONOMO", "fichier": "Plan-ERP-ONOMO.html", "description": "Mise en place d'un ERP : besoins, choix de la solution, déploiement.", "categorie": "gestion"}, {"titre": "Ingénierie du besoin", "fichier": "Projet-Ingénieurie-du-besoin.html", "description": "Recueil, analyse et spécification des exigences d'un projet.", "categorie": "gestion"}, {"titre": "Gestion d'une bibliothèque", "fichier": "Gestion-Bibliotheque.html", "description": "Conception d'une application de gestion des prêts et des ouvrages.", "categorie": "gestion"}]</script>
   <script>
-    let projetsData = [];
-
-    // Charger le fichier JSON
-    fetch("../data/projets.json")
-      .then(response => response.json())
-      .then(data => {
-        projetsData = data;
-        afficherProjets(projetsData);
-      })
-      .catch(error => console.error("Erreur de chargement du JSON :", error));
-
-    // Fonction pour afficher les projets
-    function afficherProjets(projets) {
-      const projectList = document.getElementById("projectList");
-      projectList.innerHTML = "";
-      projets.forEach(projet => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="../projets/${projet.fichier}">${projet.titre}</a>`;
-        projectList.appendChild(li);
+  (function () {
+    var all = [];
+    try { all = JSON.parse(document.getElementById("projets-data").textContent); } catch (e) {}
+    var stage = document.getElementById("stage"), list = document.getElementById("projectList");
+    var filter = "", query = "", top = 0, cards = [];
+    var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches, mx = 0;
+    var LBL = { data: "data", infra: "infra & sécurité", gestion: "gestion de projet" };
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    function current() {
+      return all.filter(function (p) {
+        return (!filter || p.categorie === filter) && (!query || (p.titre + " " + p.description).toLowerCase().indexOf(query) > -1);
       });
     }
-
-    // Fonction de recherche
-    function searchProjects() {
-      const input = document.getElementById("searchBar").value.toLowerCase();
-      const filtres = projetsData.filter(projet =>
-        projet.titre.toLowerCase().includes(input)
-      );
-      afficherProjets(filtres);
+    function render() {
+      var items = current();
+      document.getElementById("count").textContent = "· " + items.length;
+      list.innerHTML = items.map(function (p) {
+        return '<li><a href="' + encodeURI(p.fichier) + '"><small>' + esc(LBL[p.categorie] || "") + '</small><b>' + esc(p.titre) + '</b><span>' + esc(p.description) + '</span></a></li>';
+      }).join("") || '<li><a><span>Aucun projet ne correspond à cette recherche.</span></a></li>';
+      stage.innerHTML = ""; top = 0; setTimeout(signal, 600);
+      cards = items.map(function (p, i) {
+        var a = document.createElement("a"); a.className = "card"; a.href = encodeURI(p.fichier); a.tabIndex = -1;
+        a.innerHTML = '<div class="idx"><span>' + String(i + 1).padStart(2, "0") + " / " + String(items.length).padStart(2, "0") + '</span><span>' + esc(LBL[p.categorie] || "") + '</span></div><h3>' + esc(p.titre) + '</h3><p>' + esc(p.description) + '</p><span class="open">ouvrir le projet →</span>';
+        stage.appendChild(a); return a;
+      });
+      lay();
     }
+    function lay() {
+      var n = cards.length;
+      cards.forEach(function (d, i) {
+        var k = (i - top + n) % n;
+        d.style.zIndex = 99 - k; d.style.opacity = k > 4 ? 0 : 1 - k * 0.17; d.style.pointerEvents = k === 0 ? "auto" : "none";
+        d.tabIndex = k === 0 ? 0 : -1;
+        d.style.transform = "translate3d(0," + (130 - k * 32) + "px," + (-k * 85) + "px) rotateX(10deg) rotateY(" + (-12 + mx * 12) + "deg)";
+      });
+    }
+    function signal() { var it = current()[top]; if (window.net3d && it) window.net3d.focus(it.categorie); }
+    function step(d) { if (!cards.length) return; top = (top + d + cards.length) % cards.length; lay(); signal(); }
+    document.getElementById("next").onclick = function () { step(1); };
+    document.getElementById("prev").onclick = function () { step(-1); };
+    stage.addEventListener("click", function (e) { if (!e.target.closest(".card") || e.target.closest(".card") !== cards[top]) { e.preventDefault(); step(1); } });
+    stage.addEventListener("wheel", function (e) { e.preventDefault(); step(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+    stage.addEventListener("keydown", function (e) { if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); step(1); } if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); step(-1); } });
+    if (!reduce) addEventListener("pointermove", function (e) { mx = e.clientX / innerWidth - 0.5; lay(); }, { passive: true });
+    document.getElementById("filters").addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return; filter = b.dataset.f;
+      this.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); render();
+    });
+    document.getElementById("searchBar").addEventListener("input", function () { query = this.value.toLowerCase().trim(); render(); });
+    render();
+  })();
   </script>
+  <script src="../assets/js/net3d.js" defer></script>
+<script src="../assets/js/palette.js" defer></script>
 </body>
 </html>
