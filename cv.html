@@ -13,8 +13,7 @@
 </head>
 <body data-net="page">
   <a class="skip" href="#contenu">Aller au contenu</a>
-  <header class="site-head"><div class="in"><a class="brand" href="index.html">dowou<i>.</i>issa</a>
-    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="index.html">accueil</a></li><li><a href="cv.html" aria-current="page">cv</a></li><li><a href="projets/projets.html">projets</a></li><li><a href="github.html">github</a></li><li><a href="video.html">vidéos</a></li><li><a href="contact.html">contact</a></li></ul></nav></div></header>
+  <!--HEADER-->
 
   <main id="contenu" class="wrap">
     <header class="page-head">
@@ -29,7 +28,7 @@
       </nav>
       <div>
         <section class="cv-section" id="profil"><h2>Profil</h2><div>
-          <p>Étudiant en IA &amp; Big Data passionné par le Machine Learning, le NLP et la cybersécurité. Expérience pratique en classification de texte, prédiction du churn et analyse de sentiments. Capable de concevoir des solutions robustes et documentées, du prototype au déploiement.</p>
+          <p>Étudiant en IA &amp; Big Data, curieux et rigoureux, porté par l'envie de comprendre ce qui se passe sous le capot d'un modèle plutôt que de simplement l'utiliser. Expérience concrète en Machine Learning, NLP et Business Intelligence, toujours avec le même réflexe : documenter, mesurer et pousser une idée jusqu'au résultat. La cybersécurité et l'administration système complètent ce profil.</p>
         </div></section>
 
         <section class="cv-section" id="experiences"><h2>Expériences</h2><div>
@@ -43,10 +42,10 @@
         </div></section>
 
         <section class="cv-section" id="projets"><h2>Projets</h2><div>
-          <div class="item"><h3>Classification de texte NLP (AG News)</h3><ul><li>Prétraitement, vectorisation TF-IDF et fine-tuning de DistilBERT</li><li>Comparaison des approches sur accuracy et F1-score</li><li>Analyse des apports du Transformer</li></ul></div>
-          <div class="item"><h3>Analyse de sentiments</h3><ul><li>Classification positive / négative / neutre sur corpus de commentaires</li><li>Feature engineering textuel et cross-validation</li><li>Visualisation des erreurs pour interprétabilité</li></ul></div>
-          <div class="item"><h3>Prédiction du churn client</h3><ul><li>Feature engineering sur données clients</li><li>Comparaison Random Forest / Gradient Boosting / Régression Logistique</li><li>Évaluation AUC-ROC et interprétabilité avec SHAP</li></ul></div>
-          <div class="item"><h3>Segmentation clients &amp; Dashboard Power BI</h3><ul><li>ACP pour réduction de dimensionnalité</li><li>Clustering K-Means pour profils clients</li><li>Tableau de bord interactif Power BI pour suivi du churn</li></ul></div>
+          <div class="item"><h3><a href="projets/Classification-NLP-AG-News.html">Classification de texte NLP (AG News)</a></h3><ul><li>Baseline TF-IDF + régression logistique comparée au fine-tuning de DistilBERT, sur les mêmes 20 000 articles</li><li>DistilBERT : 92,3 % d'accuracy, +1,7 point sur la baseline, meilleur sur les 4 rubriques</li></ul></div>
+          <div class="item"><h3><a href="projets/Analyse-de-sentiments-IMDb.html">Analyse de sentiments (critiques IMDb)</a></h3><ul><li>Pipeline modulaire sur 50 000 critiques : nettoyage, lemmatisation, TF-IDF, trois modèles comparés</li><li>Régression logistique : 88,6 % d'accuracy, analyse des erreurs sur les avis mitigés</li></ul></div>
+          <div class="item"><h3><a href="projets/Prediction-churn-telecom.html">Prédiction du churn client (2,3 M d'abonnés télécom)</a></h3><ul><li>Nettoyage et analyse exploratoire de 2,3 millions de clients, dont 18,75 % de départs</li><li>KNN et régression logistique réglés sur le F1-score ; régression logistique retenue, AUC-ROC 0,89</li></ul></div>
+          <div class="item"><h3><a href="projets/Analyse-ventes-Power-BI.html">Analyse de la performance commerciale (Power BI)</a></h3><ul><li>Modèle en étoile reliant ventes 2023–2024, boutiques, produits et géographie ; nettoyage avec Power Query</li><li>Mesures DAX (chiffre d'affaires, écart N vs N-1 avec table calendrier) et tableau de bord interactif sur 3 pages</li></ul></div>
           <div class="item"><h3>Bot social avec LLM local (Ollama)</h3><ul><li>Chatbot interactif avec gestion des sessions</li><li>Intégration locale de modèles LLM pour confidentialité</li></ul></div>
           <div class="item"><h3>Plateforme de chat &amp; API REST</h3><ul><li>Messagerie temps réel avec WebSocket</li><li>Authentification JWT et documentation Swagger</li></ul></div>
           <div class="item"><h3>Plateforme de paiement sécurisée (Node.js + Stripe)</h3><ul><li>Intégration API Stripe et webhooks temps réel</li><li>Journalisation structurée et anonymisation des logs</li></ul></div>
@@ -59,21 +58,22 @@
         </div></section>
 
         <section class="cv-section" id="competences"><h2>Compétences</h2><div class="skills">
-          <div><b>langages</b><span class="chips"><span>Python</span><span>React</span><span>Java</span></span></div>
+          <div><b>langages</b><span class="chips"><span>Python</span><span>Java</span><span>JavaScript / React</span><span>SQL</span></span></div>
+          <div><b>data &amp; IA</b><span class="chips"><span>pandas</span><span>scikit-learn</span><span>PyTorch</span><span>Hugging Face</span><span>NLTK</span></span></div>
           <div><b>bases de données</b><span class="chips"><span>MySQL</span><span>MongoDB</span></span></div>
-          <div><b>visualisation</b><span class="chips"><span>Power BI</span></span></div>
+          <div><b>BI &amp; visualisation</b><span class="chips"><span>Power BI (Power Query, DAX)</span><span>matplotlib</span><span>seaborn</span></span></div>
+          <div><b>langues</b><span class="chips"><span>français (langue maternelle)</span><span>anglais (intermédiaire, lecture technique)</span></span></div>
           <div><b>cybersécurité &amp; OSINT</b><span class="chips"><span>audit réseau</span><span>anonymisation</span><span>monitoring</span><span>bonnes pratiques</span></span></div>
         </div></section>
 
         <section class="cv-section" id="certificats"><h2>Certificats</h2><div>
-          <p>--------------------------------------------</p>
+          <p>Certification interne, projet Power BI (analyse des ventes)</p>
         </div></section>
       </div>
     </div>
   </main>
 
-  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <!--FOOTER-->
   <script src="assets/js/net3d.js" defer></script>
-<script src="assets/js/palette.js" defer></script>
 </body>
 </html>

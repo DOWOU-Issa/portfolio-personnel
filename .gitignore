@@ -10,3 +10,6 @@ content/*.pptx
 
 # Fichiers à supprimer
 _a-supprimer/
+
+# Exclure Claude outputs
+Claude outputs/

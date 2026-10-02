@@ -24,6 +24,12 @@
     "categorie": "data"
   },
   {
+    "titre": "Analyse des ventes (Power BI)",
+    "fichier": "Analyse-ventes-Power-BI.html",
+    "description": "Modèle en étoile, Power Query et DAX sur 3 499 ventes : +3,7 % de chiffre d'affaires en 2024.",
+    "categorie": "data"
+  },
+  {
     "titre": "Bonnes pratiques de sécurité Docker",
     "fichier": "Bonne-pratique-Sécurité-Dockers.html",
     "description": "Isolation et durcissement des conteneurs : images, utilisateurs, réseau.",
