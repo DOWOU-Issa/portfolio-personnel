@@ -40,7 +40,7 @@
       v2.set(mx * 2, -my * 2); ray.setFromCamera(v2, cam); var hit = ray.intersectObjects(bars)[0];
       if (!hit) { tip.hidden = true; return; }
       var d = hit.object.userData; tip.hidden = false;
-      tip.textContent = D.cats[d.c] + " · " + D.qs[d.q].replace("-", " ") + " · " + D.v[d.c][d.q].toLocaleString("fr-FR") + " € HT";
+      tip.textContent = D.cats[d.c] + " · " + D.qs[d.q].replace("-", " ") + " · " + D.v[d.c][d.q].toLocaleString("fr-FR") + " $ HT";
       tip.style.left = Math.min(e.clientX - b.left + 14, b.width - 280) + "px"; tip.style.top = (e.clientY - b.top - 14) + "px";
     });
     r.domElement.addEventListener("pointerleave", function () { tip.hidden = true; mx = my = 0; });

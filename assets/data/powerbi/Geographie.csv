@@ -1,0 +1,32 @@
+IdGeographie,Pays,Region,Etat,Ville,CodePostal
+47,USA,Ouest,Washington,Snoqualmie,98065
+100,USA,Ouest,Oregon,Portland,97201
+101,USA,Ouest,Oregon,Beaverton,97005
+102,USA,Ouest,Oregon,Salem,97301
+103,USA,Ouest,Oregon,Eugene,97401
+104,USA,Ouest,Oregon,Medford,97501
+200,USA,Ouest,Californie,San Francisco,94102
+201,USA,Ouest,Californie,Oakland,94601
+202,USA,Ouest,Californie,San Jose,95101
+203,USA,Ouest,Californie,Los Angeles,90001
+204,USA,Ouest,Californie,San Diego,92101
+438,USA,Ouest,Washington,Renton,98055
+474,USA,Ouest,Washington,Bellevue,98004
+551,USA,Nord-Ouest,Washington,Spokane,99201
+573,USA,Ouest,Washington,Yakima,98901
+677,USA,Ouest,Washington,Redmond,98052
+812,USA,Nord-Ouest,Washington,Cheney,99004
+813,USA,Ouest,Washington,Cle Elum,98922
+838,USA,Ouest,Washington,Granger,98932
+892,USA,Ouest,Washington,Seattle,98101
+922,USA,Ouest,Washington,Everett,98201
+924,USA,Ouest,Colorado,Englewood,80110
+925,USA,Ouest,Washington,Fall City,98024
+947,USA,Ouest,Washington,Wapato,98951
+300,USA,Est,New York,New York,10001
+301,USA,Est,New York,Buffalo,14201
+302,USA,Est,Pennsylvanie,Philadelphie,19101
+303,USA,Est,Massachusetts,Boston,02101
+400,Canada,Est,Ontario,Toronto,M5H
+401,Canada,Est,Quebec,Montreal,H2Y
+402,Canada,Ouest,Colombie-Britannique,Vancouver,V6B

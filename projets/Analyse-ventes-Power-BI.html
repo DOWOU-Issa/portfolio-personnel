@@ -25,12 +25,12 @@
     <section class="tldr reveal d3" aria-label="Résumé en 30 secondes">
       <div><h2>Problème</h2><p>Les données de ventes, de boutiques et de produits sont éclatées dans 13 fichiers. Les décideurs n'ont aucune vue d'ensemble.</p></div>
       <div><h2>Ce que j'ai fait</h2><p>Un modèle en étoile dans Power BI, le nettoyage avec Power Query, des mesures DAX et un tableau de bord interactif sur 3 pages.</p></div>
-      <div class="res"><h2>Résultat</h2><strong>+3,7 %</strong><p>de chiffre d'affaires entre 2023 et 2024 (2,30 M → 2,39 M € HT), avec une marge brute stable à 52 %.</p></div>
+      <div class="res"><h2>Résultat</h2><strong>+3,7 %</strong><p>de chiffre d'affaires entre 2023 et 2024 (2,30 M → 2,39 M $ HT), avec une marge brute stable à 52 %.</p></div>
     </section>
 
     <div class="p-layout">
       <nav class="p-toc" aria-label="Sections">
-        <a href="#donnees">données</a><a href="#modele">modèle</a><a href="#ventes">ventes</a><a href="#tableau">tableau de bord</a><a href="#difficultes">difficultés</a>
+        <a href="#donnees">données</a><a href="#modele">modèle</a><a href="#ventes">ventes</a><a href="#captures">captures</a><a href="#tableau">tableau de bord</a><a href="#fichiers">données</a><a href="#difficultes">difficultés</a>
       </nav>
       <div>
         <section class="p-sec" id="donnees">
@@ -39,7 +39,7 @@
             <div><strong>3 499</strong><span>ventes 2023–2024</span></div>
             <div><strong>30</strong><span>boutiques, dont 26 ouvertes</span></div>
             <div><strong>33</strong><span>produits, 8 catégories</span></div>
-            <div><strong>4,68 M €</strong><span>chiffre d'affaires HT</span></div>
+            <div><strong>4,63 M $</strong><span>chiffre d'affaires après remise</span></div>
           </div>
           <p>Huit fichiers de ventes trimestrielles (quantité, prix, remise, montant, coût, marge) et cinq tables de référence : boutiques, géographie, produits, sous-catégories et catégories.</p>
         </section>
@@ -50,37 +50,67 @@
             <li><strong>Table de faits</strong> : les 3 499 ventes, ajoutées les unes aux autres avec Power Query.</li>
             <li><strong>Dimensions</strong> : Boutiques → Géographie, Produits → Sous-catégories → Catégories, et une table Calendrier dédiée.</li>
             <li><strong>Power Query</strong> : standardisation des formats de date, typage des colonnes, fusion des fichiers trimestriels.</li>
-            <li><strong>DAX</strong> : chiffre d'affaires, nombre de ventes, marge et écart N vs N-1 grâce aux fonctions d'intelligence temporelle.</li>
+            <li><strong>Mesures DAX</strong> : <code>CA</code>, <code>CA-1</code> (même période l'année précédente), <code>Ecart ventes</code>, <code>Nb Ventes</code>, <code>Nb Boutiques</code>, <code>Nb Produits</code>, avec une table <code>DateTable</code> pour l'intelligence temporelle.</li>
           </ul>
         </section>
 
         <section class="p-sec" id="ventes">
           <h2><small>ventes</small>Le chiffre d'affaires par catégorie et par trimestre</h2>
           <div class="t3" id="ventes3d" role="img" aria-label="Histogramme 3D du chiffre d'affaires par catégorie et par trimestre, 2023 à 2024. Record : Ordinateurs au 4e trimestre 2024."></div>
-          <p class="t3-cap">Une colonne par catégorie et par trimestre, hauteur = chiffre d'affaires HT. Les colonnes turquoise vif sont 2024, le record est en ocre. Survolez une colonne pour lire sa valeur.</p>
+          <p class="t3-cap">Une colonne par catégorie et par trimestre, hauteur = chiffre d'affaires HT (avant remise). Les colonnes turquoise vif sont 2024, le record est en ocre. Survolez une colonne pour lire sa valeur.</p>
           <div class="tbl"><table>
             <thead><tr><th>Catégorie</th><th>2023</th><th>2024</th><th>Évolution</th></tr></thead>
             <tbody>
-              <tr class="best"><td>Ordinateurs</td><td>617 721 €</td><td>703 468 €</td><td>+13,9 %</td></tr>
-              <tr><td>TV &amp; Vidéo</td><td>679 214 €</td><td>656 024 €</td><td>−3,4 %</td></tr>
-              <tr><td>Appareil photo &amp; caméscope</td><td>238 741 €</td><td>282 640 €</td><td>+18,4 %</td></tr>
-              <tr><td>Électroménager</td><td>283 096 €</td><td>247 207 €</td><td>−12,7 %</td></tr>
-              <tr><td>Téléphones &amp; accessoires</td><td>194 021 €</td><td>210 241 €</td><td>+8,4 %</td></tr>
-              <tr><td>Jeux vidéo</td><td>125 543 €</td><td>139 969 €</td><td>+11,5 %</td></tr>
-              <tr><td>Audio</td><td>147 446 €</td><td>132 744 €</td><td>−10,0 %</td></tr>
-              <tr><td>Accessoires</td><td>13 177 €</td><td>12 826 €</td><td>−2,7 %</td></tr>
+              <tr class="best"><td>Ordinateurs</td><td>617 721 $</td><td>703 468 $</td><td>+13,9 %</td></tr>
+              <tr><td>TV &amp; Vidéo</td><td>679 214 $</td><td>656 024 $</td><td>−3,4 %</td></tr>
+              <tr><td>Appareil photo &amp; caméscope</td><td>238 741 $</td><td>282 640 $</td><td>+18,4 %</td></tr>
+              <tr><td>Électroménager</td><td>283 096 $</td><td>247 207 $</td><td>−12,7 %</td></tr>
+              <tr><td>Téléphones &amp; accessoires</td><td>194 021 $</td><td>210 241 $</td><td>+8,4 %</td></tr>
+              <tr><td>Jeux vidéo</td><td>125 543 $</td><td>139 969 $</td><td>+11,5 %</td></tr>
+              <tr><td>Audio</td><td>147 446 $</td><td>132 744 $</td><td>−10,0 %</td></tr>
+              <tr><td>Accessoires</td><td>13 177 $</td><td>12 826 $</td><td>−2,7 %</td></tr>
             </tbody>
           </table></div>
-          <p class="note">Les ordinateurs passent devant la TV en 2024 et portent la croissance. Le 4e trimestre 2024 est le meilleur de la période (674 k €), alors que 2023 culminait au 2e trimestre.</p>
+          <figure class="chart" data-chart='{"type": "line", "unit": "€", "aria": "Chiffre d&#39;affaires mensuel 2023 et 2024", "labels": ["janv", "févr", "mars", "avr", "mai", "juin", "juil", "août", "sept", "oct", "nov", "déc"], "series": [{"name": "2023", "values": [174300, 177593, 176535, 224000, 215731, 234266, 152082, 184257, 163022, 186008, 185274, 225891]}, {"name": "2024", "values": [155547, 175266, 192388, 183744, 198665, 170031, 241538, 209829, 184278, 258699, 194778, 220354]}]}'><figcaption>Chiffre d'affaires HT par mois. 2024 décroche en juin mais finit plus fort, avec un record en octobre (259 k $).</figcaption></figure>
+          <figure class="chart" data-chart='{"type": "hbar", "unit": "€", "aria": "Les six produits au plus fort chiffre d&#39;affaires", "rows": [["TV OLED 65 pouces", 577997], ["Ordinateur Portable Gaming G15", 387007], ["TV OLED 55 pouces", 363347], ["Ordinateur Portable L14", 337676], ["TV LED 55 pouces", 252521], ["Appareil Photo Mirrorless M10", 235037]]}'><figcaption>Les six produits au plus fort chiffre d'affaires sur 2023–2024.</figcaption></figure>
+          <p class="note">Les ordinateurs passent devant la TV en 2024 et portent la croissance. Le 4e trimestre 2024 est le meilleur de la période (674 k $), alors que 2023 culminait au 2e trimestre.</p>
+        </section>
+
+        <section class="p-sec" id="captures">
+          <h2><small>captures</small>Le tableau de bord dans Power BI</h2>
+          <div class="gal">
+            <a href="../assets/images/projets/powerbi/boutiques.png" target="_blank" rel="noopener"><img src="../assets/images/projets/powerbi/boutiques.png" alt="Page Boutiques du tableau de bord : filtres par État et ville, 30 boutiques, répartition par statut, carte et ventes par boutique" loading="lazy"><span>Page Boutiques</span></a>
+            <a href="../assets/images/projets/powerbi/produits.png" target="_blank" rel="noopener"><img src="../assets/images/projets/powerbi/produits.png" alt="Page Produits : 33 produits, ventes et retours par produit, arbre de décomposition par catégorie, treemap des ventes" loading="lazy"><span>Page Produits</span></a>
+            <a href="../assets/images/projets/powerbi/ventes.png" target="_blank" rel="noopener"><img src="../assets/images/projets/powerbi/ventes.png" alt="Page Ventes : jauge CA contre CA N-1, 4,63 M$ de chiffre d'affaires, courbe des ventes, tableau mensuel avec écart et sparklines" loading="lazy"><span>Page Ventes</span></a>
+          </div>
+          <p class="t3-cap">Cliquez sur une capture pour l'ouvrir en grand.</p>
         </section>
 
         <section class="p-sec" id="tableau">
           <h2><small>tableau de bord</small>Trois pages, trois questions métier</h2>
-          <ul>
-            <li><strong>Boutiques</strong> : où sont les points de vente, combien d'employés et de m², lesquelles sont fermées et pourquoi.</li>
-            <li><strong>Produits</strong> : arbre de décomposition catégorie → sous-catégorie → produit, et treemap des produits phares (la TV OLED 65 pouces arrive en tête avec 578 k €).</li>
-            <li><strong>Ventes</strong> : chiffre d'affaires, nombre de ventes, écart N vs N-1 et tendance mensuelle.</li>
-          </ul>
+          <div class="tbl"><table>
+            <thead><tr><th>Page</th><th>Question</th><th>Visuels</th></tr></thead>
+            <tbody>
+              <tr><td>Boutiques</td><td>Où sont les points de vente et lesquels vendent le plus ?</td><td>carte par État et ville, entonnoir par type, secteur ouvert / fermé, ventes par boutique, tableau détaillé</td></tr>
+              <tr><td>Produits</td><td>Comment se répartit le catalogue et quels produits partent ?</td><td>arbre de décomposition catégorie → sous-catégorie, treemap des ventes, quantités vendues et retournées par produit</td></tr>
+              <tr><td>Ventes</td><td>Le chiffre d'affaires progresse-t-il par rapport à l'an dernier ?</td><td>jauge CA vs CA N-1, courbe CA et nombre de ventes, tableau mensuel avec écart et sparklines, répartition par catégorie, marque et produit</td></tr>
+            </tbody>
+          </table></div>
+          <p>Chaque page a ses filtres (pays, État, ville, marque, année, mois, boutique) et une navigation entre les pages.</p>
+        </section>
+
+        <section class="p-sec" id="fichiers">
+          <h2><small>données et fichiers</small>Les sources du tableau de bord</h2>
+          <div class="btns" style="margin-top:0">
+            <a class="btn p" href="../assets/data/powerbi/Tableau_de_Bord_Ventes.pbix" download>Télécharger le fichier Power BI (.pbix)</a>
+            <a class="btn" href="../assets/data/powerbi/analyse-ventes-power-bi.zip" download>Tout télécharger (.zip, 228 Ko)</a>
+          </div>
+          <div class="tbl"><table>
+            <thead><tr><th>Fichier</th><th>Contenu</th><th>Lignes</th><th></th></tr></thead>
+            <tbody><tr><td><code>sales/Ventes_T1_2023.csv</code></td><td>ventes du T1 2023</td><td>378</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T1_2023.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T1_2023.csv" download>télécharger</a></td></tr><tr><td><code>sales/Ventes_T1_2024.csv</code></td><td>ventes du T1 2024</td><td>426</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T1_2024.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T1_2024.csv" download>télécharger</a></td></tr><tr><td><code>sales/Ventes_T2_2023.csv</code></td><td>ventes du T2 2023</td><td>457</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T2_2023.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T2_2023.csv" download>télécharger</a></td></tr><tr><td><code>sales/Ventes_T2_2024.csv</code></td><td>ventes du T2 2024</td><td>413</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T2_2024.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T2_2024.csv" download>télécharger</a></td></tr><tr><td><code>sales/Ventes_T3_2023.csv</code></td><td>ventes du T3 2023</td><td>387</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T3_2023.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T3_2023.csv" download>télécharger</a></td></tr><tr><td><code>sales/Ventes_T3_2024.csv</code></td><td>ventes du T3 2024</td><td>484</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T3_2024.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T3_2024.csv" download>télécharger</a></td></tr><tr><td><code>sales/Ventes_T4_2023.csv</code></td><td>ventes du T4 2023</td><td>483</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T4_2023.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T4_2023.csv" download>télécharger</a></td></tr><tr><td><code>sales/Ventes_T4_2024.csv</code></td><td>ventes du T4 2024</td><td>471</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/sales/Ventes_T4_2024.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/sales/Ventes_T4_2024.csv" download>télécharger</a></td></tr><tr><td><code>Boutiques.csv</code></td><td>boutiques : statut, type, surface, employés</td><td>30</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/Boutiques.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/Boutiques.csv" download>télécharger</a></td></tr><tr><td><code>Geographie.csv</code></td><td>pays, région, État, ville</td><td>31</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/Geographie.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/Geographie.csv" download>télécharger</a></td></tr><tr><td><code>Produits.csv</code></td><td>produits : marque, couleur, prix, coût</td><td>33</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/Produits.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/Produits.csv" download>télécharger</a></td></tr><tr><td><code>Categories.csv</code></td><td>catégories de produits</td><td>9</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/Categories.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/Categories.csv" download>télécharger</a></td></tr><tr><td><code>SousCategories.csv</code></td><td>sous-catégories de produits</td><td>33</td><td class="acts"><button class="btn small" type="button" data-csv="../assets/data/powerbi/SousCategories.csv">aperçu</button><a class="btn small" href="../assets/data/powerbi/SousCategories.csv" download>télécharger</a></td></tr></tbody>
+          </table></div>
+          <div class="csv-view" id="csvView" hidden><div class="csv-head"><b id="csvName"></b><button class="btn small" type="button" id="csvClose">fermer</button></div><div class="tbl" id="csvTable"></div><p class="t3-cap" id="csvNote"></p></div>
+          <p class="t3-cap">Le fichier .pbix s'ouvre avec Power BI Desktop (gratuit, Windows). Les CSV s'ouvrent avec Excel ou tout tableur.</p>
         </section>
 
         <section class="p-sec" id="difficultes">
@@ -103,8 +133,34 @@
     </div>
   </main>
   <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <script>
+  (function () {
+    var view = document.getElementById("csvView"); if (!view) return;
+    function parse(t) { return t.trim().split(/\r?\n/).map(function (l) { return l.split(","); }); }
+    function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+    document.querySelectorAll("[data-csv]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var url = b.getAttribute("data-csv");
+        fetch(url).then(function (r) { if (!r.ok) throw 0; return r.text(); }).then(function (t) {
+          var rows = parse(t), head = rows[0], body = rows.slice(1, 11);
+          document.getElementById("csvName").textContent = url.split("/").pop();
+          document.getElementById("csvTable").innerHTML = "<table><thead><tr>" + head.map(function (h) { return "<th>" + esc(h) + "</th>"; }).join("") + "</tr></thead><tbody>" + body.map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
+          document.getElementById("csvNote").textContent = "10 premières lignes sur " + (rows.length - 1) + ".";
+          view.hidden = false; view.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }).catch(function () {
+          document.getElementById("csvName").textContent = url.split("/").pop();
+          document.getElementById("csvTable").innerHTML = "";
+          document.getElementById("csvNote").textContent = "Aperçu indisponible en ouvrant la page en local (fichier://). Utilisez le bouton Télécharger.";
+          view.hidden = false;
+        });
+      });
+    });
+    document.getElementById("csvClose").addEventListener("click", function () { view.hidden = true; });
+  })();
+  </script>
   <script src="../assets/js/net3d.js" defer></script>
   <script src="../assets/js/powerbi-3d.js" defer></script>
+<script src="../assets/js/charts.js" defer></script>
 <script src="../assets/js/palette.js" defer></script>
 </body>
 </html>

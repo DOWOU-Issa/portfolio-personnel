@@ -27,6 +27,52 @@
 
  <div class="project-card">
     <div class="project-header">
+        <h2>AG News : TF-IDF contre DistilBERT</h2>
+        <span class="project-badge">Deep Learning</span>
+    </div>
+    <p>Classification d'articles de presse en 4 rubriques (World, Sports, Business, Sci/Tech) : comparaison d'une baseline classique et d'un Transformer fine-tuné.</p>
+    <div class="project-tech">
+        <span class="tech-tag">Python</span><span class="tech-tag">PyTorch</span><span class="tech-tag">Hugging Face Transformers</span><span class="tech-tag">scikit-learn</span><span class="tech-tag">Google Colab</span>
+    </div>
+    <div class="project-features">
+        <ul>
+            <li>Baseline TF-IDF (uni + bigrammes) et régression logistique</li><li>Fine-tuning de distilbert-base-uncased sur GPU</li><li>Évaluation sur les 7 600 articles du jeu de test officiel</li><li>Comparaison du F1 par rubrique et analyse des erreurs</li>
+        </ul>
+    </div>
+    <div class="project-stats">
+        <div class="stat"><span class="stat-value">92,3 %</span><span class="stat-label">Accuracy</span></div><div class="stat"><span class="stat-value">+1,7 pt</span><span class="stat-label">vs baseline</span></div><div class="stat"><span class="stat-value">4</span><span class="stat-label">Rubriques</span></div>
+    </div>
+    <div class="project-links">
+        <a href="projets/Classification-NLP-AG-News.html" class="btn btn-primary">Voir le projet</a>
+        <a href="https://github.com/DOWOU-Issa/ag-news-distilbert" target="_blank" class="btn btn-secondary">Code source</a>
+    </div>
+</div>
+
+<div class="project-card">
+    <div class="project-header">
+        <h2>Prédiction du churn télécom</h2>
+        <span class="project-badge">Machine Learning</span>
+    </div>
+    <p>Prédire quels abonnés d'un opérateur télécom vont partir, à partir de 2,3 millions de clients, pour cibler les actions de rétention.</p>
+    <div class="project-tech">
+        <span class="tech-tag">Python</span><span class="tech-tag">pandas</span><span class="tech-tag">scikit-learn</span><span class="tech-tag">matplotlib</span><span class="tech-tag">seaborn</span>
+    </div>
+    <div class="project-features">
+        <ul>
+            <li>Analyse exploratoire d'un jeu déséquilibré (18,75 % de départs)</li><li>KNN optimisé de k = 1 à 20 sur le F1-score</li><li>Régression logistique avec régularisation L1 / L2</li><li>Recommandation métier argumentée</li>
+        </ul>
+    </div>
+    <div class="project-stats">
+        <div class="stat"><span class="stat-value">0,89</span><span class="stat-label">AUC-ROC</span></div><div class="stat"><span class="stat-value">2,3 M</span><span class="stat-label">Abonnés</span></div><div class="stat"><span class="stat-value">2</span><span class="stat-label">Modèles</span></div>
+    </div>
+    <div class="project-links">
+        <a href="projets/Prediction-churn-telecom.html" class="btn btn-primary">Voir le projet</a>
+        <a href="https://github.com/DOWOU-Issa/churn-prediction-telecom" target="_blank" class="btn btn-secondary">Code source</a>
+    </div>
+</div>
+
+<div class="project-card">
+    <div class="project-header">
         <h2>To-Do List Pro</h2>
         <span class="project-badge">En ligne</span>
     </div>

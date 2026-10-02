@@ -1,0 +1,34 @@
+IdSousCategorie,IdCategorie,NomSousCategorie
+1,1,Casques & Écouteurs
+2,1,Haut-parleurs
+3,1,Home Cinéma
+4,1,Lecteurs MP3
+5,2,Appareils Photo Numériques
+6,2,Caméscopes
+7,2,Accessoires Photo
+8,3,Ordinateurs Portables
+9,3,Ordinateurs de Bureau
+10,3,Tablettes
+11,3,Moniteurs
+12,3,Accessoires Informatiques
+13,4,Téléphones Mobiles
+14,4,Accessoires Téléphone
+15,4,Téléphones Fixes
+16,5,Téléviseurs LED
+17,5,Téléviseurs OLED
+18,5,Lecteurs Blu-Ray
+19,5,Projecteurs
+20,6,Consoles de Jeu
+21,6,Jeux PC
+22,6,Accessoires Gaming
+23,7,Réfrigérateurs
+24,7,Lave-linge
+25,7,Lave-vaisselle
+26,7,Fours & Micro-ondes
+27,7,Aspirateurs
+28,8,Films & Séries
+29,8,Musique
+30,8,Livres Numériques
+31,9,Câbles & Adaptateurs
+32,9,Piles & Chargeurs
+33,9,Sacs & Housses
