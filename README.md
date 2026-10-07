@@ -1,6 +1,6 @@
 # Portfolio — Dowou Issa
 
-Portfolio en ligne d'un étudiant en Licence IT, IA & Big Data : projets de machine learning, NLP, Business Intelligence, réseaux et cybersécurité, chacun documenté de bout en bout.
+Portfolio en ligne d'un diplômé de Licence IT, IA & Big Data : projets de machine learning, NLP, Business Intelligence, réseaux et cybersécurité, chacun documenté de bout en bout.
 
 **Site :** https://dowou-issa.github.io/portfolio-personnel/
 
