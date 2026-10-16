@@ -14,7 +14,7 @@
   {
     "titre": "Analyse de sentiments IMDb",
     "fichier": "Analyse-de-sentiments-IMDb.html",
-    "description": "50 000 critiques, trois modèles comparés : 88,6 % d'accuracy.",
+    "description": "50 000 critiques, trois modèles comparés : 88,5 % d'accuracy.",
     "categorie": "data"
   },
   {
