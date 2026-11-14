@@ -32,8 +32,8 @@
     ".dw-fiche .dw-tags span{font:500 11.5px 'JetBrains Mono',ui-monospace,monospace;border:1px solid #2c4a55;padding:4px 8px;color:#c4d2e0}" +
     ".dw-fiche .dw-read{font:500 12px 'JetBrains Mono',ui-monospace,monospace;color:#8aa0b3;margin-top:6px}" +
     ".dw-foot{border-top:1px solid #1c2a36;margin-top:48px;background:#070b10}" +
-    ".dw-foot .dw-in{max-width:1120px;margin:0 auto;padding:18px clamp(16px,4vw,32px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:#5d7184}" +
-    ".dw-foot a{color:#5d7184;text-decoration:none}.dw-foot a:hover{color:#5fd0c4}" +
+    ".dw-foot .dw-in{max-width:1120px;margin:0 auto;padding:18px clamp(16px,4vw,32px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:#7d93a6}" +
+    ".dw-foot a{color:#7d93a6;text-decoration:none}.dw-foot a:hover{color:#5fd0c4}" +
     "@media (max-width:640px){.dw-bar nav{display:none}}";
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
 

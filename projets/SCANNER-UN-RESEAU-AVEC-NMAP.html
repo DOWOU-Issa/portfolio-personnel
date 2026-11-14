@@ -603,9 +603,9 @@
       
       <div class="img-placeholder">
         <img src="../assets/images/media/image1.jpg" alt="Nmap help 1" onerror="this.style.display='none'; this.parentElement.innerHTML += '<span>Image non disponible</span>'">
-        <img src="../assets/images/media/image2.jpg" alt="Nmap help 2" onerror="this.style.display='none'">
-        <img src="../assets/images/media/image3.jpg" alt="Nmap help 3" onerror="this.style.display='none'">
-        <img src="../assets/images/media/image4.jpg" alt="Nmap help 4" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image2.jpg" alt="Nmap help 2" onerror="this.style.display='none'" loading="lazy" decoding="async">
+        <img src="../assets/images/media/image3.jpg" alt="Nmap help 3" onerror="this.style.display='none'" loading="lazy" decoding="async">
+        <img src="../assets/images/media/image4.jpg" alt="Nmap help 4" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>En entrant simplement <code>nmap</code>, vous obtiendrez une liste des options disponibles pour cette commande. Vous pouvez également consulter la documentation complète des commandes de nmap sur leur site officiel : <a href="https://nmap.org/book/man.html" style="color:var(--accent);">https://nmap.org/book/man.html</a></p>
@@ -639,13 +639,13 @@
       </ul>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image5.jpg" alt="Scan sans résultat" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image5.jpg" alt="Scan sans résultat" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Depuis ma machine distante, j'ai tenté de scanner mon adresse IP, mais je n'ai reçu aucun résultat. Cela s'explique par le fait que mon adresse IP est protégée par un pare-feu. Si le pare-feu bloque mes requêtes, une solution consiste à ajouter l'option <code>-Pn</code> à la commande <code>nmap</code>. Cela permet de contourner le pare-feu et d'effectuer le filtrage des ports.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image6.jpg" alt="Scan avec -Pn" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image6.jpg" alt="Scan avec -Pn" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Nous constatons maintenant que nous avons accès aux ports ouverts ainsi qu'aux services associés. Avec ces informations, il est déjà possible d'agir et d'exploiter ces données pour des analyses ou des actions spécifiques.</p>
@@ -653,7 +653,7 @@
       <p>Essayons maintenant depuis ma machine réelle :</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image7.jpg" alt="Scan depuis Windows" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image7.jpg" alt="Scan depuis Windows" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>En exécutant la commande depuis mon système Windows, auquel appartient l'adresse IP, je n'ai rencontré aucun problème avec le pare-feu. Ce dernier considère cette action comme une opération de routine de sécurité, visant à surveiller les ports ouverts. De plus, le fait que la commande ait été lancée depuis ma propre machine explique cette absence de blocage.</p>
@@ -677,7 +677,7 @@
       <p>La commande <code>nmap -O</code> permet de déterminer le système d'exploitation (OS) sur lequel tourne la machine cible. Il est important de noter que nmap envoie des dizaines, voire des milliers de requêtes à la cible, ce qui peut allonger considérablement le temps nécessaire pour effectuer l'analyse.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image8.jpg" alt="Scan OS" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image8.jpg" alt="Scan OS" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <h4>Ports ouverts détectés :</h4>
@@ -697,13 +697,13 @@
       <p>On remarque donc que des ports ouverts sont associés à différents services. Si vous le souhaitez, vous pouvez approfondir en recherchant à quoi ces services sont destinés. Cependant, ce qui nous intéresse ici est le suivant...</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image9.jpg" alt="OS non déterminé" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image9.jpg" alt="OS non déterminé" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Cette ligne montre que l'on n'a pas pu déterminer avec exactitude le système d'exploitation trouvé. Ce n'est pas très grave. Ce qui va nous intéresser maintenant se trouve dans le <strong>TCP/IP Fingerprint</strong>.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image10.jpg" alt="TCP/IP Fingerprint" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image10.jpg" alt="TCP/IP Fingerprint" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Dans le résultat, il est indiqué que le système d'exploitation de la machine est Windows, mais la version exacte n'a pas pu être déterminée. Toutefois, cette information peut déjà être suffisante dans le cadre d'une analyse. Par exemple en sachant qu'il s'agit de Windows, vous pouvez utiliser des scripts spécifiques du moteur NSE pour aller plus loin dans l'analyse, comme la détection de failles SMB.</p>
@@ -734,7 +734,7 @@
       </ul>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image11.jpg" alt="Scan versions services" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image11.jpg" alt="Scan versions services" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Ici, la commande fournit des informations détaillées, notamment sur les ports ouverts, les services exécutés et les versions spécifiques de ces services. Si, sur le réseau, l'une de ces versions correspond à un logiciel connu pour avoir une vulnérabilité répertoriée, il serait alors possible de l'exploiter en utilisant un outil comme <strong>Metasploit</strong>, qui permet de lancer des exploits ciblés pour des failles identifiées. Cette étape est cruciale dans le cadre d'une analyse de sécurité ou d'un test d'intrusion.</p>
@@ -742,7 +742,7 @@
       <p>Voici le résultat obtenu depuis ma machine Kali, en utilisant l'option permettant de contourner le pare-feu, une étape essentielle à ne pas négliger.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image12.jpg" alt="Scan depuis Kali" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image12.jpg" alt="Scan depuis Kali" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
     </div>
   </div>
@@ -768,7 +768,7 @@
       <p>Remplacez <code>[numéro_du_port]</code> par le port à scanner (par exemple, <code>80</code>) et <code>[adresse_IP]</code> par l'adresse cible. Cette approche est particulièrement utile pour analyser des services précis.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image13.jpg" alt="Scan port 80" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image13.jpg" alt="Scan port 80" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Dans ce cas, le résultat indique que le port 80 est fermé, ce qui signifie qu'aucun service n'écoute sur ce port à l'adresse IP ciblée.</p>
@@ -807,7 +807,7 @@
       <p><strong>Objectif de la commande :</strong> En falsifiant l'adresse MAC, l'utilisateur peut contourner ces restrictions et simuler une adresse MAC autorisée par le réseau cible. Cela permet à un appareil qui aurait été bloqué de potentiellement accéder au réseau si l'adresse MAC correspond à celles autorisées.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image14.jpg" alt="Spoofing MAC" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image14.jpg" alt="Spoofing MAC" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Dans notre exemple avec une adresse MAC quelconque, on remarque que l'adresse MAC spécifiée a été utilisée, bien qu'elle ne corresponde pas à un fabricant connu (selon la base de données d'adresses MAC).</p>
@@ -831,20 +831,20 @@
       </div>
       
       <ul style="margin-left:20px;">
-        <li><span class="option-tag">-A</span> : Active plusieurs fonctionnalités avancées de nmap en une seule commande, ce qui simplifie l'analyse approfondie. Elle combine :</li>
+        <li><span class="option-tag">-A</span> : Active plusieurs fonctionnalités avancées de nmap en une seule commande, ce qui simplifie l'analyse approfondie. Elle combine :
         <ul style="margin-left:20px;">
           <li><strong>Détection des versions des services (-sV)</strong> : Identifie les versions précises des logiciels associés aux ports ouverts.</li>
           <li><strong>Détection du système d'exploitation (-O)</strong> : Tente de déterminer le système d'exploitation de la cible.</li>
           <li><strong>Traceroute</strong> : Analyse le chemin réseau emprunté pour atteindre la cible.</li>
           <li><strong>Scripts NSE spécifiques</strong> : Exécute des scripts pour collecter davantage d'informations sur les services détectés.</li>
-        </ul>
+        </ul></li>
       </ul>
       
       <p><strong>Avantages :</strong> En utilisant -A, vous n'avez pas besoin de spécifier individuellement des options telles que -sV ou -O. Cette commande est idéale pour obtenir une vue globale et détaillée de la machine cible en une seule étape.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image15.jpeg" alt="Scan -A 1" onerror="this.style.display='none'">
-        <img src="../assets/images/media/image16.jpg" alt="Scan -A 2" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image15.jpeg" alt="Scan -A 1" onerror="this.style.display='none'" loading="lazy" decoding="async">
+        <img src="../assets/images/media/image16.jpg" alt="Scan -A 2" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Avec l'option -A, toutes les informations sont regroupées en une seule commande : les ports ouverts, les services associés, leurs versions, ainsi que les logiciels en cours d'exécution. Bien que cette commande soit la plus recommandée pour obtenir une analyse complète, elle peut être relativement longue à exécuter en raison de la quantité de données collectées.</p>
@@ -916,7 +916,7 @@
       </div>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image17.jpg" alt="Scan plage réseau" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image17.jpg" alt="Scan plage réseau" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Dans ce contexte, le suffixe <code>/24</code> représente une plage de 256 adresses IP, allant de <code>192.168.43.0</code> à <code>192.168.43.255</code>.</p>
@@ -949,7 +949,7 @@
       </ul>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image18.jpg" alt="Scan vulnérabilités" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image18.jpg" alt="Scan vulnérabilités" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <ul style="margin-left:20px;">
@@ -1011,13 +1011,13 @@
       </ul>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image19.jpg" alt="Export résultats 1" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image19.jpg" alt="Export résultats 1" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       
       <p>Ces options sont très utiles pour archiver les résultats, les partager ou les intégrer dans d'autres processus d'analyse.</p>
       
       <div class="img-placeholder">
-        <img src="../assets/images/media/image20.jpg" alt="Export résultats 2" onerror="this.style.display='none'">
+        <img src="../assets/images/media/image20.jpg" alt="Export résultats 2" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
     </div>
   </div>
@@ -1092,5 +1092,6 @@
 </script>
 <script src="../assets/js/projet-bar.js"></script>
 <script src="../assets/js/palette.js" defer></script>
+<script src="../assets/js/motion.js" defer></script>
 </body>
 </html>

@@ -64,7 +64,7 @@
 
         <section class="p-sec" id="resultats">
           <h2><small>résultats</small>Performances des modèles</h2>
-          <div class="tbl"><table>
+          <div class="tbl" tabindex="0" role="region" aria-label="Tableau défilant"><table>
             <thead><tr><th>Modèle</th><th>Accuracy</th></tr></thead>
             <tbody>
               <tr class="best"><td>Régression logistique</td><td>88,5 %<span class="bar" style="width:88.5px"></span></td></tr>
@@ -73,7 +73,7 @@
             </tbody>
           </table></div>
           <figure class="chart" data-chart='{"type": "hbar", "unit": "%", "aria": "Accuracy des trois modèles", "rows": [["Régression logistique", 0.886], ["Naive Bayes", 0.855], ["Random Forest", 0.848]]}'><figcaption>Accuracy sur 10 000 critiques de test.</figcaption></figure>
-          <div class="tbl"><table>
+          <div class="tbl" tabindex="0" role="region" aria-label="Tableau défilant"><table>
             <thead><tr><th>Régression logistique</th><th>Prédit négatif</th><th>Prédit positif</th></tr></thead>
             <tbody>
               <tr><td>Réel négatif</td><td>4 355</td><td>645</td></tr>
@@ -105,5 +105,6 @@
   <script src="../assets/js/net3d.js" defer></script>
 <script src="../assets/js/charts.js" defer></script>
 <script src="../assets/js/palette.js" defer></script>
+<script src="../assets/js/motion.js" defer></script>
 </body>
 </html>

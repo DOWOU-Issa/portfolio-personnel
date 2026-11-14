@@ -67,14 +67,14 @@
 
         <section class="p-sec" id="resultats">
           <h2><small>résultats</small>Comparaison des deux modèles</h2>
-          <div class="tbl"><table>
+          <div class="tbl" tabindex="0" role="region" aria-label="Tableau défilant"><table>
             <thead><tr><th>Modèle</th><th>Accuracy</th><th>F1 macro</th><th>Données d'entraînement</th><th>Temps</th></tr></thead>
             <tbody>
               <tr><td>TF-IDF + régression logistique</td><td>90,58 %</td><td>90,54 %</td><td>20 000 articles</td><td>18 s (CPU)</td></tr>
               <tr class="best"><td>DistilBERT fine-tuné</td><td>92,32 %</td><td>92,31 %</td><td>20 000 articles</td><td>2,7 min (GPU)</td></tr>
             </tbody>
           </table></div>
-          <div class="tbl"><table>
+          <div class="tbl" tabindex="0" role="region" aria-label="Tableau défilant"><table>
             <thead><tr><th>Classe</th><th>F1 baseline</th><th>F1 DistilBERT</th><th>Écart</th></tr></thead>
             <tbody>
               <tr class="best"><td>World</td><td>0,9084</td><td>0,9326</td><td>+0,024</td></tr>
@@ -113,5 +113,6 @@
   <script src="../assets/js/net3d.js" defer></script>
 <script src="../assets/js/charts.js" defer></script>
 <script src="../assets/js/palette.js" defer></script>
+<script src="../assets/js/motion.js" defer></script>
 </body>
 </html>

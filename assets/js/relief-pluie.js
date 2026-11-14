@@ -12,7 +12,7 @@
     ".dw-hero{position:relative;height:clamp(360px,56vh,500px);background:#070b10;border-bottom:1px solid #1c2a36;overflow:hidden;font-family:'JetBrains Mono',ui-monospace,Consolas,monospace}" +
     ".dw-hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}" +
     ".dw-hero .dw-txt{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:36px clamp(16px,4vw,32px);pointer-events:none}" +
-    ".dw-hero .dw-path{font-size:12px;color:#5fd0c4;margin:0 0 12px}.dw-hero .dw-path span{color:#5d7184}" +
+    ".dw-hero .dw-path{font-size:12px;color:#5fd0c4;margin:0 0 12px}.dw-hero .dw-path span{color:#7d93a6}" +
     ".dw-hero h2{font:800 clamp(30px,5vw,56px)/1 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;color:#fff;margin:0 0 12px;max-width:14ch}" +
     ".dw-hero h2 em{font-style:normal;color:#5fd0c4}" +
     ".dw-hero p{font:400 15px/1.55 'Instrument Sans',system-ui,sans-serif;color:#a5b6c6;max-width:44ch;margin:0}" +

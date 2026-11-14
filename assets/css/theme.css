@@ -5,7 +5,7 @@
    ========================================================= */
 :root{
   --bg:#070b10; --bg2:#0c1219; --bg3:#111a23; --line:#1c2a36; --line2:#2c4a55;
-  --fg:#d7e3ee; --fg-strong:#ffffff; --mute:#8aa0b3; --dim:#5d7184;
+  --fg:#d7e3ee; --fg-strong:#ffffff; --mute:#8aa0b3; --dim:#7d93a6;
   --acc:#5fd0c4; --acc-ink:#061014; --warm:#e8b86a;
   --f-d:"Bricolage Grotesque",system-ui,sans-serif;
   --f-b:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -285,3 +285,15 @@ figure.fig figcaption{font:400 12px var(--f-m);color:var(--mute)}
 .csv-view{border:1px solid var(--line2);background:var(--bg2);padding:12px;display:grid;gap:10px}
 .csv-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font:500 13px var(--f-m);color:var(--fg-strong)}
 .csv-view .tbl td,.csv-view .tbl th{font-size:12.5px;padding:7px 10px}
+
+/* Transitions entre pages (navigateurs récents) : fondu doux, menu fixe */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:mv-page-out .22s cubic-bezier(.4,0,.2,1) both}
+::view-transition-new(root){animation:mv-page-in .4s cubic-bezier(.22,1,.36,1) both}
+.site-head{view-transition-name:site-head}
+@keyframes mv-page-out{to{opacity:0;transform:translateY(-6px)}}
+@keyframes mv-page-in{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+main h1.title,.dw-fiche h1{view-transition-name:vt-hero}
+html.vt-leaving main h1.title,html.vt-leaving .dw-fiche h1{view-transition-name:none}
+::view-transition-group(vt-hero){animation-duration:.55s;animation-timing-function:cubic-bezier(.22,1,.36,1)}

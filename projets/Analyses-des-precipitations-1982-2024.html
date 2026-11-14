@@ -426,7 +426,7 @@
       </table>
       <div class="img-placeholder">
         Figure 2 — Régime pluviométrique mensuel moyen (barres = somme, losanges rouges = jours de pluie).
-        <img src="../assets/images/figure2_mensuel.png" alt="Figure 2 : Régime mensuel" onerror="this.style.display='none'">
+        <img src="../assets/images/figure2_mensuel.png" alt="Figure 2 : Régime mensuel" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       <div class="info-note"><strong>Régime unimodal typique</strong> : saison des pluies Juin–Octobre (76% du total). Pic maximal en Août (752 mm, 27.6 jours). Saison sèche Nov–Fév (3% annuel).</div>
     </div>
@@ -448,7 +448,7 @@
       </table>
       <div class="img-placeholder">
         Figure 3 — Nuages de points : Somme vs Jours de pluie, Écart-type, Max journalier (droite de régression en rouge).
-        <img src="../assets/images/figure3_nuages_points.png" alt="Figure 3 : Nuages de points" onerror="this.style.display='none'">
+        <img src="../assets/images/figure3_nuages_points.png" alt="Figure 3 : Nuages de points" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       <div class="info-note">Corrélation maximale Somme vs P95 (r=0.78). Les années humides génèrent davantage d'épisodes intenses.</div>
     </div>
@@ -468,11 +468,11 @@
       </table>
       <div class="img-placeholder">
         Figure 4 — Évolution du nombre annuel de jours de pluie (1982–2024) avec tendance.
-        <img src="../assets/images/figure4_jours_pluie.png" alt="Figure 4 : Évolution jours de pluie" onerror="this.style.display='none'">
+        <img src="../assets/images/figure4_jours_pluie.png" alt="Figure 4 : Évolution jours de pluie" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       <div class="img-placeholder">
         Figure 5 — Distribution des totaux annuels par décennie (violinplot + observations individuelles).
-        <img src="../assets/images/figure5_distribution_decennie.png" alt="Figure 5 : Distribution par décennie" onerror="this.style.display='none'">
+        <img src="../assets/images/figure5_distribution_decennie.png" alt="Figure 5 : Distribution par décennie" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       <div class="info-note"><strong>Conclusion robuste :</strong> aucune tendance significative détectée sur 43 ans (régression, Mann-Kendall). Régime pluviométrique stationnaire.</div>
     </div>
@@ -492,7 +492,7 @@
       </table>
       <div class="img-placeholder">
         Figure 6 — Gauche : scores des années sur PC1×PC2 (couleur = année). Droite : cercle de corrélation des variables.
-        <img src="../assets/images/figure6_acp_biplot.png" alt="Figure 6 : ACP biplot" onerror="this.style.display='none'">
+        <img src="../assets/images/figure6_acp_biplot.png" alt="Figure 6 : ACP biplot" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       <div class="info-note">PC1 (53.4%) : Somme, P95, Écart-type, Jours_Pluie positifs. PC2 (29.3%) : oppose Jours_Pluie (fréquence) à Écart-type et Max (intensité). Années humides et intenses : 2003, 2008.</div>
     </div>
@@ -512,7 +512,7 @@
       </table>
       <div class="img-placeholder">
         Figure 7 — Prévision pluviométrique 2025–2031 avec intervalle de confiance 90% (bootstrap 500 itérations).
-        <img src="../assets/images/figure7_prevision.png" alt="Figure 7 : Prévision 2025-2031" onerror="this.style.display='none'">
+        <img src="../assets/images/figure7_prevision.png" alt="Figure 7 : Prévision 2025-2031" onerror="this.style.display='none'" loading="lazy" decoding="async">
       </div>
       <div class="info-note">Prévision basée sur tendance polynomiale degré 2 + bootstrap. IC90 large (±1100 mm) reflète la forte variabilité naturelle. Ne remplace pas un modèle climatique régional.</div>
     </div>
@@ -581,5 +581,6 @@
 <script src="../assets/js/projet-bar.js"></script>
 <script src="../assets/js/relief-pluie.js"></script>
 <script src="../assets/js/palette.js" defer></script>
+<script src="../assets/js/motion.js" defer></script>
 </body>
 </html>

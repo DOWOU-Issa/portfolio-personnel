@@ -7,7 +7,9 @@
   var THREE_URL = (document.currentScript && document.currentScript.src ? new URL("vendor/three.min.js", document.currentScript.src).href : "assets/js/vendor/three.min.js");
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var saveData = navigator.connection && navigator.connection.saveData;
-  if (reduce || saveData) return;
+  var slow = navigator.connection && /(^|-)2g|3g/.test(navigator.connection.effectiveType || "");
+  // Sur téléphone ou connexion lente, on évite de charger three.js (600 Ko) pour un simple décor.
+  if (reduce || saveData || slow || innerWidth < 820) return;
   try { var t = document.createElement("canvas"); if (!(t.getContext("webgl") || t.getContext("experimental-webgl"))) return; } catch (e) { return; }
 
   function load(cb) {
