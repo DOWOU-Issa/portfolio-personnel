@@ -297,3 +297,9 @@ figure.fig figcaption{font:400 12px var(--f-m);color:var(--mute)}
 main h1.title,.dw-fiche h1{view-transition-name:vt-hero}
 html.vt-leaving main h1.title,html.vt-leaving .dw-fiche h1{view-transition-name:none}
 ::view-transition-group(vt-hero){animation-duration:.55s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+
+/* Cibles tactiles >= 44px sur écrans tactiles */
+@media (pointer:coarse){
+  .btn,.btn.small,.filters button,.btn-tertiary,.btn-secondary,.video-link,.nav a,.home-links a{min-height:44px}
+  .btn.small,.filters button,.btn-tertiary,.btn-secondary,.video-link{display:inline-flex;align-items:center}
+}
