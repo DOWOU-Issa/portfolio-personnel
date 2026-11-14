@@ -288,30 +288,12 @@ figure.fig figcaption{font:400 12px var(--f-m);color:var(--mute)}
 
 /* Transitions entre pages (navigateurs récents) : fondu doux, menu fixe */
 @view-transition{navigation:auto}
-::view-transition-old(root){animation:mv-page-out .22s cubic-bezier(.4,0,.2,1) both}
-::view-transition-new(root){animation:mv-page-in .4s cubic-bezier(.22,1,.36,1) both}
+::view-transition-old(root){animation:mv-page-out .15s cubic-bezier(.4,0,.2,1) both}
+::view-transition-new(root){animation:mv-page-in .28s cubic-bezier(.22,1,.36,1) both}
 .site-head{view-transition-name:site-head}
 @keyframes mv-page-out{to{opacity:0;transform:translateY(-6px)}}
 @keyframes mv-page-in{from{opacity:0;transform:translateY(10px)}}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 main h1.title,.dw-fiche h1{view-transition-name:vt-hero}
 html.vt-leaving main h1.title,html.vt-leaving .dw-fiche h1{view-transition-name:none}
-::view-transition-group(vt-hero){animation-duration:.55s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
-
-/* Cibles tactiles >= 44px sur écrans tactiles */
-@media (pointer:coarse){
-  .btn,.btn.small,.filters button,.btn-tertiary,.btn-secondary,.video-link,.home-links a{min-height:44px}
-  .btn.small,.filters button,.btn-tertiary,.btn-secondary,.video-link{display:inline-flex;align-items:center}
-}
-
-/* Correctifs d'affichage mobile */
-.project-header{flex-wrap:wrap}
-.project-header h2,.project-header h3{flex:1 1 220px;min-width:0}
-@media (max-width:420px){
-  .site-nav{flex-wrap:nowrap;gap:4px 12px;font-size:12px;overflow-x:auto;scrollbar-width:none}
-  .site-nav::-webkit-scrollbar{display:none}
-  .site-nav a{white-space:nowrap}
-}
-@media (max-width:640px){
-  body:has(.tour-launch) footer{padding-bottom:120px}
-}
+::view-transition-group(vt-hero){animation-duration:.4s;animation-timing-function:cubic-bezier(.22,1,.36,1)}

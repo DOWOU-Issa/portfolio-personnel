@@ -67,6 +67,7 @@
     requestAnimationFrame(loop);
     requestAnimationFrame(function () { canvas.classList.add("on"); });
   }
-  var go = function () { load(start); };
+  // Le décor 3D ne tourne que sur l'accueil : sur les autres pages, il ralentissait chaque changement de page.
+  var go = function () { if ((document.body.getAttribute("data-net") || "page") !== "home") return; load(start); };
   if ("requestIdleCallback" in window) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 400);
 })();

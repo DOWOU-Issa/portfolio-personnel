@@ -29,8 +29,8 @@
     /* Vignettes vidéo : léger zoom */
     '@media (hover:hover){.video-card:hover .vthumb{transform:scale(1.04);opacity:.85}}' +
     /* Titres : dévoilement doux par le bas, comme un rideau */
-    'html.mv .mv-t{clip-path:inset(0 0 100% 0);transform:translateY(.35em);transition:clip-path .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}' +
-    'html.mv .mv-t.mv-in{clip-path:inset(-10% -5% -15% -5%);transform:none}' +
+    'html.mv .mv-t{opacity:0;transform:translateY(.4em);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}' +
+    'html.mv .mv-t.mv-in{opacity:1;transform:none}' +
     /* Carte vers page projet : morphing partagé */
     'main h1.title,.dw-fiche h1{view-transition-name:vt-hero}' +
     'html.vt-leaving main h1.title,html.vt-leaving .dw-fiche h1{view-transition-name:none}' +
@@ -121,13 +121,11 @@
     cinema(); tilt();
     document.addEventListener('click', shareOnClick, true);
     // Titres : dévoilement en rideau à leur arrivée à l'écran
-    // (le titre masqué n'est pas observable lui-même : on observe un repère invisible placé juste avant)
-    var tio = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { e.target._mvTitle.classList.add('mv-in'); tio.unobserve(e.target); } }); }, { rootMargin: '0px 0px -10% 0px' });
-    document.querySelectorAll('main h2').forEach(function (h) {
-      h.classList.remove('mv-r'); h.classList.add('mv-t');
-      var m = document.createElement('span'); m.setAttribute('aria-hidden', 'true'); m.style.cssText = 'display:block;height:1px;margin-bottom:-1px';
-      m._mvTitle = h; h.parentNode.insertBefore(m, h); tio.observe(m);
-    });
+    var tio = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('mv-in'); tio.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('main h1.title, main h2, .dw-fiche h1').forEach(function (h) { h.classList.remove('mv-r'); h.classList.add('mv-t'); tio.observe(h); });
+    // Filet de sécurité : tout ce qui est déjà au-dessus de l'écran (retour arrière, ancre, impression) est affiché
+    function flush() { document.querySelectorAll('.mv-r:not(.mv-in), .mv-t:not(.mv-in)').forEach(function (el) { if (el.getBoundingClientRect().top < innerHeight) el.classList.add('mv-in'); }); }
+    addEventListener('load', flush); addEventListener('beforeprint', function () { document.querySelectorAll('.mv-r, .mv-t').forEach(function (el) { el.classList.add('mv-in'); }); });
     // Les listes construites par script (page Projets, recherche) sont révélées aussi
     var list = document.getElementById('projectList');
     if (list && 'MutationObserver' in window) new MutationObserver(function () { prepare(list); }).observe(list, { childList: true });
