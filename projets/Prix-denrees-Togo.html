@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prix des denrées au Togo — Dowou Issa</title>
-  <meta name="description" content="51 179 relevés PAM, panel de 36 marchés : saisonnalité, écarts régionaux et prévision SARIMA (4,1 % d&#x27;erreur).">
+  <meta name="description" content="51 179 relevés PAM, panel de 36 marchés : saisonnalité, écarts régionaux et prévision SARIMA (4,3 % d&#x27;erreur).">
   <meta name="theme-color" content="#070b10">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
   <meta property="og:site_name" content="Dowou Issa">
   <meta property="og:locale" content="fr_FR">
   <meta property="og:title" content="Prix des denrées au Togo — Dowou Issa">
-  <meta property="og:description" content="51 179 relevés PAM, panel de 36 marchés : saisonnalité, écarts régionaux et prévision SARIMA (4,1 % d&#x27;erreur).">
+  <meta property="og:description" content="51 179 relevés PAM, panel de 36 marchés : saisonnalité, écarts régionaux et prévision SARIMA (4,3 % d&#x27;erreur).">
   <meta property="og:url" content="https://dowou-issa.github.io/portfolio-personnel/projets/Prix-denrees-Togo.html">
   <meta property="og:image" content="https://dowou-issa.github.io/portfolio-personnel/assets/images/og-cover.jpg">
   <meta property="og:image:width" content="1200">
@@ -85,12 +85,25 @@
           <div class="tbl" tabindex="0" role="region" aria-label="Tableau défilant"><table>
             <thead><tr><th>Période de test (12 mois)</th><th>Erreur SARIMA</th><th>Erreur « prix figé »</th></tr></thead>
             <tbody>
-              <tr class="best"><td>nov. 2024 → oct. 2025 (année normale)</td><td>4,1 %</td><td>13,1 %</td></tr>
+              <tr class="best"><td>nov. 2024 → oct. 2025 (année normale)</td><td>4,3 %</td><td>13,1 %</td></tr>
               <tr><td>nov. 2025 → oct. 2026 (année de la chute)</td><td>91,7 %</td><td>70,6 %</td></tr>
             </tbody>
           </table></div>
           <p>Sur une année normale, le modèle saisonnier divise l'erreur par trois par rapport à la référence naïve. En revanche, aucun des deux n'anticipe la chute de 2025–2026, sans précédent dans l'historique : un modèle qui ne connaît que les prix passés ne voit pas venir un choc d'offre.</p>
           <figure class="fig"><div class="pad"><img src="../assets/images/projets/prix/06_prevision_mais.png" alt="Prix du maïs observé et prévision sur 12 mois avec intervalle" loading="lazy"></div><figcaption>Maïs blanc : prix observé et prévision sur 12 mois (intervalle à 80 %).</figcaption></figure>
+        </section>
+
+        <section class="p-sec" id="avance">
+          <h2><small>analyses avancées</small>Pouvoir d'achat, marchés et prévisions</h2>
+          <p><b>Pouvoir d'achat.</b> Un mois de SMIG achetait 224 kg de maïs en 2016, seulement 140 kg en juin 2022. La hausse du SMIG (35 000 → 52 500 FCFA en janvier 2023) le remonte à 207 kg, et la chute des prix le porte à 352 kg en octobre 2026.</p>
+          <figure class="fig"><div class="pad"><img src="../assets/images/projets/prix/07_pouvoir_achat.png" alt="Kilos de maïs achetables avec un mois de SMIG, 2016-2026" loading="lazy"></div><figcaption>Kilos de maïs achetables avec un mois de SMIG.</figcaption></figure>
+          <p><b>Intégration des marchés.</b> Les variations mensuelles du maïs sont peu corrélées entre régions (0,27 à 0,39 en moyenne) : les marchés restent assez cloisonnés, et aucune région ne « transmet » clairement ses prix aux autres.</p>
+          <figure class="fig"><div class="pad"><img src="../assets/images/projets/prix/08_integration_regions.png" alt="Corrélation des variations du prix du maïs entre régions" loading="lazy"></div><figcaption>Corrélation des variations mensuelles du maïs entre régions.</figcaption></figure>
+          <p><b>Prévision à 1 mois.</b> J'ai comparé quatre méthodes. Sur une année normale, SARIMA fait le mieux (3,7 % d'erreur, contre 4,9 % pour le prix figé). Ajouter le prix mondial du maïs (SARIMAX, 3,9 %) n'aide pas, et le gradient boosting fait moins bien (5,1 %). Pendant la chute de 2026, aucune ne fait mieux que le prix figé.</p>
+          <figure class="fig"><div class="pad"><img src="../assets/images/projets/prix/09_prevision_comparee.png" alt="Erreur de prévision de quatre méthodes sur deux périodes" loading="lazy"></div><figcaption>Erreur moyenne de prévision à 1 mois selon la méthode.</figcaption></figure>
+          <p><b>Alertes de marché.</b> En octobre 2026, 23 couples marché × denrée sur 224 s'écartaient de plus de 25 % de leur prix de saison attendu, surtout des baisses.</p>
+          <figure class="fig"><div class="pad"><img src="../assets/images/projets/prix/10_alertes.png" alt="Marchés en alerte en octobre 2026" loading="lazy"></div><figcaption>Marchés dont le prix s'écarte de plus de 25 % du prix attendu.</figcaption></figure>
+          <p>Ces analyses sont mises à jour chaque mois dans l'<a href="Observatoire-prix-Togo.html">Observatoire des prix alimentaires au Togo</a>, un tableau de bord interactif.</p>
         </section>
 
         <section class="p-sec" id="conclusion">

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observatoire des prix alimentaires au Togo | Dowou Issa</title>
+  <meta name="description" content="Tableau de bord interactif des prix des denrées au Togo : évolution, saisonnalité, prévision et alertes de marché, mis à jour chaque mois.">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Dowou Issa">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Observatoire des prix alimentaires au Togo">
+  <meta property="og:description" content="Tableau de bord interactif des prix des denrées au Togo : évolution, saisonnalité, prévision et alertes de marché, mis à jour chaque mois.">
+  <meta property="og:url" content="https://dowou-issa.github.io/portfolio-personnel/projets/Observatoire-prix-Togo.html">
+  <meta property="og:image" content="https://dowou-issa.github.io/portfolio-personnel/assets/images/og-cover.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://dowou-issa.github.io/portfolio-personnel/projets/Observatoire-prix-Togo.html">
+<style>
+#observatoire{opacity:.4;transition:opacity .4s}#observatoire.ok{opacity:1}
+.obs-ctrl{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin:8px 0 18px}
+.obs-ctrl label{display:grid;gap:6px;font:500 12px var(--f-m);color:var(--mute)}
+.obs-ctrl select{background:var(--bg2);color:var(--fg-strong);border:1px solid var(--line2);padding:9px 12px;font:500 14px var(--f-b);min-width:200px}
+#obs-maj{font:400 12px var(--f-m);color:var(--mute);margin:0 0 20px}
+.obs-card{border:1px solid var(--line);background:var(--bg);padding:16px 18px;margin-bottom:18px}
+.obs-card h2{font:700 18px var(--f-d);color:var(--fg-strong);margin:0 0 4px}.obs-card p.sub{margin:0 0 10px;color:var(--mute);font-size:14px}
+.obs-card svg{width:100%;height:auto;display:block}
+.obs-grid{stroke:var(--line);stroke-width:1}.obs-ax{fill:var(--mute);font:11px var(--f-m)}.obs-val{fill:var(--fg);font:600 11px var(--f-m)}
+.obs-line{fill:none;stroke:var(--acc);stroke-width:2.2}.obs-prev{fill:none;stroke:#e8b86a;stroke-width:2.2;stroke-dasharray:6 4}.obs-band{fill:rgba(232,184,106,.18)}
+.obs-dot{fill:var(--fg-strong)}.obs-tip{fill:var(--fg-strong);font:600 13px var(--f-m)}
+.obs-up{fill:#c0574a}.obs-down{fill:#4b8fc0}
+.obs-two{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
+.obs-frame{fill:none;stroke:var(--line)}.obs-faint{fill:var(--line2)}.obs-alert-up{fill:rgba(192,87,74,.75)}.obs-alert-down{fill:rgba(75,143,192,.75)}
+#obs-alertes{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:420px;overflow:auto}
+#obs-alertes li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;border-bottom:1px solid var(--line);padding:8px 0}
+#obs-alertes small{color:var(--mute);font:11px var(--f-m)}#obs-alertes em{grid-column:1/-1;font-style:normal;color:var(--mute);font-size:13px}
+#obs-alertes span{font:700 15px var(--f-m);grid-row:1/3;grid-column:2;align-self:center}#obs-alertes .up{color:#e07a6d}#obs-alertes .down{color:#6fb0e0}
+#obs-alertes .none{color:var(--mute);display:block}
+@media(max-width:760px){.obs-two{grid-template-columns:1fr}.obs-two svg{max-width:220px;margin:0 auto}}
+</style>
+</head>
+<body data-net="page">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="site-head"><div class="in"><a class="brand" href="../index.html">dowou<i>.</i>issa</a>
+    <nav aria-label="Navigation principale"><ul class="site-nav"><li><a href="../index.html">accueil</a></li><li><a href="../cv.html">cv</a></li><li><a href="../projets/projets.html" aria-current="page">projets</a></li><li><a href="../github.html">github</a></li><li><a href="../video.html">vidéos</a></li><li><a href="../contact.html">contact</a></li></ul></nav></div></header>
+  <main id="contenu" class="wrap">
+    <header class="p-head">
+      <p class="path reveal"><a href="projets.html">~/projets</a>/<span>observatoire-prix</span></p>
+      <h1 class="title reveal d1">Observatoire des <em>prix alimentaires</em> au Togo.</h1>
+      <div class="p-meta reveal d2"><span>source <b>Programme alimentaire mondial (PAM), via HDX</b></span><span>mise à jour <b>automatique chaque mois</b></span></div>
+    </header>
+
+    <section id="observatoire" data-src="../assets/data/observatoire.json" aria-label="Tableau de bord interactif">
+      <div class="obs-ctrl">
+        <label>Denrée <select id="obs-prod"></select></label>
+        <label>Région <select id="obs-reg"></select></label>
+      </div>
+      <p id="obs-maj">Chargement des données…</p>
+
+      <div class="kpis">
+        <div><strong id="obs-k1">–</strong><span id="obs-k1l">FCFA/kg</span></div>
+        <div><strong id="obs-k2">–</strong><span>sur un an</span></div>
+        <div><strong id="obs-k3">–</strong><span>achetables avec un mois de SMIG (national)</span></div>
+        <div><strong id="obs-k4">–</strong><span id="obs-k4l">prévision</span></div>
+      </div>
+
+      <div class="obs-card"><h2>Évolution du prix</h2><p class="sub">Prix médian mensuel sur les marchés suivis depuis 2016. En pointillés : la prévision sur 6 mois (au niveau national), avec son intervalle à 80 %. Survolez la courbe pour lire un mois.</p><div id="obs-courbe"></div></div>
+      <div class="obs-card"><h2>Saisonnalité</h2><p class="sub">Écart moyen au prix de l'année selon le mois (2016–2025) : quand acheter, quand éviter.</p><div id="obs-saison"></div></div>
+      <div class="obs-card"><h2>Alertes de marché</h2><p class="sub">Marchés dont le dernier prix s'écarte de plus de 25 % de leur prix de saison attendu. En rouge : hausse anormale, en bleu : baisse anormale.</p>
+        <div class="obs-two"><div id="obs-carte"></div><ul id="obs-alertes"></ul></div></div>
+    </section>
+
+    <p class="note">Méthode, limites et code : voir le projet <a href="Prix-denrees-Togo.html">Prix des denrées au Togo</a> et le dépôt <a href="https://github.com/DOWOU-Issa/prix-denrees-togo" target="_blank" rel="noopener">prix-denrees-togo</a>. Les prévisions prolongent les cycles passés et ne prévoient pas les chocs.</p>
+
+
+      </div>
+    </div>
+  </main>
+  <footer class="site-foot"><div class="in"><span>© 2026 Dowou Issa</span><span><a href="https://github.com/DOWOU-Issa" target="_blank" rel="noopener">github.com/DOWOU-Issa</a> · <a href="https://www.linkedin.com/in/issa-dowou-4abbaa3a1" target="_blank" rel="noopener">linkedin</a> · <a href="mailto:dowouissa69@gmail.com">dowouissa69@gmail.com</a></span></div></footer>
+  <script src="../assets/js/net3d.js" defer></script>
+  <script src="../assets/js/palette.js" defer></script>
+<script src="../assets/js/motion.js" defer></script>
+<script src="../assets/js/observatoire.js" defer></script>
+</body>
+</html>
